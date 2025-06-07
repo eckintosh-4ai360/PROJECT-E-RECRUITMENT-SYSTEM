@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h4 mb-0">Apply for {{ job.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Job Details</h5>
+                        <p><strong>Department:</strong> {{ job.department }}</p>
+                        <p><strong>Description:</strong></p>
+                        <p>{{ job.description|nl2br }}</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('main.apply_for_job', job_id=job.job_id) }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="resume" class="form-label">Select Resume</label>
+                            {{ form.resume(class="form-select") }}
+                            {% for error in form.resume.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            {% if not form.resume.choices %}
+                            <div class="alert alert-warning mt-2">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                You need to <a href="{{ url_for('main.user_profile') }}">upload a resume</a> before applying.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cover_letter" class="form-label">Cover Letter</label>
+                            {{ form.cover_letter(class="form-control", rows=6) }}
+                            {% for error in form.cover_letter.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Explain why you're a good fit for this position (100-2000 characters).
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" 
+                               class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

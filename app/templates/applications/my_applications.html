@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-primary mb-3">My Applications</h1>
+            <p class="lead text-muted">
+                Track the status of your job applications
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary">
+                <i class="bi bi-briefcase"></i> Browse Jobs
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Filter by Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="submitted" {{ 'selected' if request.args.get('status') == 'submitted' }}>Submitted</option>
+                        <option value="under_review" {{ 'selected' if request.args.get('status') == 'under_review' }}>Under Review</option>
+                        <option value="interview_scheduled" {{ 'selected' if request.args.get('status') == 'interview_scheduled' }}>Interview Scheduled</option>
+                        <option value="accepted" {{ 'selected' if request.args.get('status') == 'accepted' }}>Accepted</option>
+                        <option value="rejected" {{ 'selected' if request.args.get('status') == 'rejected' }}>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="department" class="form-label">Filter by Department</label>
+                    <select name="department" id="department" class="form-select">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}" {{ 'selected' if request.args.get('department') == dept }}>{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Applications List -->
+    {% if applications %}
+    <div class="row">
+        {% for application in applications %}
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <!-- Job Title and Company -->
+                        <div class="col-md-4">
+                            <h5 class="card-title mb-1">{{ application.job.title }}</h5>
+                            <p class="text-muted mb-0">{{ application.job.department }}</p>
+                        </div>
+
+                        <!-- Application Status -->
+                        <div class="col-md-2">
+                            <span class="badge bg-{{ 'success' if application.status.value == 'Accepted' 
+                                                else 'warning' if application.status.value == 'Under Review' 
+                                                else 'info' if application.status.value == 'Submitted' 
+                                                else 'danger' if application.status.value == 'Rejected' 
+                                                else 'secondary' }} px-3 py-2">
+                                {{ application.status_display }}
+                            </span>
+                        </div>
+
+                        <!-- Application Date -->
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Applied on</small>
+                            {{ application.application_date.strftime('%B %d, %Y') }}
+                        </div>
+
+                        <!-- Interview Details (if any) -->
+                        <div class="col-md-2">
+                            {% if application.interview %}
+                            <small class="text-muted d-block">Interview</small>
+                            {{ application.interview.scheduled_date.strftime('%B %d, %Y') }}
+                            {% endif %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-md-1 text-end">
+                            <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
+        <h3>No Applications Found</h3>
+        <p class="text-muted">
+            {% if request.args %}
+            No applications match your filter criteria.
+            <a href="{{ url_for('main.my_applications') }}" class="btn btn-link">Clear filters</a>
+            {% else %}
+            You haven't applied to any jobs yet.
+            {% endif %}
+        </p>
+        <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary mt-3">
+            <i class="bi bi-briefcase"></i> Browse Available Jobs
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

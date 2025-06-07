@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <h2>Open Positions</h2>
+    <hr>
+    {% if jobs %}
+        <div class="list-group">
+            {% for job in jobs %}
+                <a href="{{ url_for("main.view_job_detail", job_id=job.job_id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ job.title }}</h5>
+                        <small>Posted: {{ job.posted_date.strftime("%Y-%m-%d") }}</small>
+                    </div>
+                    <p class="mb-1">Department: {{ job.department }}</p>
+                    <small>Status: <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status }}</span></small>
+                    {% if job.closing_date %}
+                        <small class="ms-2"> | Closes: {{ job.closing_date.strftime("%Y-%m-%d") }}</small>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>There are currently no open positions listed.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,155 @@
+* {
+    font-family: "Sora", sans-serif;
+}
+
+/* body {
+    background-image: url("../bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    z-index: 1;
+} */
+
+#umatTitle {
+    color: #6351ce;
+    /* background-color: #1c2331; */
+    font-weight: 800;
+}
+
+.loginbtn1 {
+    padding: 5px;
+    background-color: #1c2331;
+    margin-left: 5px;
+    border-radius: 10px;
+}
+
+.loginbtn2 {
+    padding: 5px;
+    background-color: #2e3a53;
+    margin-left: 5px;
+    border-radius: 10px;
+}
+
+/* Form field styles */
+.form-control:focus {
+    border-color: #6351ce;
+    box-shadow: 0 0 0 0.2rem rgba(99, 81, 206, 0.25);
+}
+
+/* Auth form button styles */
+.auth-form-btn {
+    background-color: #1c2331 !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    width: 100%;
+}
+
+.auth-form-btn:hover {
+    background-color: #2e3a53 !important;
+}
+
+/* Auth form input placeholder styles */
+.auth-form input::placeholder {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* Profile page styles */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background-color: #6351ce !important;
+}
+
+.btn-primary {
+    background-color: #6351ce !important;
+    border: none !important;
+}
+
+.btn-primary:hover {
+    background-color: #5344b0 !important;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.card {
+    border: none;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.list-group-item {
+    border-left: 0;
+    border-right: 0;
+}
+
+.list-group-item:first-child {
+    border-top: 0;
+}
+
+.list-group-item:last-child {
+    border-bottom: 0;
+}
+
+.main-container {
+    position: relative;
+    /* For ::before pseudo-element positioning */
+    z-index: 0;
+    /* Establish a stacking context */
+}
+
+.main-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../umat.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 20%;
+    opacity: 0.2;
+    z-index: -1;
+ 
+    border-radius: inherit;
+    /* Inherit from .main-container if it has .rounded-3 */
+}
+
+.main-container>.container-fluid {
+    /* Target direct child to ensure it's above ::before */
+    position: relative;
+}
+
+/* Styles for the new list group background */
+.list-group-custom-bg {
+    position: relative;
+    /* Required for positioning the pseudo-element */
+}
+
+.list-group-custom-bg .list-group-item {
+    background-color: transparent !important;
+    /* Override Bootstrap's default white background */
+    color: #333333;
+}
+
+.container {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}
