@@ -1,5 +1,6 @@
 from app import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.utils import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import Enum
 import enum
@@ -38,6 +39,13 @@ class User(UserMixin, db.Model):
     role = db.Column(Enum(UserRole, native_enum=False), nullable=False, default=UserRole.candidate)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
     updated_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    
+    @property
+    def profile_image_url(self):
+        """Returns the URL for the user's profile image"""
+        if self.profile_image:
+            return f"/static/img/{self.profile_image}"
+        return None
 
     # Relationships
     candidate_profile = db.relationship("Candidate", backref="user", uselist=False, lazy=True, cascade="all, delete-orphan")

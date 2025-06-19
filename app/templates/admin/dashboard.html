@@ -127,11 +127,16 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     {% if application.applicant.profile_image %}
-                                    <img src="{{ url_for('static', filename='uploads/' + application.applicant.profile_image) }}" 
+                                    <img src="{{ application.applicant.profile_image_url }}" 
                                          class="rounded-circle me-2" 
                                          width="32" 
                                          height="32"
                                          alt="{{ application.applicant.username }}">
+                                    {% else %}
+                                    <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white"
+                                         style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                        {{ application.applicant.first_name[0] }}{{ application.applicant.last_name[0] }}
+                                    </div>
                                     {% endif %}
                                     <div>
                                         <div class="fw-bold">{{ application.applicant.first_name }} {{ application.applicant.last_name }}</div>

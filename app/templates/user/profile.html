@@ -8,7 +8,7 @@
             <div class="row align-items-center">
                 <div class="col-auto">
                     {% if current_user.profile_image %}
-                        <img src="{{ url_for('static', filename=current_user.profile_image) }}" 
+                        <img src="{{ current_user.profile_image_url }}" 
                              class="rounded-circle profile-image" 
                              alt="{{ current_user.username }}'s profile picture"
                              style="width: 150px; height: 150px; object-fit: cover;">
@@ -20,12 +20,19 @@
                     {% endif %}
                 </div>
                 <div class="col">
-                    <h2 class="mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</h2>
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-envelope me-2"></i>{{ current_user.email }}
-                        <span class="mx-2">•</span>
-                        <i class="bi bi-person-badge me-2"></i>{{ current_user.role.value.capitalize() }}
-                    </p>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h2 class="mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</h2>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-envelope me-2"></i>{{ current_user.email }}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-person-badge me-2"></i>{{ current_user.role.value.capitalize() }}
+                            </p>
+                        </div>
+                        <a href="{{ url_for('main.edit_profile') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil-square"></i> Edit Profile
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

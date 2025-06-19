@@ -3,7 +3,7 @@ from markupsafe import Markup
 from app import db
 from datetime import datetime
 from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus
-from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm
+from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm, ProfileEditForm
 from flask_login import login_user, logout_user, current_user, login_required
 from functools import wraps
 import os
@@ -164,7 +164,10 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         # Handle profile image upload
-        profile_image_path = save_profile_image(form.profile_image.data)
+        profile_image_path = None
+        if form.profile_image.data:
+            profile_image_path = save_profile_image(form.profile_image.data)
+            print(f"Saved profile image: {profile_image_path}")
         
         user = User(
             username=form.username.data,
@@ -192,7 +195,7 @@ def register():
             flash(f"Error creating account: {str(e)}", "danger")
             return redirect(url_for("main.register"))
     
-    return render_template("register.html", title="Register", form=form)
+    return render_template("auth/register.html", title="Register", form=form)
 
 # --- Add routes for LOGIN --- 
 @bp.route("/login", methods=["GET", "POST"])
@@ -233,6 +236,11 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for("main.index"))
 
+# --- Test route for image display ---
+@bp.route("/image-test")
+def image_test():
+    return render_template("image_test.html", title="Image Test")
+
 # --- Add routes for USER PROFILE --- 
 @bp.route("/user/profile")
 @login_required
@@ -248,12 +256,46 @@ def user_profile():
 
     upload_form = ResumeUploadForm()
     resumes = Resume.query.filter_by(candidate_id=current_user.id).order_by(Resume.upload_date.desc()).all()
-
+    
     # Fetch job matches for the candidate's resumes
-    # This could be optimized, e.g., only fetch for primary or latest resume
     matches = JobMatch.query.join(Resume).filter(Resume.candidate_id == current_user.id).order_by(JobMatch.match_score.desc()).all()
 
     return render_template("user/profile.html", title="My Profile", upload_form=upload_form, resumes=resumes, matches=matches)
+
+@bp.route("/user/edit-profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    if current_user.role != UserRole.candidate:
+        flash("Access denied.", "danger")
+        return redirect(url_for("main.index"))
+    
+    form = ProfileEditForm(current_user.username, current_user.email)
+    
+    if form.validate_on_submit():
+        # Update user data
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        
+        # Handle profile image if provided
+        if form.profile_image.data:
+            profile_image_path = save_profile_image(form.profile_image.data)
+            if profile_image_path:
+                current_user.profile_image = profile_image_path
+        
+        db.session.commit()
+        flash("Your profile has been successfully updated!", "success")
+        return redirect(url_for("main.user_profile"))
+    
+    # Pre-populate form with existing data
+    elif request.method == "GET":
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+    
+    return render_template("user/edit_profile.html", title="Edit Profile", form=form)
 
 @bp.route("/admin/dashboard")
 @login_required

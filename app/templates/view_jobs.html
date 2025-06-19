@@ -2,26 +2,26 @@
 
 {% block content %}
 <div class="container mt-4 mb-4">
-    <h2>Open Positions</h2>
+    <h2><i class="bi bi-briefcase me-2 text-primary"></i>Open Positions</h2>
     <hr>
     {% if jobs %}
-        <div class="list-group">
+        <div class="list-group job-listings">
             {% for job in jobs %}
-                <a href="{{ url_for("main.view_job_detail", job_id=job.job_id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                <a href="{{ url_for("main.view_job_detail", job_id=job.job_id) }}" class="list-group-item list-group-item-action flex-column align-items-start job-item">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ job.title }}</h5>
-                        <small>Posted: {{ job.posted_date.strftime("%Y-%m-%d") }}</small>
+                        <h5 class="mb-1"><i class="bi bi-file-earmark-text me-2 text-primary"></i>{{ job.title }}</h5>
+                        <small><i class="bi bi-calendar3 me-1"></i>Posted: {{ job.posted_date.strftime("%Y-%m-%d") }}</small>
                     </div>
-                    <p class="mb-1">Department: {{ job.department }}</p>
-                    <small>Status: <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status }}</span></small>
+                    <p class="mb-1"><i class="bi bi-building me-2 text-muted"></i>Department: {{ job.department }}</p>
+                    <small><i class="bi bi-tag me-2 text-success"></i>Status: <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status }}</span></small>
                     {% if job.closing_date %}
-                        <small class="ms-2"> | Closes: {{ job.closing_date.strftime("%Y-%m-%d") }}</small>
+                        <small class="ms-2"><i class="bi bi-calendar-x me-1 text-danger"></i>Closes: {{ job.closing_date.strftime("%Y-%m-%d") }}</small>
                     {% endif %}
                 </a>
             {% endfor %}
         </div>
     {% else %}
-        <p>There are currently no open positions listed.</p>
+        <p class="alert alert-info"><i class="bi bi-info-circle me-2"></i>There are currently no open positions listed.</p>
     {% endif %}
 </div>
 {% endblock %}

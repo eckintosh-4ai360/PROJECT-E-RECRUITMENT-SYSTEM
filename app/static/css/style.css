@@ -39,15 +39,20 @@
 
 /* Auth form button styles */
 .auth-form-btn {
-    background-color: #1c2331 !important;
+    background-color: #6351ce !important;
     border: none !important;
     color: white !important;
     padding: 10px 20px !important;
     width: 100%;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
 }
 
 .auth-form-btn:hover {
-    background-color: #2e3a53 !important;
+    background-color: #5344b0 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
 
 /* Auth form input placeholder styles */
@@ -83,11 +88,12 @@
 
 .card {
     border: none;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.3s;
 }
 
 .card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(99, 81, 206, 0.15);
 }
 
 .list-group-item {
@@ -152,4 +158,78 @@
 
 footer {
     margin-top: auto;
+}
+
+/* Job Listings Styles */
+.job-listings {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.job-item {
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    padding: 16px 20px;
+}
+
+.job-item:hover {
+    background-color: #f8f9fa;
+    border-left: 4px solid #6351ce;
+    transform: translateX(5px);
+}
+
+/* View All Open Positions Button */
+.view-all-btn {
+    background-color: #6351ce;
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    padding: 8px 20px;
+    border-radius: 5px;
+}
+
+.view-all-btn:hover {
+    background-color: #5344b0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 81, 206, 0.3);
+    color: white;
+}
+
+/* Feature Cards */
+.card .card-body i {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-body i {
+    transform: scale(1.2);
+}
+
+/* Enhance the design of the recent job postings section */
+h3 .bi {
+    color: #6351ce;
+}
+
+/* Section Titles */
+.section-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-weight: 600;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #6351ce;
+    bottom: 0;
+    left: 0;
+}
+
+.recent-jobs-section {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 10px;
 }

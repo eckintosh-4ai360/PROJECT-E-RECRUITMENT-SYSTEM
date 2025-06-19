@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>{% if job %}Edit Job{% else %}Create New Job{% endif %}</h2>
+    <h2>{% if job %}<i class="bi bi-pencil-square me-2"></i>Edit Job{% else %}<i class="bi bi-plus-circle me-2"></i>Create New Job{% endif %}</h2>
     <hr>
     <form method="POST" class="needs-validation" novalidate>
         {{ form.hidden_tag() }}
@@ -50,7 +50,7 @@
         </div>
         <div class="mb-3">
             {{ form.submit(class="btn btn-primary") }}
-            <a href="{{ url_for('main.list_jobs') }}" class="btn btn-secondary">Cancel</a>
+            <a href="{{ url_for('main.list_jobs') }}" class="btn btn-secondary"><i class="bi bi-x-circle me-1"></i>Cancel</a>
         </div>
     </form>
 </div>

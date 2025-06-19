@@ -52,6 +52,8 @@
             display: inline;
         }
     </style>
+    
+    {% block additional_styles %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar bg-white navbar-expand-lg sticky-top mb-4 shadow-lg"> 
@@ -72,22 +74,32 @@
                     {% if current_user.is_authenticated %}
                         {% if current_user.is_admin() %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for("main.admin_dashboard") }}">Admin Dashboard</a>
+                                <a class="nav-link" href="{{ url_for("main.admin_dashboard") }}">
+                                    <i class="bi bi-speedometer2 me-1"></i>Admin Dashboard
+                                </a>
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for("main.user_profile") }}">My Profile</a>
+                                <a class="nav-link" href="{{ url_for("main.user_profile") }}">
+                                    <i class="bi bi-person-circle me-1"></i>My Profile
+                                </a>
                             </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for("main.logout") }}">Logout</a>
+                            <a class="nav-link" href="{{ url_for("main.logout") }}">
+                                <i class="bi bi-box-arrow-right me-1"></i>Logout
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item loginbtn1">
-                            <a class="nav-link" style="color: white; font-weight: 500;" href="{{ url_for("main.login") }}">Login</a>
+                            <a class="nav-link" style="color: white; font-weight: 500;" href="{{ url_for("main.login") }}">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            </a>
                         </li>
                         <li class="nav-item loginbtn2">
-                            <a class="nav-link" style="color: white; font-weight: 500;" href="{{ url_for("main.register") }}">Register</a>
+                            <a class="nav-link" style="color: white; font-weight: 500;" href="{{ url_for("main.register") }}">
+                                <i class="bi bi-person-plus me-1"></i>Register
+                            </a>
                         </li>
                     {% endif %}
                 </ul>
