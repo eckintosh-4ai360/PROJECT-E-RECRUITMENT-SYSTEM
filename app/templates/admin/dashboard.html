@@ -13,46 +13,63 @@
             </a>
         </div>
     </div>
+    <hr>
 
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="card text-white bg-primary" style="border: 3px solid white; outline: 1px solid blue;">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <h2 class="card-text">{{ total_users }}</h2>
+            <a href="{{ url_for('admin.list_users') }}" class="text-decoration-none">
+                <div class="card text-white bg-primary" style="border: 3px solid white; outline: 1px solid blue;">
+                    <div class="card-body position-relative">
+                        <i class="bi bi-people position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title">Total Users</h5>
+                        <h2 class="card-text">{{ total_users }}</h2>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
+            <a href="{{ url_for('admin.active_jobs') }}" class="text-decoration-none">
             <div class="card text-white bg-success" style="border: 3px solid white; outline: 1px solid green;">
-                <div class="card-body">
+                <div class="card-body position-relative">
+                    <i class="bi bi-briefcase position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
                     <h5 class="card-title">Active Jobs</h5>
                     <h2 class="card-text">{{ total_jobs }}</h2>
                 </div>
             </div>
+            </a>
         </div>
+
+        <!-- Total Applications -->
         <div class="col-md-3">
-            <div class="card text-white bg-info" style="border: 3px solid white; outline: 1px solid rgb(0, 238, 255);">
-                <div class="card-body">
+            <a href="{{ url_for('admin.all_applications') }}" class="text-decoration-none">
+            <div class="card text-white " style="background-color:blueviolet; border: 3px solid white; outline: 1px solid blueviolet; ">
+                <div class="card-body position-relative">
+                    <i class="bi bi-file-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
                     <h5 class="card-title">Total Applications</h5>
-                    <h2 class="card-text">{{ total_applications }}</h2>
+                    <h2 class="card-text">{{ total_applications  }}</h2>
                 </div>
             </div>
+            </a>
         </div>
+
+        <!-- Total Resumes -->  
         <div class="col-md-3">
             <div class="card text-white bg-warning" style="border: 3px solid white; outline: 1px solid yellow;">
-                <div class="card-body">
+                <div class="card-body position-relative">
+                    <i class="bi bi-file-earmark-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
                     <h5 class="card-title">Total Resumes</h5>
                     <h2 class="card-text">{{ total_resumes }}</h2>
                 </div>
             </div>
         </div>
     </div>
-
+    
+    <hr>
+<!-- //***
 
     <!-- Charts Row -->
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4 mx-2">
         <!-- Monthly Activity Chart -->
         <div class="col-md-8">
             <div class="card shadow-sm">
@@ -66,7 +83,7 @@
         </div>
 
         <!-- Department Distribution -->
-        <div class="col-md-4">
+        <div class="col-md-4" style="border: 3px solid white; outline: 1px solid yellow;">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white">
                     <h5 class="card-title mb-0">Jobs by Department</h5>
@@ -77,7 +94,7 @@
             </div>
 
             <!-- Application Status -->
-            <div class="card shadow-sm">
+            <div class="card shadow-sm mb-4" style="border: 3px solid white; outline: 1px solid blue;">
                 <div class="card-header bg-white">
                     <h5 class="card-title mb-0">Application Status</h5>
                 </div>
@@ -89,37 +106,21 @@
     </div>
 
     <!-- Recent Applications Table -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <div class="d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Recent Applications</h5>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Filter by Status
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='all') }}">All</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='submitted') }}">Submitted</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='under_review') }}">Under Review</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='interview_scheduled') }}">Interview Scheduled</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='accepted') }}">Accepted</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard', status='rejected') }}">Rejected</a></li>
-                    </ul>
-                </div>
-            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Candidate</th>
-                            <th>Job Position</th>
+                            <th>Applicant</th>
+                            <th>Position</th>
                             <th>Department</th>
                             <th>Applied Date</th>
                             <th>Status</th>
                             <th>Match Score</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,14 +129,14 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     {% if application.applicant.profile_image %}
-                                    <img src="{{ application.applicant.profile_image_url }}" 
+                                    <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" 
                                          class="rounded-circle me-2" 
                                          width="32" 
                                          height="32"
-                                         alt="{{ application.applicant.username }}">
+                                         alt="{{ application.applicant.first_name }}'s profile picture">
                                     {% else %}
-                                    <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white"
-                                         style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px;">
                                         {{ application.applicant.first_name[0] }}{{ application.applicant.last_name[0] }}
                                     </div>
                                     {% endif %}
@@ -180,122 +181,42 @@
                                 <small class="text-muted">No resume</small>
                                 {% endif %}
                             </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <button type="button" 
-                                            class="btn btn-sm btn-outline-success"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#updateStatusModal{{ application.application_id }}">
-                                        <i class="bi bi-check2"></i>
-                                    </button>
-                                </div>
-                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="card-footer bg-white">
-            <nav aria-label="Applications pagination">
-                <ul class="pagination justify-content-center mb-0">
-                    <li class="page-item {{ 'disabled' if not recent_applications.has_prev }}">
-                        <a class="page-link" href="{{ url_for('main.admin_dashboard', page=recent_applications.prev_num) if recent_applications.has_prev else '#' }}" tabindex="-1">Previous</a>
-                    </li>
-                    {% for page_num in recent_applications.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
-                        {% if page_num %}
-                            <li class="page-item {{ 'active' if page_num == recent_applications.page }}">
-                                <a class="page-link" href="{{ url_for('main.admin_dashboard', page=page_num) }}">{{ page_num }}</a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                    <li class="page-item {{ 'disabled' if not recent_applications.has_next }}">
-                        <a class="page-link" href="{{ url_for('main.admin_dashboard', page=recent_applications.next_num) if recent_applications.has_next else '#' }}">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
     </div>
 </div>
-
-<!-- Status Update Modals -->
-{% for application in recent_applications.items %}
-<div class="modal fade" id="updateStatusModal{{ application.application_id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Application Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ url_for('main.update_application_status', application_id=application.application_id) }}" method="POST">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="status" class="form-label">New Status</label>
-                        <select name="status" id="status" class="form-select" required>
-                            <option value="submitted" {{ 'selected' if application.status.value == 'Submitted' }}>Submitted</option>
-                            <option value="under_review" {{ 'selected' if application.status.value == 'Under Review' }}>Under Review</option>
-                            <option value="interview_scheduled" {{ 'selected' if application.status.value == 'Interview Scheduled' }}>Interview Scheduled</option>
-                            <option value="accepted" {{ 'selected' if application.status.value == 'Accepted' }}>Accepted</option>
-                            <option value="rejected" {{ 'selected' if application.status.value == 'Rejected' }}>Rejected</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Status</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-{% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Parse the server-side data
-    const monthlyStats = {{ monthly_stats|tojson|safe }};
-    const deptStats = {{ dept_stats|tojson|safe }};
-    const appStats = {{ application_stats|tojson|safe }};
-
     // Monthly Activity Chart
-    const monthlyLabels = monthlyStats.map(stat => stat.month);
-    const applicationData = monthlyStats.map(stat => stat.applications);
-    const resumeData = monthlyStats.map(stat => stat.resumes);
-    const jobData = monthlyStats.map(stat => stat.jobs);
-
-    const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
-    if (monthlyChartCtx) {
-        new Chart(monthlyChartCtx, {
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyData = {{ monthly_stats|tojson|safe }};
+    
+    new Chart(monthlyCtx, {
             type: 'line',
             data: {
-                labels: monthlyLabels,
+            labels: monthlyData.map(item => item.month),
                 datasets: [{
                     label: 'Applications',
-                    data: applicationData,
+                data: monthlyData.map(item => item.applications),
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
                     fill: false
                 }, {
                     label: 'Resumes',
-                    data: resumeData,
+                data: monthlyData.map(item => item.resumes),
                     borderColor: 'rgb(255, 205, 86)',
                     tension: 0.1,
                     fill: false
                 }, {
                     label: 'Jobs',
-                    data: jobData,
+                data: monthlyData.map(item => item.jobs),
                     borderColor: 'rgb(54, 162, 235)',
                     tension: 0.1,
                     fill: false
@@ -319,17 +240,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
 
     // Department Distribution Chart
-    const deptChartCtx = document.getElementById('deptChart').getContext('2d');
-    if (deptChartCtx && deptStats.labels.length > 0) {
-        new Chart(deptChartCtx, {
-            type: 'pie',
+    const deptCtx = document.getElementById('deptChart').getContext('2d');
+    const deptData = {{ dept_stats|tojson|safe }};
+    
+    new Chart(deptCtx, {
+        type: 'doughnut',
             data: {
-                labels: deptStats.labels,
+            labels: deptData.labels,
                 datasets: [{
-                    data: deptStats.values,
+                data: deptData.values,
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
@@ -350,22 +271,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
 
     // Application Status Chart
-    const statusChartCtx = document.getElementById('statusChart').getContext('2d');
-    if (statusChartCtx && appStats.labels.length > 0) {
-        new Chart(statusChartCtx, {
-            type: 'doughnut',
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusData = {{ application_stats|tojson|safe }};
+    
+    new Chart(statusCtx, {
+        type: 'pie',
             data: {
-                labels: appStats.labels,
+            labels: statusData.labels,
                 datasets: [{
-                    data: appStats.values,
+                data: statusData.values,
                     backgroundColor: [
-                        'rgb(75, 192, 192)',
-                        'rgb(255, 205, 86)',
-                        'rgb(255, 99, 132)',
-                        'rgb(54, 162, 235)'
+                    'rgb(75, 192, 192)',  // Success
+                    'rgb(255, 205, 86)',  // Warning
+                    'rgb(54, 162, 235)',  // Info
+                    'rgb(255, 99, 132)',  // Danger
+                    'rgb(153, 102, 255)'  // Other
                     ]
                 }]
             },
@@ -379,8 +301,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
 });
 </script>
+{% endblock %}
+
 {% endblock %}
 

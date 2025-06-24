@@ -152,7 +152,13 @@ def allowed_file(filename):
 @bp.route("/")
 @bp.route("/index")
 def index():
-    # Simple homepage - maybe list some recent jobs 
+    if current_user.is_authenticated:
+        if current_user.is_admin():
+            return redirect(url_for("main.admin_dashboard"))
+        else:
+            return redirect(url_for("main.view_jobs"))
+            
+    # Show homepage for non-authenticated users
     jobs = Job.query.filter_by(status="open").order_by(Job.posted_date.desc()).limit(5).all()
     return render_template("index.html", title="Home", jobs=jobs)
 
@@ -200,33 +206,93 @@ def register():
 # --- Add routes for LOGIN --- 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
+    print("\n======== LOGIN ROUTE ACCESSED ========")
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
+    
     form = LoginForm()
+    
+    # Check if we can query the database
+    try:
+        user_count = User.query.count()
+        print(f"===DEBUG=== Database connection OK. Found {user_count} users.")
+        
+        # Get all users for debugging
+        all_users = User.query.all()
+        for user in all_users:
+            print(f"===DEBUG=== User in DB: {user.username}, ID: {user.id}, Role: {user.role}, Hash: {user.password_hash}")
+        
+    except Exception as e:
+        print(f"===DEBUG=== Database error: {e}")
+    
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash("Invalid email or password", "danger")
+        print(f"\n===DEBUG=== Form validated")
+        print(f"===DEBUG=== Login attempt for username: {form.username.data}")
+        print(f"===DEBUG=== Password length: {len(form.password.data)}")
+        print(f"===DEBUG=== First 3 chars of password: {form.password.data[:3]}")
+        
+        # Try a direct database query
+        try:
+            # Find the specific user
+            user = User.query.filter_by(username=form.username.data).first()
+            
+            if user is None:
+                print(f"===DEBUG=== User '{form.username.data}' not found in database")
+                flash("Invalid username or password", "danger")
+                return redirect(url_for("main.login"))
+            
+            print(f"===DEBUG=== Found user: {user.username}, ID: {user.id}")
+            print(f"===DEBUG=== User role: {user.role}")
+            print(f"===DEBUG=== Stored hash: {user.password_hash}")
+            
+            # Check password
+            password_ok = user.check_password(form.password.data)
+            print(f"===DEBUG=== Password check result: {password_ok}")
+            
+            if not password_ok:
+                print("===DEBUG=== Password verification failed")
+                flash("Invalid username or password", "danger")
+                return redirect(url_for("main.login"))
+            
+            # Password verified, log in user
+            login_user(user, remember=form.remember_me.data)
+            flash(f"Welcome back, {user.username}!", "success")
+            next_page = request.args.get("next")
+            
+            # Print user admin status for debug
+            print(f"===DEBUG=== User.is_admin() returns: {user.is_admin()}")
+            print(f"===DEBUG=== User.role == UserRole.admin: {user.role == UserRole.admin}")
+            
+            if user.is_admin():
+                print("===DEBUG=== User is admin, redirecting to admin dashboard")
+                return redirect(next_page) if next_page else redirect(url_for("main.admin_dashboard"))
+            else:
+                print("===DEBUG=== User is not admin, redirecting to user profile")
+                # Ensure candidate profile exists
+                if not user.candidate_profile:
+                    try:
+                        print("===DEBUG=== Creating candidate profile")
+                        candidate = Candidate(candidate_id=user.id)
+                        db.session.add(candidate)
+                        db.session.commit()
+                        print("===DEBUG=== Candidate profile created successfully")
+                    except Exception as e:
+                        db.session.rollback()
+                        print(f"===DEBUG=== Failed to create candidate profile: {e}")
+                        logger.error(f"Failed to create candidate profile on login for user {user.id}: {e}", exc_info=True)
+                        flash("Error accessing profile. Please contact support.", "danger")
+                        logout_user() # Log out user if profile creation fails
+                        return redirect(url_for("main.login"))
+                return redirect(next_page) if next_page else redirect(url_for("main.user_profile"))
+        except Exception as db_error:
+            print(f"===DEBUG=== Database error during login: {db_error}")
+            flash("System error during login. Please try again later.", "danger")
             return redirect(url_for("main.login"))
-        login_user(user, remember=form.remember_me.data)
-        flash(f"Welcome back, {user.username}!", "success")
-        next_page = request.args.get("next")
-        if user.is_admin():
-            return redirect(next_page) if next_page else redirect(url_for("main.admin_dashboard"))
-        else:
-            # Ensure candidate profile exists
-            if not user.candidate_profile:
-                 try:
-                     candidate = Candidate(candidate_id=user.id)
-                     db.session.add(candidate)
-                     db.session.commit()
-                 except Exception as e:
-                     db.session.rollback()
-                     logger.error(f"Failed to create candidate profile on login for user {user.id}: {e}", exc_info=True)
-                     flash("Error accessing profile. Please contact support.", "danger")
-                     logout_user() # Log out user if profile creation fails
-                     return redirect(url_for("main.login"))
-            return redirect(next_page) if next_page else redirect(url_for("main.user_profile"))
+    
+    # If form validation failed, show the form errors
+    if form.errors:
+        print(f"===DEBUG=== Form validation errors: {form.errors}")
+        
     return render_template("auth/login.html", title="Sign In", form=form)
 
 # --- Add routes for LOGOUT --- 
@@ -278,6 +344,10 @@ def edit_profile():
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
         
+        # Update phone number in candidate profile
+        if current_user.candidate_profile:
+            current_user.candidate_profile.phone_number = form.phone_number.data
+        
         # Handle profile image if provided
         if form.profile_image.data:
             profile_image_path = save_profile_image(form.profile_image.data)
@@ -294,6 +364,8 @@ def edit_profile():
         form.email.data = current_user.email
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
+        if current_user.candidate_profile:
+            form.phone_number.data = current_user.candidate_profile.phone_number
     
     return render_template("user/edit_profile.html", title="Edit Profile", form=form)
 
@@ -308,6 +380,9 @@ def admin_dashboard():
         total_jobs = Job.query.count()
         total_applications = Application.query.count()
         total_resumes = Resume.query.count()
+
+        # Get active jobs with their applications
+        active_jobs = Job.query.filter_by(status='open').order_by(Job.posted_date.desc()).all()
 
         # Get recent applications with related data
         page = request.args.get('page', 1, type=int)
@@ -385,7 +460,8 @@ def admin_dashboard():
             monthly_stats=monthly_stats,
             dept_stats=department_stats,
             application_stats=application_stats,
-            recent_applications=recent_applications
+            recent_applications=recent_applications,
+            active_jobs=active_jobs
         )
     except Exception as e:
         logger.error(f"Error in admin dashboard: {str(e)}", exc_info=True)

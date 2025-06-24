@@ -1,13 +1,12 @@
 {% extends "auth/base_auth.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
 <!-- Left side - Image -->
-<div class="auth-image login-bg">
+<div class="auth-image login-bg w-100">
 </div>
 
 <!-- Right side - Form -->
-<div class="auth-form-container">
+<div class="auth-form-container w-100">
     <div class="auth-card py-2 px-3">
         <!-- Centered Logo -->
         <div class="auth-logo-container">
@@ -18,22 +17,27 @@
         
         <h2 class="auth-form-title">Sign In</h2>
         
-        <form method="POST" action="" class="auth-form">
+        <!-- Note about using username -->
+        <div class="alert alert-info mb-3">
+            <small>Please use your <strong>username</strong> to log in (not your email address)</small>
+        </div>
+        
+        <form method="POST" action="{{ url_for('main.login') }}" class="auth-form">
             {{ form.hidden_tag() }}
             
             <div class="mb-2">
-                {{ form.email.label(class="form-label auth-form-label") }}
-                {{ form.email(class="form-control auth-form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Enter your email address") }}
-                {% if form.email.errors %}
+                {{ form.username.label(class="form-label auth-form-label") }}
+                {{ form.username(class="form-control auth-form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Enter your username (not email)", autocomplete="username") }}
+                {% if form.username.errors %}
                     <div class="invalid-feedback small-text">
-                        {{ form.email.errors|join(", ") }}
+                        {{ form.username.errors|join(", ") }}
                     </div>
                 {% endif %}
             </div>
             
             <div class="mb-2">
                 {{ form.password.label(class="form-label auth-form-label") }}
-                {{ form.password(class="form-control auth-form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Enter your password") }}
+                {{ form.password(class="form-control auth-form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Enter your password", autocomplete="current-password") }}
                 {% if form.password.errors %}
                     <div class="invalid-feedback small-text">
                         {{ form.password.errors|join(", ") }}
@@ -47,15 +51,24 @@
             </div>
             
             <div class="d-grid mb-3">
-                <button type="submit" class="btn auth-form-btn">
-                    Login
-                </button>
+                <button type="submit" class="btn auth-form-btn">Sign In</button>
             </div>
             
             <div class="text-center">
                 <p class="mb-0 small-text">New User? <a href="{{ url_for('main.register') }}" class="text-decoration-none fw-bold" style="color: #6351ce;">Create an Account</a></p>
             </div>
         </form>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mt-3">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 </div>
 {% endblock %}

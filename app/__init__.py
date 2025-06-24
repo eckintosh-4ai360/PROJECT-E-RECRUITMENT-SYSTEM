@@ -45,7 +45,9 @@ def create_app(config_class=Config):
 
     # Import and register blueprints
     from app.routes import bp as main_bp
+    from app.admin_routes import admin as admin_bp
     app.register_blueprint(main_bp)
+    app.register_blueprint(admin_bp)
 
     # Context processor to inject variables into templates
     @app.context_processor

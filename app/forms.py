@@ -10,6 +10,7 @@ class RegistrationForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     first_name = StringField("First Name", validators=[DataRequired()])
     last_name = StringField("Last Name", validators=[DataRequired()])
+    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)])
     profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
@@ -30,6 +31,7 @@ class ProfileEditForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     first_name = StringField("First Name", validators=[DataRequired()])
     last_name = StringField("Last Name", validators=[DataRequired()])
+    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)])
     profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
     submit = SubmitField('Save Changes')
 
@@ -51,10 +53,32 @@ class ProfileEditForm(FlaskForm):
                 raise ValidationError("That email is already in use. Please choose a different one.")
 
 class LoginForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
+    username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember_me = BooleanField("Remember Me")
-    submit = SubmitField(Markup('<i class="bi bi-box-arrow-in-right me-1"></i> Login'))
+    submit = SubmitField("Sign In")
+
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        
+    def validate(self):
+        initial_validation = super(LoginForm, self).validate()
+        if not initial_validation:
+            print("===DEBUG=== Form validation failed")
+            return False
+            
+        if self.username.data:
+            print(f"===DEBUG=== Form validation - Username length: {len(self.username.data)}")
+        if self.password.data:
+            print(f"===DEBUG=== Form validation - Password length: {len(self.password.data)}")
+        
+        # Ensure password field is not empty
+        if not self.password.data or not self.password.data.strip():
+            print("===DEBUG=== Empty password submitted")
+            self.password.errors = ["Password cannot be empty"]
+            return False
+            
+        return True
 
 class ResumeUploadForm(FlaskForm):
     resume_file = FileField("Upload Resume", validators=[
@@ -68,7 +92,9 @@ class JobForm(FlaskForm):
     title = StringField("Job Title", validators=[DataRequired()])
     department = StringField("Department", validators=[DataRequired()])
     description = TextAreaField("Job Description", validators=[DataRequired()])
-    required_skills = TextAreaField("Required Skills", validators=[DataRequired()])
+    requirements = TextAreaField("Job Requirements", validators=[DataRequired()])
+    location = StringField("Location", validators=[DataRequired()])
+    salary_range = StringField("Salary Range")
     status = SelectField("Status", choices=[("open", "Open"), ("closed", "Closed")], validators=[DataRequired()])
     closing_date = DateField("Closing Date", format="%Y-%m-%d", validators=[DataRequired()])
     submit = SubmitField(Markup('<i class="bi bi-briefcase me-1"></i> Submit Job Posting'))

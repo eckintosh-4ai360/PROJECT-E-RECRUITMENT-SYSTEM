@@ -66,11 +66,20 @@
                                         Uploaded on {{ application.resume.upload_date.strftime('%B %d, %Y') }}
                                     </small>
                                 </div>
-                                <a href="{{ url_for('static', filename='uploads/' + application.resume.file_path) }}" 
-                                   class="btn btn-sm btn-outline-primary ms-auto" 
-                                   target="_blank">
-                                    <i class="bi bi-download"></i> Download
-                                </a>
+                                <div class="ms-auto">
+                                    <a href="{{ url_for('admin.download_resume', application_id=application.application_id) }}" 
+                                       class="btn btn-sm btn-outline-primary me-2" 
+                                       target="_blank">
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                    {% if current_user.is_admin() %}
+                                    <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}" 
+                                       class="btn btn-sm btn-outline-secondary"
+                                       target="_blank">
+                                        <i class="bi bi-eye"></i> View Resume
+                                    </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         {% endif %}

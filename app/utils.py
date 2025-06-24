@@ -121,28 +121,74 @@ def save_uploaded_file(uploaded_file, directory):
 # Custom password hashing functions that use sha256 instead of scrypt
 def generate_password_hash(password):
     """Generate a SHA-256 password hash compatible with Python 3.13."""
-    salt = os.urandom(16)  # 16 bytes of random salt
-    password_bytes = password.encode('utf-8')
-    salted_hash = hashlib.sha256(salt + password_bytes).hexdigest()
-    # Store as algorithm:salt:hash
-    return f"sha256:{base64.b64encode(salt).decode('utf-8')}:{salted_hash}"
+    try:
+        print(f"===DEBUG=== Generating hash for password")
+        salt = os.urandom(16)  # 16 bytes of random salt
+        password_bytes = password.encode('utf-8')
+        print(f"===DEBUG=== Password bytes: {password_bytes!r}")
+        print(f"===DEBUG=== Salt bytes: {salt!r}")
+        salted_hash = hashlib.sha256(salt + password_bytes).hexdigest()
+        print(f"===DEBUG=== Generated hash: {salted_hash}")
+        final_hash = f"sha256:{base64.b64encode(salt).decode('utf-8')}:{salted_hash}"
+        print(f"===DEBUG=== Final stored hash: {final_hash}")
+        return final_hash
+    except Exception as e:
+        print(f"===DEBUG=== Error generating password hash: {e}")
+        raise
 
 def check_password_hash(stored_hash, password):
     """Check a password against a SHA-256 hash."""
     try:
+        print(f"\n===DEBUG=== Starting password verification")
+        print(f"===DEBUG=== Checking password hash: {stored_hash}")
+        print(f"===DEBUG=== Input password length: {len(password)}")
+        
         # Parse the stored hash
-        algorithm, salt_b64, hash_value = stored_hash.split(':')
+        parts = stored_hash.split(':')
+        if len(parts) != 3:
+            print(f"===DEBUG=== Invalid hash format, got {len(parts)} parts instead of 3")
+            print(f"===DEBUG=== Hash parts: {parts}")
+            return False
+            
+        algorithm, salt_b64, hash_value = parts
+        
+        print(f"===DEBUG=== Hash algorithm: {algorithm}")
+        print(f"===DEBUG=== Salt (b64): {salt_b64}")
+        print(f"===DEBUG=== Expected hash: {hash_value}")
         
         # Check if this is a new-style hash
         if algorithm == 'sha256':
-            salt = base64.b64decode(salt_b64)
-            password_bytes = password.encode('utf-8')
-            calculated_hash = hashlib.sha256(salt + password_bytes).hexdigest()
-            return calculated_hash == hash_value
+            try:
+                salt = base64.b64decode(salt_b64)
+                print(f"===DEBUG=== Decoded salt: {salt!r}")
+                password_bytes = password.encode('utf-8')
+                print(f"===DEBUG=== Password bytes: {password_bytes!r}")
+                
+                # Create the combined bytes
+                combined = salt + password_bytes
+                print(f"===DEBUG=== Combined bytes to hash: {combined!r}")
+                
+                calculated_hash = hashlib.sha256(combined).hexdigest()
+                print(f"===DEBUG=== Calculated hash: {calculated_hash}")
+                print(f"===DEBUG=== Expected hash:  {hash_value}")
+                result = calculated_hash == hash_value
+                print(f"===DEBUG=== Hash match: {result}")
+                return result
+            except Exception as e:
+                print(f"===DEBUG=== Error in SHA-256 hash calculation: {e}")
+                print(f"===DEBUG=== Exception type: {type(e)}")
+                import traceback
+                traceback.print_exc()
+                return False
         else:
             # Fall back to werkzeug's implementation for old-style hashes
+            print(f"===DEBUG=== Using werkzeug for non-SHA-256 hash")
             return werkzeug_check_password_hash(stored_hash, password)
-    except Exception:
+    except Exception as e:
+        print(f"===DEBUG=== Error checking password hash: {e}")
+        print(f"===DEBUG=== Exception type: {type(e)}")
+        import traceback
+        traceback.print_exc()
         # If any error occurs, return False (invalid format)
         return False
 

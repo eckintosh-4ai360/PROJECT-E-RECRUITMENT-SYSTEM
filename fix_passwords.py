@@ -1,66 +1,52 @@
-from app import create_app, db
-from app.models import User, UserRole
-from app.utils import generate_password_hash
-import traceback
+import sqlite3
+import os
+import hashlib
+import base64
+
+def generate_password_hash(password):
+    """Generate a SHA-256 password hash compatible with Python 3.13."""
+    salt = os.urandom(16)  # 16 bytes of random salt
+    password_bytes = password.encode('utf-8')
+    salted_hash = hashlib.sha256(salt + password_bytes).hexdigest()
+    # Store as algorithm:salt:hash
+    return f"sha256:{base64.b64encode(salt).decode('utf-8')}:{salted_hash}"
 
 def fix_passwords():
-    """Reset passwords to use SHA-256 hashing"""
+    # Connect to the database
+    conn = sqlite3.connect('app.db')
+    cursor = conn.cursor()
+    
+    # Set a temporary known password for all users
+    temp_password = "UMaT2024!"
+    new_hash = generate_password_hash(temp_password)
+    
     try:
-        print("Starting password rehashing process...")
-        app = create_app()
-        with app.app_context():
-            print("Acquired app context")
-            users = User.query.all()
-            print(f"Found {len(users)} users in the database")
+        # Get all users first
+        cursor.execute("SELECT id, username, email FROM users")
+        users = cursor.fetchall()
+        
+        if not users:
+            print("No users found in the database.")
+            return
             
-            if not users:
-                print("No users found in the database.")
-                return
-            
-            # Create a temporary admin account with known credentials
-            admin_exists = User.query.filter_by(role=UserRole.admin).first()
-            if not admin_exists:
-                print("Creating a default admin account...")
-                admin = User(
-                    username="admin",
-                    email="admin@example.com",
-                    role=UserRole.admin,
-                    first_name="Admin",
-                    last_name="User"
-                )
-                admin.password_hash = generate_password_hash("admin123")
-                db.session.add(admin)
-                db.session.commit()
-                print("Default admin account created:")
-                print("Email: admin@example.com")
-                print("Password: admin123")
-                print("IMPORTANT: Change this password immediately after logging in!")
-            else:
-                print(f"Admin user found: {admin_exists.username} ({admin_exists.email})")
-                admin_exists.password_hash = generate_password_hash("admin123")
-                print("Reset admin password to: admin123")
-            
-            print("Setting temporary passwords for all users...")
-            
-            # Reset all user passwords to a known temporary value
-            temp_password = "TempPass123!"
-            
-            for user in users:
-                if user.role == UserRole.admin:
-                    continue  # Skip admin user, already handled above
-                
-                print(f"Rehashing password for user: {user.username} ({user.email})")
-                user.password_hash = generate_password_hash(temp_password)
-            
-            db.session.commit()
-            print("\nPassword rehashing completed.")
-            print("Admin password: admin123")
-            print(f"All other users now have the temporary password: {temp_password}")
-            print("Please advise users to change their passwords immediately after logging in.")
+        print(f"Found {len(users)} users. Resetting passwords...")
+        
+        # Update each user with a unique salt
+        for user_id, username, email in users:
+            # Generate a new hash with a unique salt for each user
+            user_hash = generate_password_hash(temp_password)
+            cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (user_hash, user_id))
+            print(f"Reset password for user: {username} ({email})")
+        
+        conn.commit()
+        print("\nAll passwords have been reset to: UMaT2024!")
+        print("Please inform users to change their passwords upon next login.")
+        
     except Exception as e:
-        print(f"ERROR: {str(e)}")
-        print("Traceback:")
-        traceback.print_exc()
+        print(f"Error updating passwords: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     fix_passwords() 

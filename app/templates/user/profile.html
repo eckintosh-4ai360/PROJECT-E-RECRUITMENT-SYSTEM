@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-4">
     <!-- User Profile Header -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4" style="border: 3px solid white; outline: 1px solid rgb(109, 255, 131);">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-auto">
@@ -14,7 +14,7 @@
                              style="width: 150px; height: 150px; object-fit: cover;">
                     {% else %}
                         <div class="rounded-circle profile-image d-flex align-items-center justify-content-center bg-primary text-white"
-                             style="width: 150px; height: 150px; font-size: 3rem;">
+                             style="width: 150px; height: 150px; font-size: 3rem; ">
                             {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
                         </div>
                     {% endif %}
@@ -27,6 +27,10 @@
                                 <i class="bi bi-envelope me-2"></i>{{ current_user.email }}
                                 <span class="mx-2">•</span>
                                 <i class="bi bi-person-badge me-2"></i>{{ current_user.role.value.capitalize() }}
+                                {% if current_user.candidate_profile and current_user.candidate_profile.phone_number %}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-telephone me-2"></i>{{ current_user.candidate_profile.phone_number }}
+                                {% endif %}
                             </p>
                         </div>
                         <a href="{{ url_for('main.edit_profile') }}" class="btn btn-outline-primary">
@@ -40,14 +44,14 @@
 
     <div class="row">
         <!-- Resume Management Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
+        <div class="col-md-6 mb-4" >
+            <div class="card shadow-sm h-100" style="border: 3px solid white; outline: 1px solid greenyellow;">
                 <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">
                             <i class="bi bi-file-earmark-text me-2"></i>Resume Management
                         </h4>
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#uploadForm" aria-expanded="false" aria-controls="uploadForm">
+                        <button class="btn upload-btn" type="button" data-bs-toggle="collapse" data-bs-target="#uploadForm" aria-expanded="false" aria-controls="uploadForm">
                             <i class="bi bi-plus-lg"></i> Upload New
                         </button>
                     </div>
@@ -72,7 +76,7 @@
                                     {{ upload_form.is_primary(class="form-check-input") }}
                                     {{ upload_form.is_primary.label(class="form-check-label") }}
                                 </div>
-                                {{ upload_form.submit(class="btn btn-primary auth-form-btn") }}
+                                {{ upload_form.submit(class="btn upload-btn") }}
                             </form>
                         </div>
                     </div>
@@ -80,7 +84,7 @@
                     <!-- Resumes List -->
                     {% if resumes %}
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover table-sm">
                                 <thead>
                                     <tr>
                                         <th>Filename</th>
@@ -101,17 +105,50 @@
                                         </td>
                                         <td>
                                             <a href="{{ url_for('main.resume_analysis', resume_id=resume.resume_id) }}" 
-                                               class="btn btn-primary btn-sm">
-                                                <i class="bi bi-graph-up"></i> View Analysis
+                                               class="btn btn-primary btn-sm mb-1">
+                                                <i class="bi bi-graph-up"></i> View
                                             </a>
-                                            <form action="{{ url_for('main.delete_resume', resume_id=resume.resume_id) }}" 
-                                                  method="POST" 
-                                                  class="d-inline">
-                                                <button type="submit" class="btn btn-danger btn-sm" 
-                                                        onclick="return confirm('Are you sure you want to delete this resume?')">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal{{ resume.resume_id }}">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+
+                                            <!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal{{ resume.resume_id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ resume.resume_id }}" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ resume.resume_id }}">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>Delete Resume
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Are you sure you want to delete this resume?</h6>
+                <p class="text-muted mb-0">
+                    <strong>{{ resume.original_filename }}</strong>
+                </p>
+                <p class="text-muted small mt-1">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Cancel
+                </button>
+                <form action="{{ url_for('main.delete_resume', resume_id=resume.resume_id) }}" 
+                      method="POST" 
+                      class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -132,8 +169,8 @@
         </div>
 
         <!-- Job Matches Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
+        <div class="col-md-6 mb-4" >
+            <div class="card shadow-sm h-100" style="border: 3px solid white; outline: 1px solid greenyellow;">
                 <div class="card-header bg-white py-3">
                     <h4 class="mb-0">
                         <i class="bi bi-briefcase me-2"></i>Job Matches
@@ -142,7 +179,7 @@
                 <div class="card-body">
                     {% if matches %}
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover table-sms">
                                 <thead>
                                     <tr>
                                         <th>Position</th>
@@ -193,7 +230,7 @@
     </div>
 </div>
 
-<!-- Add custom styles -->
+<!-- custom styles -->
 <style>
 .progress {
     background-color: #e9ecef;

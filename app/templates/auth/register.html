@@ -3,7 +3,7 @@
 
 {% block content %}
 <!-- Left side - Image -->
-<div class="auth-image register-bg">
+<div class="auth-image register-bg ">
 </div>
 
 <!-- Right side - Form -->
@@ -52,14 +52,29 @@
                 {% endif %}
             </div>
             
-            <div class="mb-2">
-                {{ form.email.label(class="form-label auth-form-label") }}
-                {{ form.email(class="form-control auth-form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Email address") }}
-                {% if form.email.errors %}
-                    <div class="invalid-feedback small-text">
-                        {{ form.email.errors|join(", ") }}
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        {{ form.email.label(class="form-label auth-form-label") }}
+                        {{ form.email(class="form-control auth-form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Email address") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback small-text">
+                                {{ form.email.errors|join(", ") }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        {{ form.phone_number.label(class="form-label auth-form-label") }}
+                        {{ form.phone_number(class="form-control auth-form-control" + (" is-invalid" if form.phone_number.errors else ""), placeholder="Phone number") }}
+                        {% if form.phone_number.errors %}
+                            <div class="invalid-feedback small-text">
+                                {{ form.phone_number.errors|join(", ") }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             
             <div class="row mb-2">
@@ -95,7 +110,7 @@
             
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-lg auth-form-btn">
-                    Register
+                    <i class="bi bi-person-plus me-1"></i> Register
                 </button>
             </div>
             

@@ -1,5 +1,6 @@
 * {
     font-family: "Sora", sans-serif;
+    /* background-color: lavender */
 }
 
 /* body {
@@ -29,6 +30,22 @@
     background-color: #2e3a53;
     margin-left: 5px;
     border-radius: 10px;
+}
+
+.upload-btn {
+    background-color: #6351ce !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background-color: #5344b0 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
 
 /* Form field styles */
@@ -182,21 +199,19 @@ footer {
 /* View All Open Positions Button */
 .view-all-btn {
     background-color: #6351ce;
-    border: none;
     color: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    text-decoration: none;
     transition: all 0.3s ease;
-    padding: 8px 20px;
-    border-radius: 5px;
 }
 
 .view-all-btn:hover {
     background-color: #5344b0;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(99, 81, 206, 0.3);
-    color: white;
+    box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
 
-/* Feature Cards */
 .card .card-body i {
     transition: transform 0.3s ease;
 }
@@ -205,31 +220,49 @@ footer {
     transform: scale(1.2);
 }
 
-/* Enhance the design of the recent job postings section */
+/* Icon styles */
 h3 .bi {
+    margin-right: 0.5rem;
     color: #6351ce;
 }
 
-/* Section Titles */
+/* Section title styles */
 .section-title {
     position: relative;
     padding-bottom: 10px;
-    font-weight: 600;
+    margin-bottom: 20px;
 }
 
 .section-title:after {
     content: '';
     position: absolute;
-    display: block;
-    width: 50px;
-    height: 3px;
-    background: #6351ce;
     bottom: 0;
     left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #6351ce;
 }
 
+/* Recent jobs section */
 .recent-jobs-section {
     background-color: #f9f9f9;
     padding: 25px;
     border-radius: 10px;
+}
+
+/* Upload button styles */
+.upload-btn {
+    background-color: #6351ce !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background-color: #5344b0 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }

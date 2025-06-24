@@ -36,49 +36,21 @@ def register():
             
             # Create candidate profile for non-admin users
             if user.role == UserRole.candidate:
-                candidate = Candidate(candidate_id=user.id)
+                candidate = Candidate(
+                    candidate_id=user.id,
+                    phone_number=form.phone_number.data
+                )
                 db.session.add(candidate)
                 db.session.commit()
             
             flash("Your account has been created! You can now log in.", "success")
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("main.login"))
         except Exception as e:
             db.session.rollback()
             flash(f"Error creating account: {str(e)}", "danger")
-            return redirect(url_for("auth.register"))
+            return redirect(url_for("main.register"))
     
     return render_template("auth/register.html", title="Register", form=form)
-
-@auth_bp.route("/login", methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash("Invalid email or password", "danger")
-            return redirect(url_for("auth.login"))
-        login_user(user, remember=form.remember_me.data)
-        flash(f"Welcome back, {user.username}!", "success")
-        next_page = request.args.get("next")
-        if user.is_admin():
-            return redirect(next_page) if next_page else redirect(url_for("admin.dashboard"))
-        else:
-            # Ensure candidate profile exists
-            if not user.candidate_profile:
-                 try:
-                     candidate = Candidate(candidate_id=user.id)
-                     db.session.add(candidate)
-                     db.session.commit()
-                 except Exception as e:
-                     db.session.rollback()
-                     logger.error(f"Failed to create candidate profile on login for user {user.id}: {e}", exc_info=True)
-                     flash("Error accessing profile. Please contact support.", "danger")
-                     logout_user() # Log out user if profile creation fails
-                     return redirect(url_for("auth.login"))
-            return redirect(next_page) if next_page else redirect(url_for("user.profile"))
-    return render_template("auth/login.html", title="Sign In", form=form)
 
 @auth_bp.route("/logout")
 def logout():

@@ -56,8 +56,8 @@ def rehash_passwords():
             
             print("Setting temporary passwords for all users...")
             
-            # Reset all user passwords to a known temporary value
-            temp_password = "TempPass123!"
+            #! Reset all user passwords to a known temporary value
+            temp_password = "UMaT2024!"
             password_hash = generate_password_hash(temp_password)
             
             for user in users:

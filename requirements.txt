@@ -24,10 +24,9 @@ requests
 plotly
 # WSGI Server for deployment
 gunicorn
-# PDF display
-streamlit
 
 # AI & NLP Libraries
 nltk
 pandas
 scikit-learn
+PyPDF2==3.0.1
