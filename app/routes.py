@@ -220,28 +220,28 @@ def login():
         # Get all users for debugging
         all_users = User.query.all()
         for user in all_users:
-            print(f"===DEBUG=== User in DB: {user.username}, ID: {user.id}, Role: {user.role}, Hash: {user.password_hash}")
+            print(f"===DEBUG=== User in DB: {user.email}, ID: {user.id}, Role: {user.role}, Hash: {user.password_hash}")
         
     except Exception as e:
         print(f"===DEBUG=== Database error: {e}")
     
     if form.validate_on_submit():
         print(f"\n===DEBUG=== Form validated")
-        print(f"===DEBUG=== Login attempt for username: {form.username.data}")
+        print(f"===DEBUG=== Login attempt for email: {form.email.data}")
         print(f"===DEBUG=== Password length: {len(form.password.data)}")
         print(f"===DEBUG=== First 3 chars of password: {form.password.data[:3]}")
         
         # Try a direct database query
         try:
-            # Find the specific user
-            user = User.query.filter_by(username=form.username.data).first()
+            # Find the specific user by email
+            user = User.query.filter_by(email=form.email.data).first()
             
             if user is None:
-                print(f"===DEBUG=== User '{form.username.data}' not found in database")
-                flash("Invalid username or password", "danger")
+                print(f"===DEBUG=== User with email '{form.email.data}' not found in database")
+                flash("Invalid email or password", "danger")
                 return redirect(url_for("main.login"))
             
-            print(f"===DEBUG=== Found user: {user.username}, ID: {user.id}")
+            print(f"===DEBUG=== Found user: {user.email}, ID: {user.id}")
             print(f"===DEBUG=== User role: {user.role}")
             print(f"===DEBUG=== Stored hash: {user.password_hash}")
             
@@ -251,12 +251,12 @@ def login():
             
             if not password_ok:
                 print("===DEBUG=== Password verification failed")
-                flash("Invalid username or password", "danger")
+                flash("Invalid email or password", "danger")
                 return redirect(url_for("main.login"))
             
             # Password verified, log in user
             login_user(user, remember=form.remember_me.data)
-            flash(f"Welcome back, {user.username}!", "success")
+            flash(f"Welcome back, {user.first_name}!", "success")
             next_page = request.args.get("next")
             
             # Print user admin status for debug

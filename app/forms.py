@@ -53,7 +53,7 @@ class ProfileEditForm(FlaskForm):
                 raise ValidationError("That email is already in use. Please choose a different one.")
 
 class LoginForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember_me = BooleanField("Remember Me")
     submit = SubmitField("Sign In")
@@ -67,8 +67,8 @@ class LoginForm(FlaskForm):
             print("===DEBUG=== Form validation failed")
             return False
             
-        if self.username.data:
-            print(f"===DEBUG=== Form validation - Username length: {len(self.username.data)}")
+        if self.email.data:
+            print(f"===DEBUG=== Form validation - Email length: {len(self.email.data)}")
         if self.password.data:
             print(f"===DEBUG=== Form validation - Password length: {len(self.password.data)}")
         
