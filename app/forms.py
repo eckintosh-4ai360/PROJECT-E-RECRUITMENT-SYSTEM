@@ -6,14 +6,38 @@ from flask_wtf.file import FileAllowed
 from markupsafe import Markup
 
 class RegistrationForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)])
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    first_name = StringField("First Name", validators=[DataRequired()])
-    last_name = StringField("Last Name", validators=[DataRequired()])
-    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)])
-    profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
+    username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    email = StringField("Email", validators=[DataRequired(), Email()], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    first_name = StringField("First Name", validators=[DataRequired()], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    last_name = StringField("Last Name", validators=[DataRequired()], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")], 
+    render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px;  color: green"
+        ,})
     submit = SubmitField(Markup('<i class="bi bi-person-plus me-1"></i> Register'))
 
     def validate_username(self, username):
@@ -53,9 +77,16 @@ class ProfileEditForm(FlaskForm):
                 raise ValidationError("That email is already in use. Please choose a different one.")
 
 class LoginForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    remember_me = BooleanField("Remember Me")
+    email = StringField("Email", validators=[DataRequired(), Email()], 
+            render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,}
+ )
+    password = PasswordField("Password", validators=[DataRequired()], 
+            render_kw={
+            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    remember_me = BooleanField("Remember Me", )
     submit = SubmitField("Sign In")
 
     def __init__(self, *args, **kwargs):

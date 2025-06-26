@@ -7,7 +7,7 @@
 </div>
 
 <!-- Right side - Form -->
-<div class="auth-form-container">
+<div class="auth-form-container" >
     <div class="auth-card py-2 px-3">
         <!-- Centered Logo -->
         <div class="auth-logo-container">
@@ -16,7 +16,7 @@
             </a>
         </div>
         
-        <h2 class="auth-form-title">Create Account</h2>
+        <h2 class="auth-form-title" style="color: var(--primary-dark);">Create Account</h2>
         
         <form method="POST" action="" class="auth-form" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
@@ -115,7 +115,7 @@
             </div>
             
             <div class="text-center">
-                <p class="mb-0 small-text">Already have an account? <a href="{{ url_for('main.login') }}" class="text-decoration-none fw-bold" style="color: #6351ce;">Sign In</a></p>
+                <p class="mb-0 small-text">Already have an account? <a href="{{ url_for('main.login') }}" class="text-decoration-none fw-bold" style="color: var(--primary-dark);">Sign In</a></p>
             </div>
         </form>
     </div>

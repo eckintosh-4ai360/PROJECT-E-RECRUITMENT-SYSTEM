@@ -3,12 +3,12 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="display-5">Admin Dashboard</h1>
+        <h1 class="display-5" style="color:var(--primary-dark); font-weight: 600;">Admin Dashboard</h1>
         <div>
-            <a href="{{ url_for('main.create_job') }}" class="btn btn-primary">
+            <a href="{{ url_for('main.create_job') }}" class="btn" style="background-color: var(--primary-dark); color: white;">
                 <i class="bi bi-plus-circle"></i> Create New Job
             </a>
-            <a href="{{ url_for('main.list_jobs') }}" class="btn btn-outline-primary ms-2">
+            <a href="{{ url_for('main.list_jobs') }}" class="btn ms-2" style="border:1px solid var(--primary); color: var(--primary-dark); ">
                 <i class="bi bi-gear"></i> Manage Jobs
             </a>
         </div>
@@ -74,7 +74,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">Monthly Activity</h5>
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Monthly Activity</h5>
                 </div>
                 <div class="card-body" style="height: 400px;">
                     <canvas id="monthlyChart"></canvas>
@@ -86,7 +86,7 @@
         <div class="col-md-4" style="border: 3px solid white; outline: 1px solid yellow;">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">Jobs by Department</h5>
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Jobs by Department</h5>
                 </div>
                 <div class="card-body" style="height: 200px;">
                     <canvas id="deptChart"></canvas>
@@ -96,7 +96,7 @@
             <!-- Application Status -->
             <div class="card shadow-sm mb-4" style="border: 3px solid white; outline: 1px solid blue;">
                 <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">Application Status</h5>
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Application Status</h5>
                 </div>
                 <div class="card-body" style="height: 200px;">
                     <canvas id="statusChart"></canvas>
@@ -108,19 +108,19 @@
     <!-- Recent Applications Table -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-                <h5 class="card-title mb-0">Recent Applications</h5>
+                <h5 class="card-title mb-0" style="color:var(--primary-dark);">Recent Applications</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Applicant</th>
-                            <th>Position</th>
-                            <th>Department</th>
-                            <th>Applied Date</th>
-                            <th>Status</th>
-                            <th>Match Score</th>
+                            <th style="color:var(--primary-dark);">Applicant</th>
+                            <th style="color:var(--primary-dark);">Position</th>
+                            <th style="color:var(--primary-dark);">Department</th>
+                            <th style="color:var(--primary-dark);">Applied Date</th>
+                            <th style="color:var(--primary-dark);">Status</th>
+                            <th style="color:var(--primary-dark);">Match Score</th>
                         </tr>
                     </thead>
                     <tbody>
