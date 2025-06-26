@@ -4,18 +4,18 @@
 <div class="container mt-4 " style="background-color: #ffffff;">
     <div class="p-5 mb-4 rounded-3 main-container">
         <div class="container-fluid py-5">
-            <h4 class="display-5 " style="color: #181f2e; font-family: Blacksword;">Welcome to the</h4>
-            <h1 class="display-5 fw-bold" style="color: #181f2e;"><span>UMaT Job Portal</span> </h1>
+            <h4 class="display-5 " style="color: var(--primary); font-family: Blacksword;">Welcome to the</h4>
+            <h1 class="display-5 fw-bold" style="color: var(--primary-dark);"><span>UMaT Job Portal</span> </h1>
             <p class="col-md-8 fs-4">Your gateway to career opportunities at 
                 the University of Mines and Technology,
                 especially within the Computer Science department.</p>
             {% if not current_user.is_authenticated %}
             <a href="{{ url_for('main.register') }}" class="btn btn-lg"
-                style="background-color: #1c2331; border: none; color: white; border-color: none;" type="button">
+                style="background-color: var(--primary-dark); border: none; color: white; border-color: none;" type="button">
                 <i class="bi bi-person-plus me-2"></i>Register Now
             </a>
             <a href="{{ url_for('main.login') }}" class="btn btn-secondary btn-lg "
-                style="background-color: #6351ce; border: none; color: white;" type="button">
+                style="background-color: var(--primary); border: none; color: white;" type="button">
                 <i class="bi bi-box-arrow-in-right me-2"></i>Login
             </a>
             {% else %}
@@ -26,8 +26,8 @@
         </div>
     </div>
 
-    <div class="recent-jobs-section mb-5">
-        <h3 class="mb-4 section-title"><i class="bi bi-briefcase me-2"></i>Recent Job Postings</h3>
+    <div class="recent-jobs-section mb-5" style="background-color: lavender;">
+        <h3 class="mb-4 section-title" style="color: var(--primary-dark);"><i class="bi bi-briefcase me-2"></i>Recent Job Postings</h3>
         {% if jobs %}
         <div class="list-group job-listings">
             {% for job in jobs %}
@@ -52,12 +52,13 @@
         {% endif %}
     </div>
 
+    <!-- * features sections * -->
     <section class="container py-5">
-        <h3 class="text-center mb-5 fw-bold fs-2" style="color: #1c2331;">Key Features</h3>
+        <h3 class="text-center mb-5 fw-bold fs-2" style="color: var(--primary-dark);">Key Features</h3>
         <div class="row g-4">
             <!-- Resume Analysis -->
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border-color: #6351ce; border: 1px solid #6351ce;">
+                <div class="card text-center h-100" style="border: 1px solid green;">
                     <div class="card-body">
                         <i class="bi bi-file-earmark-text fs-1 text-primary mb-3"></i>
                         <h5 class="card-title" style="color: #1c2331;">Resume Analysis</h5>
@@ -68,7 +69,7 @@
     
             <!-- Application Tracking -->
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border-color: #6351ce; border: 1px solid #6351ce;">
+                <div class="card text-center h-100" style="border: 1px solid greenyellow;">
                     <div class="card-body">
                         <i class="bi bi-people fs-1 text-success mb-3"></i>
                         <h5 class="card-title" style="color: #1c2331;">Application Tracking</h5>
@@ -79,9 +80,9 @@
     
             <!-- Interview Management -->
             <div class="col-md-6 col-lg-3" >
-                <div class="card text-center h-100" style="border-color: #6351ce;border: 1px solid #6351ce;">
+                <div class="card text-center h-100" style="border: 1px solid green;">
                     <div class="card-body">
-                        <i class="bi bi-calendar2-check fs-1 text-purple mb-3" style="color: #6f42c1;"></i>
+                        <i class="bi bi-calendar2-check fs-1 text-purple mb-3" ></i>
                         <h5 class="card-title" style="color: #1c2331;">Interview Management</h5>
                         <p class="card-text small">Schedule and conduct interviews with built-in video conferencing</p>
                     </div>
@@ -90,7 +91,7 @@
     
             <!-- Analytics -->
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border-color: #6351ce;border: 1px solid #6351ce;">
+                <div class="card text-center h-100" style="border: 1px solid greenyellow;">
                     <div class="card-body">
                         <i class="bi bi-bar-chart-line fs-1 text-warning mb-3"></i>
                         <h5 class="card-title" style="color: #1c2331;">Analytics</h5>

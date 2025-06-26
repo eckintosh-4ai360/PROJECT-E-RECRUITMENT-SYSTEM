@@ -25,7 +25,7 @@ def add_initial_data():
         print("Creating default admin user...")
         admin_user = User(
             username="admin",
-            email="admin@umat.edu.gh", # Example email
+            email="admin@umat.edu.gh", 
             first_name="Admin",
             last_name="User",
             role=UserRole.admin

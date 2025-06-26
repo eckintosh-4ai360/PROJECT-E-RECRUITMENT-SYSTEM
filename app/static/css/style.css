@@ -1,41 +1,73 @@
+:root {
+    /* Primary Colors */
+    --primary: #006a3c;
+    --primary-dark: #004c23;
+    --secondary: #FFCB06;
+    --secondary-dark: #ad8d1a;
+    
+    /* Text Colors */
+    --text-primary: #494949;
+    --text-light: #999;
+    --text-white: white;
+    
+    /* Background Colors */
+    --bg-light: #f9f9f9;
+    --bg-lighter: #f8f9fa;
+    --bg-input: ;
+}
+/* :root {
+    --emerald: #50C878;
+    --forest-green: #228B22;
+    --lime-green: #32CD32;
+    --olive: #808000;
+    --mint-green: #98FF98;
+    --sea-green: #2E8B57;
+    --pine-green: #01796F;
+    --kelly-green: #4CBB17;
+    --hunter-green: #355E3B;
+    --chartreuse: #7FFF00;
+    --spring-green: #00FF7F;
+    --jade: #00A86B;
+    --sage: #9DC183;
+    --lawn-green: #7CFC00;
+    --moss-green: #8A9A5B;
+    --british-racing-green: #004225;
+    --dark-olive-green: #556B2F;
+    --pistachio: #93C572;
+    --tea-green: #D0F0C0;
+    --army-green: #4B5320;
+    
+  } */
+
 * {
     font-family: "Sora", sans-serif;
     /* background-color: lavender */
 }
 
-/* body {
-    background-image: url("../bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    z-index: 1;
-} */
-
 #umatTitle {
-    color: #6351ce;
+    color: var(--primary);
     /* background-color: #1c2331; */
     font-weight: 800;
 }
 
 .loginbtn1 {
     padding: 5px;
-    background-color: #1c2331;
+    background-color: var(--secondary);
     margin-left: 5px;
     border-radius: 10px;
 }
 
 .loginbtn2 {
     padding: 5px;
-    background-color: #2e3a53;
+    background-color: var(--secondary);
     margin-left: 5px;
     border-radius: 10px;
 }
 
 .upload-btn {
-    background-color: #6351ce !important;
+    background-color: var(--primary) !important;
     border: none !important;
-    color: white !important;
+    color: var(--text-white) !important;
     padding: 10px 20px !important;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -43,22 +75,22 @@
 }
 
 .upload-btn:hover {
-    background-color: #5344b0 !important;
+    background-color: var(--primary-dark) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
 
 /* Form field styles */
 .form-control:focus {
-    border-color: #6351ce;
+    border-color: var(--primary);
     box-shadow: 0 0 0 0.2rem rgba(99, 81, 206, 0.25);
 }
 
 /* Auth form button styles */
 .auth-form-btn {
-    background-color: #6351ce !important;
+    background-color: var(--primary) !important;
     border: none !important;
-    color: white !important;
+    color: var(--text-white) !important;
     padding: 10px 20px !important;
     width: 100%;
     font-weight: 600;
@@ -67,14 +99,14 @@
 }
 
 .auth-form-btn:hover {
-    background-color: #5344b0 !important;
+    background-color: var(--primary-dark) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
 
 /* Auth form input placeholder styles */
 .auth-form input::placeholder {
-    color: #999;
+    color: var(--text-light);
     font-size: 0.9rem;
 }
 
@@ -82,20 +114,20 @@
 .profile-avatar {
     width: 80px;
     height: 80px;
-    background-color: #6351ce !important;
+    background-color: var(--primary) !important;
 }
 
 .btn-primary {
-    background-color: #6351ce !important;
+    background-color: var(--primary) !important;
     border: none !important;
 }
 
 .btn-primary:hover {
-    background-color: #5344b0 !important;
+    background-color: var(--primary-dark) !important;
 }
 
 .progress {
-    background-color: #e9ecef;
+    background-color: var(--bg-input);
     border-radius: 10px;
 }
 
@@ -166,7 +198,7 @@
 .list-group-custom-bg .list-group-item {
     background-color: transparent !important;
     /* Override Bootstrap's default white background */
-    color: #333333;
+    color: var(--text-primary);
 }
 
 .container {
@@ -191,15 +223,15 @@ footer {
 }
 
 .job-item:hover {
-    background-color: #f8f9fa;
-    border-left: 4px solid #6351ce;
+    background-color: var(--bg-lighter);
+    border-left: 4px solid var(--primary);
     transform: translateX(5px);
 }
 
 /* View All Open Positions Button */
 .view-all-btn {
-    background-color: #6351ce;
-    color: white;
+    background-color: var(--primary);
+    color: var(--text-white);
     padding: 10px 25px;
     border-radius: 25px;
     text-decoration: none;
@@ -207,7 +239,8 @@ footer {
 }
 
 .view-all-btn:hover {
-    background-color: #5344b0;
+    color: #FFCB06;
+    background-color: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
@@ -223,7 +256,7 @@ footer {
 /* Icon styles */
 h3 .bi {
     margin-right: 0.5rem;
-    color: #6351ce;
+    color: var(--primary);
 }
 
 /* Section title styles */
@@ -240,21 +273,21 @@ h3 .bi {
     left: 0;
     width: 50px;
     height: 2px;
-    background-color: #6351ce;
+    background-color: var(--primary);
 }
 
 /* Recent jobs section */
 .recent-jobs-section {
-    background-color: #f9f9f9;
+    background-color: var(--bg-light);
     padding: 25px;
     border-radius: 10px;
 }
 
 /* Upload button styles */
 .upload-btn {
-    background-color: #6351ce !important;
+    background-color: var(--primary) !important;
     border: none !important;
-    color: white !important;
+    color: var(--text-white) !important;
     padding: 10px 20px !important;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -262,7 +295,7 @@ h3 .bi {
 }
 
 .upload-btn:hover {
-    background-color: #5344b0 !important;
+    background-color: var(--primary-dark) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(99, 81, 206, 0.2);
 }
