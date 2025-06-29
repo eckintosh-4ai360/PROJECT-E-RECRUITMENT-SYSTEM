@@ -8,35 +8,35 @@ from markupsafe import Markup
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     email = StringField("Email", validators=[DataRequired(), Email()], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     first_name = StringField("First Name", validators=[DataRequired()], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     last_name = StringField("Last Name", validators=[DataRequired()], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     password = PasswordField("Password", validators=[DataRequired(), Length(min=6)], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")], 
     render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px;  color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px;  color: green"
         ,})
     submit = SubmitField(Markup('<i class="bi bi-person-plus me-1"></i> Register'))
 
@@ -79,12 +79,12 @@ class ProfileEditForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()], 
             render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,}
  )
     password = PasswordField("Password", validators=[DataRequired()], 
             render_kw={
-            "style": "border: 2px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
         ,})
     remember_me = BooleanField("Remember Me", )
     submit = SubmitField("Sign In")
@@ -117,23 +117,33 @@ class ResumeUploadForm(FlaskForm):
         FileAllowed(["pdf", "docx"], "Only PDF and DOCX files are allowed!")
     ])
     is_primary = BooleanField("Set as primary resume")
-    submit = SubmitField(Markup('<i class="bi bi-upload me-1"></i> Upload'))
 
 class JobForm(FlaskForm):
     title = StringField("Job Title", validators=[DataRequired()])
     department = StringField("Department", validators=[DataRequired()])
     description = TextAreaField("Job Description", validators=[DataRequired()])
-    requirements = TextAreaField("Job Requirements", validators=[DataRequired()])
+    required_skills = TextAreaField("Required Skills", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
     salary_range = StringField("Salary Range")
     status = SelectField("Status", choices=[("open", "Open"), ("closed", "Closed")], validators=[DataRequired()])
     closing_date = DateField("Closing Date", format="%Y-%m-%d", validators=[DataRequired()])
-    submit = SubmitField(Markup('<i class="bi bi-briefcase me-1"></i> Submit Job Posting'))
+    submit = SubmitField("Submit Job Posting")
 
 class ApplicationForm(FlaskForm):
     resume = SelectField('Select Resume', coerce=int, validators=[DataRequired()])
-    cover_letter = TextAreaField('Cover Letter', validators=[DataRequired(), Length(min=100, max=2000)])
-    submit = SubmitField(Markup('<i class="bi bi-send me-1"></i> Submit Application'))
+    cover_letter = TextAreaField('Cover Letter', validators=[Optional()],
+                               render_kw={"rows": 6, "placeholder": "Type your cover letter here..."})
+    cover_letter_file = FileField('Upload Cover Letter (PDF, DOC, DOCX)', 
+                                validators=[Optional(), FileAllowed(['pdf', 'doc', 'docx'])])
+    submit = SubmitField('Submit Application', render_kw={"class": "btn-primary", "data-icon": "bi-send"})
+
+    def validate(self):
+        if not super().validate():
+            return False
+        if not self.cover_letter.data and not self.cover_letter_file.data:
+            self.cover_letter.errors.append('Please provide a cover letter - either type it or upload a file.')
+            return False
+        return True
 
 class InterviewForm(FlaskForm):
     interview_date = DateField('Interview Date', format='%Y-%m-%d', validators=[DataRequired()])

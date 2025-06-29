@@ -43,7 +43,7 @@ class User(UserMixin, db.Model):
     def profile_image_url(self):
         """Returns the URL for the user's profile image"""
         if self.profile_image:
-            return f"/static/img/{self.profile_image}"
+            return f"/static/profile_images/{self.profile_image}"
         return None
 
     # Relationships
@@ -114,13 +114,14 @@ class Job(db.Model):
     job_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    requirements = db.Column(db.Text)
+    required_skills = db.Column(db.Text)
     department = db.Column(db.String(100), default="Computer Science")
     location = db.Column(db.String(100))
     salary_range = db.Column(db.String(100))
     posted_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     posted_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     status = db.Column(db.String(50), nullable=False, default="open")
+    closing_date = db.Column(db.DateTime)
 
     # Relationships
     applications = db.relationship("Application", backref="job", lazy=True)
@@ -136,6 +137,7 @@ class Application(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey("jobs.job_id"), nullable=False)
     resume_id = db.Column(db.Integer, db.ForeignKey("resumes.resume_id"))
     cover_letter = db.Column(db.Text)
+    cover_letter_file = db.Column(db.String(512))  # Path to uploaded cover letter file
     status = db.Column(Enum(ApplicationStatus, native_enum=False), nullable=False, default=ApplicationStatus.submitted)
     application_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

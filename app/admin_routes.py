@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, send_file
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, send_file, send_from_directory
 from flask_login import login_required, current_user
 from app.models import User, Job, Application, Resume, ApplicationStatus
 from app import db
 import os
 from werkzeug.utils import secure_filename
 from app.utils import show_pdf
+import logging
 
 admin = Blueprint('admin', __name__)
 
@@ -47,7 +48,12 @@ def all_applications():
     
     # Apply filters
     if status:
-        query = query.filter(Application.status == status)
+        try:
+            # Convert the status string to enum value
+            status_enum = ApplicationStatus[status.lower()]
+            query = query.filter(Application.status == status_enum)
+        except (KeyError, AttributeError):
+            flash('Invalid status filter', 'warning')
     if department:
         query = query.filter(Job.department == department)
     
@@ -115,3 +121,49 @@ def download_resume(application_id):
         as_attachment=True,
         download_name=application.resume.original_filename
     )
+
+@admin.route('/applications/<int:application_id>/cover-letter/download')
+@login_required
+def download_cover_letter(application_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+    
+    application = Application.query.get_or_404(application_id)
+    if not application.cover_letter_file:
+        flash('No cover letter file found.', 'warning')
+        return redirect(url_for('main.view_application', application_id=application_id))
+    
+    try:
+        return send_from_directory(
+            current_app.config['UPLOAD_FOLDER'],
+            application.cover_letter_file,
+            as_attachment=True
+        )
+    except Exception as e:
+        logger.error(f"Error downloading cover letter: {e}", exc_info=True)
+        flash('Error downloading cover letter file.', 'danger')
+        return redirect(url_for('main.view_application', application_id=application_id))
+
+@admin.route('/applications/<int:application_id>/cover-letter/view')
+@login_required
+def view_cover_letter(application_id):
+    if not current_user.is_admin():
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+    
+    application = Application.query.get_or_404(application_id)
+    if not application.cover_letter_file:
+        flash('No cover letter file found.', 'warning')
+        return redirect(url_for('main.view_application', application_id=application_id))
+    
+    try:
+        return send_from_directory(
+            current_app.config['UPLOAD_FOLDER'],
+            application.cover_letter_file,
+            as_attachment=False
+        )
+    except Exception as e:
+        logger.error(f"Error viewing cover letter: {e}", exc_info=True)
+        flash('Error viewing cover letter file.', 'danger')
+        return redirect(url_for('main.view_application', application_id=application_id))

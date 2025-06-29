@@ -3,7 +3,16 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="display-5">User Management</h1>
+        <h2  style="color:var(--primary-dark); "><i class="bi bi-people " style="margin-right:6px"></i>User Management</h2>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+        
+        <div>
+           
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
+                <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
     </div>
 
     <div class="card shadow-sm" style="border: 3px solid white; outline: 1px solid green;">
@@ -12,13 +21,13 @@
                 <table class="table table-hover table-sm">
                     <thead>
                         <tr>
-                            <th style="padding: 0.25rem 0.5rem;">Profile</th>
-                            <th style="padding: 0.25rem 0.5rem;">Username</th>
-                            <th style="padding: 0.25rem 0.5rem;">Full Name</th>
-                            <th style="padding: 0.25rem 0.5rem;">Email</th>
-                            <th style="padding: 0.25rem 0.5rem;">Phone Number</th>
-                            <th style="padding: 0.25rem 0.5rem;">Role</th>
-                            <th style="padding: 0.25rem 0.5rem;">Joined Date</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Profile</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Username</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Full Name</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Email</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Phone Number</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Role</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Joined Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +54,7 @@
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.email }}</td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
-                                <span class="badge bg-{{ 'primary' if user.role.value == 'admin' else 'secondary' }}">
+                                <span class="badge bg-{{ 'success' if user.role.value == 'admin' else 'secondary' }}">
                                     {{ user.role.value }}
                                 </span>
                             </td>

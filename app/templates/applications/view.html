@@ -49,8 +49,44 @@
                         <!-- Cover Letter -->
                         <div class="col-12">
                             <h6 class="text-muted mb-2">Cover Letter</h6>
-                            <div class="border rounded p-3 bg-light">
-                                {{ application.cover_letter|nl2br }}
+                            <div class="row">
+                                {% if application.cover_letter %}
+                                <div class="col-12 {% if application.cover_letter_file %}col-lg-6{% endif %} mb-3">
+                                    <div class="border rounded p-3 bg-light">
+                                        {{ application.cover_letter|nl2br }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if application.cover_letter_file %}
+                                <div class="col-12 {% if application.cover_letter %}col-lg-6{% endif %} mb-3">
+                                    <div class="border rounded p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-text fs-4 me-2"></i>
+                                            <div class="flex-grow-1">
+                                                <p class="mb-0">Uploaded Cover Letter</p>
+                                                <small class="text-muted">
+                                                    {{ application.cover_letter_file.split('/')[-1] }}
+                                                </small>
+                                            </div>
+                                            <div class="ms-2">
+                                                <a href="{{ url_for('admin.download_cover_letter', application_id=application.application_id) }}" 
+                                                   class="btn btn-sm btn-outline-primary me-2" 
+                                                   target="_blank">
+                                                    <i class="bi bi-download"></i> Download
+                                                </a>
+                                                {% if current_user.is_admin() %}
+                                                <a href="{{ url_for('admin.view_cover_letter', application_id=application.application_id) }}" 
+                                                   class="btn btn-sm btn-outline-secondary"
+                                                   target="_blank">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
 

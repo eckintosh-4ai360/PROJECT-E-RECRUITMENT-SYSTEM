@@ -398,6 +398,16 @@ def admin_dashboard():
             )
         )
 
+        # Debug logging for profile images
+        for application in recent_applications.items:
+            logger.info(f"Application ID: {application.application_id}")
+            logger.info(f"Applicant: {application.applicant.first_name} {application.applicant.last_name}")
+            logger.info(f"Profile Image Path: {application.applicant.profile_image}")
+            if application.applicant.profile_image:
+                image_path = os.path.join(current_app.static_folder, 'profile_images', application.applicant.profile_image)
+                logger.info(f"Full Image Path: {image_path}")
+                logger.info(f"Image exists: {os.path.exists(image_path)}")
+
         # Log the number of applications fetched for debugging
         logger.info(f"Admin dashboard fetched {recent_applications.total} recent applications")
 
@@ -494,8 +504,36 @@ def delete_resume(resume_id):
         return redirect(url_for("main.user_profile"))
     
     try:
+        # Check if this is the primary resume and there are other resumes
+        if resume.is_primary:
+            other_resume = Resume.query.filter(
+                Resume.candidate_id == current_user.id,
+                Resume.resume_id != resume.resume_id
+            ).first()
+            if other_resume:
+                # Make the other resume primary
+                other_resume.is_primary = True
+
         # Delete associated matches first
         JobMatch.query.filter_by(resume_id=resume.resume_id).delete()
+        
+        # Update applications to use another resume if available
+        applications = Application.query.filter_by(resume_id=resume.resume_id).all()
+        if applications:
+            # Find another resume to associate with the applications
+            alternate_resume = Resume.query.filter(
+                Resume.candidate_id == current_user.id,
+                Resume.resume_id != resume.resume_id
+            ).first()
+            
+            if alternate_resume:
+                # Update applications to use the alternate resume
+                for application in applications:
+                    application.resume_id = alternate_resume.resume_id
+            else:
+                # If no alternate resume exists, we need to delete the applications
+                for application in applications:
+                    db.session.delete(application)
         
         # Delete the file from storage
         file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], resume.file_path)
@@ -503,16 +541,21 @@ def delete_resume(resume_id):
             os.remove(file_path)
             logger.info(f"Deleted resume file: {file_path}")
         else:
-             logger.warning(f"Resume file not found for deletion: {file_path}")
+            logger.warning(f"Resume file not found for deletion: {file_path}")
 
         # Delete the resume record
         db.session.delete(resume)
         db.session.commit()
-        flash("Resume deleted successfully.", "success")
+        
+        if applications and not alternate_resume:
+            flash("Resume deleted successfully. Note: Related job applications were also deleted since no alternate resume was available.", "warning")
+        else:
+            flash("Resume deleted successfully.", "success")
+        
         logger.info(f"Deleted resume record {resume_id} for user {current_user.id}")
     except Exception as e:
         db.session.rollback()
-        flash("Error deleting resume.", "danger")
+        flash("Error deleting resume. Please try again.", "danger")
         logger.error(f"Error deleting resume {resume_id}: {e}", exc_info=True)
         
     return redirect(url_for("main.user_profile"))
@@ -526,11 +569,13 @@ def create_job():
         job = Job(
             title=form.title.data,
             description=form.description.data,
-            requirements=form.requirements.data,
+            required_skills=form.required_skills.data,
             department=form.department.data,
             location=form.location.data,
             salary_range=form.salary_range.data,
-            status="open"
+            status=form.status.data,
+            closing_date=form.closing_date.data,
+            posted_by=current_user.id
         )
         try:
             db.session.add(job)
@@ -666,7 +711,6 @@ def apply_for_job(job_id):
         flash("This position is no longer accepting applications.", "warning")
         return redirect(url_for("main.view_job_detail", job_id=job_id))
     
-    # Check if already applied
     existing_application = Application.query.filter_by(
         candidate_id=current_user.id,
         job_id=job_id
@@ -677,61 +721,50 @@ def apply_for_job(job_id):
         return redirect(url_for("main.view_application", application_id=existing_application.application_id))
     
     form = ApplicationForm()
-    # Get user's resumes for the dropdown
     form.resume.choices = [(r.resume_id, r.original_filename) 
                           for r in Resume.query.filter_by(candidate_id=current_user.id).all()]
     
     if form.validate_on_submit():
         try:
+            cover_letter_file_path = None
+            if form.cover_letter_file.data:
+                file = form.cover_letter_file.data
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                
+                cover_letters_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'cover_letters')
+                os.makedirs(cover_letters_dir, exist_ok=True)
+                
+                file_path = os.path.join(cover_letters_dir, unique_filename)
+                file.save(file_path)
+                cover_letter_file_path = f"cover_letters/{unique_filename}"
+            
             application = Application(
                 candidate_id=current_user.id,
                 job_id=job_id,
                 resume_id=form.resume.data,
                 cover_letter=form.cover_letter.data,
+                cover_letter_file=cover_letter_file_path,
                 status=ApplicationStatus.submitted
             )
+            
             db.session.add(application)
             db.session.commit()
             
-            # Log success for debugging
-            logger.info(f"Application created successfully for user {current_user.id} and job {job_id}")
+            flash("Your application has been submitted successfully!", "success")
+            return redirect(url_for("main.view_application", application_id=application.application_id))
             
-            # Send email notifications
-            try:
-                # Notify candidate
-                send_email(
-                    subject="Application Submitted Successfully",
-                    recipients=[current_user.email],
-                    template="email/application_submitted.html",
-                    user=current_user,
-                    job=job
-                )
-                
-                # Notify admin
-                admin_users = User.query.filter_by(role=UserRole.admin).all()
-                admin_emails = [admin.email for admin in admin_users]
-                if admin_emails:
-                    send_email(
-                        subject=f"New Job Application - {job.title}",
-                        recipients=admin_emails,
-                        template="email/new_application_admin.html",
-                        user=current_user,
-                        job=job,
-                        application=application
-                    )
-            except Exception as email_err:
-                logger.error(f"Failed to send application notification emails: {email_err}", exc_info=True)
-                # Don't block the application process, just log
-        except Exception as db_err:
-            db.session.rollback()  # Rollback on error to avoid partial saves
-            logger.error(f"Error creating application: {str(db_err)}", exc_info=True)
-            flash("There was an error submitting your application. Please try again.", "danger")
-            return redirect(url_for('main.apply_for_job', job_id=job_id))  # Redirect back to form
-
-        flash("Your application has been submitted successfully!", "success")
-        return redirect(url_for("main.view_application", application_id=application.application_id))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error submitting application: {e}", exc_info=True)
+            flash("Error submitting your application. Please try again.", "danger")
     
-    return render_template("jobs/apply.html", title=f"Apply - {job.title}", form=form, job=job)
+    return render_template(
+        "jobs/apply.html",
+        title=f"Apply for {job.title}",
+        form=form,
+        job=job
+    )
 
 @bp.route("/applications/<int:application_id>")
 @login_required
@@ -897,3 +930,49 @@ def update_application_status(application_id):
         flash("Error updating application status. Please try again.", "danger")
     
     return redirect(url_for("main.view_application", application_id=application_id)) 
+
+@bp.route("/admin/fix-profile-images")
+@login_required
+@admin_required
+def fix_profile_images():
+    """Fix profile image paths in the database."""
+    try:
+        # Get all users with profile images
+        users_with_images = User.query.filter(User.profile_image.isnot(None)).all()
+        fixed_count = 0
+        
+        for user in users_with_images:
+            logger.info(f"Checking user {user.id}: {user.first_name} {user.last_name}")
+            logger.info(f"Current profile image: {user.profile_image}")
+            
+            # Check if image exists in profile_images directory
+            profile_images_path = os.path.join(current_app.static_folder, 'profile_images', user.profile_image)
+            if os.path.exists(profile_images_path):
+                logger.info(f"Image already in correct location: {profile_images_path}")
+                continue
+                
+            # Check if image exists in old location
+            old_path = os.path.join(current_app.static_folder, 'img', user.profile_image)
+            if os.path.exists(old_path):
+                try:
+                    # Move file to new location
+                    os.rename(old_path, profile_images_path)
+                    fixed_count += 1
+                    logger.info(f"Moved image from {old_path} to {profile_images_path}")
+                except Exception as e:
+                    logger.error(f"Error moving file for user {user.id}: {str(e)}")
+            else:
+                logger.warning(f"Image not found in either location for user {user.id}")
+                # If image doesn't exist anywhere, set profile_image to None
+                user.profile_image = None
+                fixed_count += 1
+        
+        db.session.commit()
+        flash(f"Fixed {fixed_count} profile image paths", "success")
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error fixing profile images: {str(e)}")
+        flash("Error fixing profile images", "danger")
+    
+    return redirect(url_for("admin.admin_dashboard")) 

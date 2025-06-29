@@ -16,7 +16,7 @@
                         <p>{{ job.description|nl2br }}</p>
                     </div>
 
-                    <form method="POST" action="{{ url_for('main.apply_for_job', job_id=job.job_id) }}">
+                    <form method="POST" action="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-3">
@@ -35,17 +35,26 @@
 
                         <div class="mb-3">
                             <label for="cover_letter" class="form-label">Cover Letter</label>
-                            {{ form.cover_letter(class="form-control", rows=6) }}
+                            {{ form.cover_letter(class="form-control") }}
                             {% for error in form.cover_letter.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
-                            <div class="form-text">
-                                Explain why you're a good fit for this position (100-2000 characters).
-                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="cover_letter_file" class="form-label">
+                                <i class="bi bi-upload me-1"></i>Upload Cover Letter
+                            </label>
+                            {{ form.cover_letter_file(class="form-control") }}
+                            {% for error in form.cover_letter_file.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <div class="d-grid gap-2">
-                            {{ form.submit(class="btn btn-primary") }}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send me-2"></i>Submit Application
+                            </button>
                             <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" 
                                class="btn btn-outline-secondary">Cancel</a>
                         </div>

@@ -58,8 +58,21 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
+                        <!-- Candidate Image -->
+                        <div class="col-md-1">
+                            {% if application.applicant.profile_image %}
+                            <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" 
+                                 class="rounded-circle" alt="Profile Image" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="bi bi-person text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
                         <!-- Job Title and Company -->
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <h5 class="card-title mb-1">{{ application.job.title }}</h5>
                             <p class="text-muted mb-0">{{ application.job.department }}</p>
                         </div>

@@ -57,8 +57,8 @@ def save_profile_image(file):
         return None
     
     try:
-        # Use img directory for profile images
-        profile_images_path = os.path.join(current_app.static_folder, 'img')
+        # Use profile_images directory for profile images
+        profile_images_path = os.path.join(current_app.static_folder, 'profile_images')
         os.makedirs(profile_images_path, exist_ok=True)
         
         # Generate a unique filename

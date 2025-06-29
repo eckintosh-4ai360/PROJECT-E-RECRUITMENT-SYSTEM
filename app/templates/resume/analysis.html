@@ -2,18 +2,20 @@
 
 {% block content %}
 <div class="container py-5">
-    <!-- Resume Header -->
-    <div class="row mb-4">
+    <!-- Modern Resume Header -->
+    <div class="resume-analysis-header">
+        <div class="row align-items-center">
         <div class="col-md-8">
-            <h1 class="display-5 fw-bold text-primary mb-3">Resume Analysis</h1>
-            <p class="lead text-muted">
-                Detailed analysis and recommendations for your resume: {{ resume.original_filename }}
+                <h1 class="mb-2">Resume Analysis</h1>
+                <p class="lead mb-0">
+                    {{ resume.original_filename }}
             </p>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ url_for('main.user_profile') }}" class="btn btn-outline-primary">
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('main.user_profile') }}" class="btn btn-light">
                 <i class="bi bi-arrow-left"></i> Back to Profile
             </a>
+            </div>
         </div>
     </div>
 
@@ -22,10 +24,10 @@
         <!-- Left Column - Resume Content and Completeness -->
         <div class="col-lg-8">
             <!-- Resume Preview -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-file-text me-2"></i>Resume Content
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text"></i>Resume Content
                     </h5>
                 </div>
                 <div class="card-body">
@@ -47,7 +49,7 @@
                         </div>
                     {% else %}
                         <div class="parsed-content">
-                            <pre>{{ resume.parsed_text }}</pre>
+                            <pre class="bg-light p-3 rounded">{{ resume.parsed_text }}</pre>
                         </div>
                     {% endif %}
                 </div>
@@ -55,45 +57,57 @@
 
             <!-- Completeness Analysis -->
             {% if analysis and analysis.completeness %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-check-circle me-2"></i>Resume Completeness
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-check-circle"></i>Resume Completeness
                     </h5>
-                    <span class="badge bg-{{ 'success' if analysis.completeness.completeness_score >= 0.8 else 'warning' if analysis.completeness.completeness_score >= 0.6 else 'danger' }} rounded-pill">
+                        <div class="match-score-badge {{ 'high' if analysis.completeness.completeness_score >= 0.8 else 'medium' if analysis.completeness.completeness_score >= 0.6 else 'low' }}">
+                            <i class="bi bi-pie-chart"></i>
                         {{ "%.0f"|format(analysis.completeness.completeness_score * 100) }}%
-                    </span>
+                        </div>
+                    </div>
+                    <div class="completeness-indicator mt-3">
+                        <div class="completeness-bar bg-{{ 'success' if analysis.completeness.completeness_score >= 0.8 else 'warning' if analysis.completeness.completeness_score >= 0.6 else 'danger' }}"
+                             style="width: {{ analysis.completeness.completeness_score * 100 }}%">
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Present Sections -->
                     {% if analysis.completeness.present_sections %}
+                    <div class="section-status present mb-4">
                     <h6 class="text-success mb-3">
-                        <i class="bi bi-check2"></i> Present Sections
+                            <i class="bi bi-check2-circle"></i> Present Sections
                     </h6>
-                    <div class="mb-4">
+                        <div>
                         {% for section in analysis.completeness.present_sections %}
-                        <span class="badge bg-success-subtle text-success me-2 mb-2">{{ section|title }}</span>
+                            <span class="skill-badge">{{ section|title }}</span>
                         {% endfor %}
+                        </div>
                     </div>
                     {% endif %}
 
                     <!-- Missing Sections -->
                     {% if analysis.completeness.missing_sections %}
+                    <div class="section-status missing">
                     <h6 class="text-danger mb-3">
                         <i class="bi bi-exclamation-triangle"></i> Missing Sections
                     </h6>
                     <div class="list-group list-group-flush">
                         {% for missing in analysis.completeness.missing_sections %}
-                        <div class="list-group-item border-0 ps-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ missing.section|title }}</h6>
-                                <small class="text-{{ 'danger' if missing.importance == 'critical' else 'warning' if missing.importance == 'high' else 'info' }}">
+                            <div class="p-3 rounded mb-2 bg-white">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">{{ missing.section|title }}</h6>
+                                    <span class="badge bg-{{ 'danger' if missing.importance == 'critical' else 'warning' if missing.importance == 'high' else 'info' }}">
                                     {{ missing.importance|title }}
-                                </small>
+                                    </span>
+                                </div>
+                                <p class="mb-0 text-muted small">{{ missing.tip }}</p>
                             </div>
-                            <p class="mb-1 text-muted small">{{ missing.tip }}</p>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
                     {% endif %}
                 </div>
@@ -101,23 +115,23 @@
             {% endif %}
         </div>
 
-        <!-- Right Column - Skills, Experience, and Recommendations -->
+        <!-- Right Column - Skills and Experience -->
         <div class="col-lg-4">
             <!-- Skills Analysis -->
             {% if analysis and analysis.skills %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-gear me-2"></i>Skills Analysis
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i>Skills Analysis
                     </h5>
                 </div>
                 <div class="card-body">
                     {% for category, skills in analysis.skills.items() %}
-                    <div class="mb-3">
-                        <h6 class="text-primary mb-2">{{ category|title|replace('_', ' ') }}</h6>
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">{{ category|title|replace('_', ' ') }}</h6>
                         <div>
                             {% for skill in skills %}
-                            <span class="badge bg-light text-dark border me-2 mb-2">{{ skill }}</span>
+                            <span class="skill-badge">{{ skill }}</span>
                             {% endfor %}
                         </div>
                     </div>
@@ -128,19 +142,21 @@
 
             <!-- Experience Level -->
             {% if analysis and analysis.experience %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-briefcase me-2"></i>Experience Level
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-briefcase"></i>Experience Level
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Years of Experience</h6>
-                            <p class="text-muted mb-0">{{ analysis.experience.years }} years</p>
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                        <div>
+                            <h6 class="mb-1">Years of Experience</h6>
+                            <p class="h4 mb-0 text-primary">{{ analysis.experience.years }} years</p>
                         </div>
-                        <span class="badge bg-primary">{{ analysis.experience.level|title }}</span>
+                        <span class="match-score-badge {{ 'high' if analysis.experience.years >= 5 else 'medium' if analysis.experience.years >= 2 else 'low' }}">
+                            {{ analysis.experience.level|title }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -150,10 +166,10 @@
 
     <!-- Job Matches -->
     {% if matched_jobs %}
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-                <i class="bi bi-briefcase me-2"></i>Matching Job Opportunities
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-briefcase"></i>Matching Job Opportunities
             </h5>
         </div>
         <div class="card-body">
@@ -170,21 +186,15 @@
                     <tbody>
                         {% for match in matched_jobs %}
                         <tr>
-                            <td>{{ match.job.title }}</td>
-                            <td>{{ match.job.department }}</td>
-                            <td>
-                                <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar bg-{{ 'success' if match.match_score >= 0.7 else 'warning' if match.match_score >= 0.5 else 'danger' }}"
-                                        role="progressbar"
-                                        style="width: {{ match.match_score * 100 }}%"
-                                        aria-valuenow="{{ match.match_score * 100 }}"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100">
-                                        {{ "%.0f"|format(match.match_score * 100) }}%
-                                    </div>
+                            <td class="align-middle">{{ match.job.title }}</td>
+                            <td class="align-middle">{{ match.job.department }}</td>
+                            <td class="align-middle" style="width: 200px;">
+                                <div class="match-score-badge {{ 'high' if match.match_score >= 0.7 else 'medium' if match.match_score >= 0.5 else 'low' }}">
+                                    <i class="bi bi-pie-chart-fill"></i>
+                                    {{ "%.0f"|format(match.match_score * 100) }}% Match
                                 </div>
                             </td>
-                            <td>
+                            <td class="align-middle">
                                 <a href="{{ url_for('main.view_job_detail', job_id=match.job.job_id) }}" 
                                    class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> View Details
@@ -201,26 +211,25 @@
 
     <!-- Course Recommendations -->
     {% if recommended_courses %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-book me-2"></i>Recommended Courses
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-book"></i>Recommended Courses
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="row g-4">
                         {% for category, courses in recommended_courses.items() %}
-                        <div class="col">
-                            <div class="card h-100 border">
+                <div class="col-md-6 col-lg-4">
+                    <div class="course-card h-100">
                                 <div class="card-body">
-                                    <h6 class="card-title">{{ category }}</h6>
+                            <h6 class="card-title text-primary mb-3">{{ category }}</h6>
                                     <div class="list-group list-group-flush">
                                         {% for course in courses %}
                                         <a href="{{ course['Link'] }}" 
                                            target="_blank" 
-                                           class="list-group-item list-group-item-action">
+                                   class="course-link">
+                                    <i class="bi bi-play-circle me-2"></i>
                                             {{ course["Course Name"] }}
                                         </a>
                                         {% endfor %}
@@ -229,38 +238,70 @@
                             </div>
                         </div>
                         {% endfor %}
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     {% endif %}
 
-    <!-- Resume Writing Tips -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-camera-video me-2"></i>Resume & Interview Tips
+    <!-- Resume & Interview Tips -->
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-camera-video"></i>Resume & Interview Tips
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+            <div class="row g-4">
                         <!-- Resume Writing Tips -->
                         <div class="col-md-6">
-                            <h6 class="mb-3">Resume Writing Tips</h6>
-                            <div class="ratio ratio-16x9 mb-3">
+                    <div class="video-card">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-file-text me-2"></i>Resume Writing Tips
+                        </h6>
+                        <div class="ratio ratio-16x9 rounded overflow-hidden mb-3">
                                 <iframe src="https://www.youtube.com/embed/y8YH0Qbu5h4" 
-                                        allowfullscreen></iframe>
+                                    allowfullscreen
+                                    class="shadow-sm"></iframe>
+                        </div>
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Keep your resume clear and concise
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Tailor your resume to the job
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Highlight your achievements
+                            </div>
+                        </div>
                             </div>
                         </div>
                         <!-- Interview Tips -->
                         <div class="col-md-6">
-                            <h6 class="mb-3">Interview Tips</h6>
-                            <div class="ratio ratio-16x9 mb-3">
+                    <div class="video-card">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person-video3 me-2"></i>Interview Tips
+                        </h6>
+                        <div class="ratio ratio-16x9 rounded overflow-hidden mb-3">
                                 <iframe src="https://www.youtube.com/embed/Ji46s5BHdr0" 
-                                        allowfullscreen></iframe>
+                                    allowfullscreen
+                                    class="shadow-sm"></iframe>
+                        </div>
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Research the company beforehand
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Practice common interview questions
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Prepare relevant examples
                             </div>
                         </div>
                     </div>
@@ -269,26 +310,4 @@
         </div>
     </div>
 </div>
-
-<!-- Add custom styles for resume content -->
-<style>
-.parsed-content {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.parsed-content pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-family: inherit;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin: 0;
-}
-
-.pdf-container {
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-}
-</style>
 {% endblock %} 
