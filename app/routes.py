@@ -82,25 +82,48 @@ def upload_resume():
                     jobs_data = [{
                         "job_id": job.job_id,
                         "description": job.description,
-                        "title": job.title
+                        "title": job.title,
+                        "requirements": getattr(job, 'requirements', '')  # Use getattr with default empty string
                     } for job in jobs_to_analyze]
                     
-                    # Perform analysis
-                    analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
-                    
-                    if not analysis_results:
-                        flash("Resume uploaded, but analysis could not be completed.", "warning")
-                        return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
+                    # Try enhanced semantic job matching first
+                    try:
+                        from app.semantic_job_matcher import enhanced_job_matching
+                        
+                        # Perform resume analysis
+                        analysis = resume_analyzer.analyze_resume(parsed_text)
+                        
+                        # Generate job matches with enhanced algorithm
+                        matches = enhanced_job_matching(
+                            resume_text=parsed_text,
+                            resume_analysis=analysis,
+                            jobs_data=jobs_data
+                        )
+                        
+                        logger.info(f"Enhanced semantic job matching completed for resume {new_resume.resume_id}")
+                        
+                    except ImportError:
+                        # Fall back to basic matching
+                        logger.warning("Enhanced job matching not available, using basic algorithm")
+                        
+                        # Perform analysis with basic algorithm
+                        analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
+                        
+                        if not analysis_results:
+                            flash("Resume uploaded, but analysis could not be completed.", "warning")
+                            return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
+                            
+                        matches = analysis_results.get("matches", [])
                     
                     # Delete old matches
                     JobMatch.query.filter_by(resume_id=new_resume.resume_id).delete()
 
                     # Save new matches
                     matches_saved = 0
-                    for match in analysis_results["matches"]:
+                    for match in matches:
                         if match["match_score"] > 0.05:  # 5% minimum threshold
                             db_match = JobMatch(
-                                resume_id=match["resume_id"],
+                                resume_id=new_resume.resume_id,
                                 job_id=match["job_id"],
                                 match_score=match["match_score"],
                                 match_details=match.get("match_details")
@@ -648,7 +671,64 @@ def resume_analysis(resume_id):
         # Perform resume analysis
         analysis = resume_analyzer.analyze_resume(resume.parsed_text)
         
-        # Get job matches for this resume
+        # Get all active jobs for matching
+        active_jobs = Job.query.filter_by(status='open').all()
+        jobs_data = [
+            {
+                "job_id": job.job_id,
+                "title": job.title,
+                "description": job.description,
+                "requirements": getattr(job, 'requirements', '')  # Use getattr with default empty string
+            }
+            for job in active_jobs
+        ]
+        
+        # Use enhanced semantic job matching
+        try:
+            from app.semantic_job_matcher import enhanced_job_matching
+            
+            # Generate job matches with enhanced algorithm
+            enhanced_matches = enhanced_job_matching(
+                resume_text=resume.parsed_text,
+                resume_analysis=analysis,
+                jobs_data=jobs_data
+            )
+            
+            # Update or create JobMatch records
+            for match in enhanced_matches:
+                job_id = match["job_id"]
+                match_score = match["match_score"]
+                match_details = match["match_details"]
+                
+                # Check if match record exists
+                existing_match = JobMatch.query.filter_by(
+                    resume_id=resume_id,
+                    job_id=job_id
+                ).first()
+                
+                if existing_match:
+                    # Update existing match
+                    existing_match.match_score = match_score
+                    existing_match.match_details = match_details
+                    existing_match.calculated_at = datetime.utcnow()
+                else:
+                    # Create new match record
+                    new_match = JobMatch(
+                        resume_id=resume_id,
+                        job_id=job_id,
+                        match_score=match_score,
+                        match_details=match_details
+                    )
+                    db.session.add(new_match)
+            
+            # Commit changes to database
+            db.session.commit()
+            logger.info(f"Enhanced job matching completed for resume {resume_id}")
+            
+        except ImportError:
+            logger.warning("Enhanced job matching not available, using existing matches")
+            
+        # Get job matches for this resume from database
         matches = (
             JobMatch.query
             .join(Job)

@@ -13,6 +13,7 @@
                 <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>
+        
         <div class="mb-3">
             {{ form.department.label(class="form-label") }}
             {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else "")) }}
