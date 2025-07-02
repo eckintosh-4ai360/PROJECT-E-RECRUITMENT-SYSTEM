@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Interview Scheduled</title>
+    <title>Interview Scheduled - Admin Notification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,6 +31,12 @@
             border-radius: 5px;
             margin: 15px 0;
         }
+        .candidate-details {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
         .button {
             display: inline-block;
             background-color: #044a10;
@@ -50,12 +56,19 @@
 </head>
 <body>
     <div class="header">
-        <h2>Interview Scheduled</h2>
+        <h2>Interview Scheduled - Admin Notification</h2>
     </div>
     <div class="content">
-        <p>Dear {{ user.first_name }},</p>
+        <p>Dear Admin,</p>
         
-        <p>Congratulations! We are pleased to inform you that your application for <strong>{{ job.title }}</strong> has progressed to the interview stage.</p>
+        <p>This is to inform you that an interview has been scheduled for the <strong>{{ job.title }}</strong> position.</p>
+        
+        <div class="candidate-details">
+            <h3>Candidate Information:</h3>
+            <p><strong>Name:</strong> {{ candidate.first_name }} {{ candidate.last_name }}</p>
+            <p><strong>Email:</strong> {{ candidate.email }}</p>
+            <p><strong>Application ID:</strong> {{ application.application_id }}</p>
+        </div>
         
         <div class="interview-details">
             <h3>Interview Details:</h3>
@@ -68,18 +81,16 @@
             {% endif %}
         </div>
         
-        <p>Please be prepared for your interview and ensure you have a stable internet connection if it's a remote interview. We recommend joining the meeting a few minutes early to check your audio and video settings.</p>
+        <p>Please ensure that all necessary preparations are made for this interview.</p>
         
-        <p>If you need to reschedule for any reason, please contact us as soon as possible.</p>
-        
-        <p>Good luck with your interview!</p>
+        <a href="{{ url_for('main.view_application', application_id=application.application_id, _external=True) }}" class="button">View Application Details</a>
         
         <p>Best regards,<br>
-        UMaT Job Portal Team</p>
+        UMaT Job Portal System</p>
     </div>
     <div class="footer">
-        <p>This is an automated message. Please do not reply directly to this email.</p>
-        <p>University of Mines and Technology (UMaT) Job Portal</p>
+        <p>This is an automated message from the UMaT Job Portal.</p>
+        <p>University of Mines and Technology (UMaT)</p>
     </div>
 </body>
 </html> 

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 style="color:var(--primary-dark);"><i class="bi bi-envelope-at me-2"></i>Email Settings</h2>
+                <a href="{{ url_for('main.admin_dashboard') }}" class="btn" style="border: 1px solid green; color: var(--primary-dark)">
+                    <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <span>Configure the email settings to enable notification emails for interview scheduling and other system notifications.</span>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">SMTP Email Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form.mail_server.label(class="form-label") }}
+                                    {{ form.mail_server(class="form-control") }}
+                                    {% if form.mail_server.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.mail_server.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">For Gmail: smtp.gmail.com</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.mail_port.label(class="form-label") }}
+                                    {{ form.mail_port(class="form-control") }}
+                                    {% if form.mail_port.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.mail_port.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">For Gmail: 587</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                {{ form.mail_use_tls(class="form-check-input") }}
+                                {{ form.mail_use_tls.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-text">Enable TLS for secure connection (recommended)</div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.mail_username.label(class="form-label") }}
+                            {{ form.mail_username(class="form-control") }}
+                            {% if form.mail_username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.mail_username.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Your email address (e.g., your-email@gmail.com)</div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.mail_password.label(class="form-label") }}
+                            {{ form.mail_password(class="form-control") }}
+                            {% if form.mail_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.mail_password.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <strong>For Gmail:</strong> Use an App Password, not your regular password.
+                                <a href="https://support.google.com/accounts/answer/185833" target="_blank">Learn how to create an App Password</a>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            {{ form.mail_default_sender.label(class="form-label") }}
+                            {{ form.mail_default_sender(class="form-control") }}
+                            {% if form.mail_default_sender.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.mail_default_sender.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">The email address that will appear in the "From" field</div>
+                        </div>
+
+                        <hr>
+                        
+                        <!-- Test Email Section -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Test Configuration</h5>
+                            <div class="row align-items-end">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        {{ form.test_recipient.label(class="form-label") }}
+                                        {{ form.test_recipient(class="form-control", placeholder="Enter email address") }}
+                                        {% if form.test_recipient.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.test_recipient.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Enter an email address to receive a test message</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.test_email(class="btn btn-warning w-100") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="d-flex justify-content-end">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Email Service Tips</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Gmail Configuration Tips:</h6>
+                    <ol>
+                        <li>Use <strong>smtp.gmail.com</strong> for the server and <strong>587</strong> for the port</li>
+                        <li>Enable 2-Factor Authentication on your Google account</li>
+                        <li>Generate an App Password:
+                            <ul>
+                                <li>Go to your Google Account → Security</li>
+                                <li>Under "Signing in to Google," select "App passwords"</li>
+                                <li>Generate a new app password for "Mail" on "Other"</li>
+                                <li>Use this app password instead of your regular Google password</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

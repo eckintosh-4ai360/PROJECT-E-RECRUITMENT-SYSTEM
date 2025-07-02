@@ -8,6 +8,10 @@
                 <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
             </a>
     </div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>How to schedule interviews:</strong> Find an application with status "Submitted" or "Under Review", then click the green calendar button <i class="bi bi-calendar-plus"></i> in the Actions column or click the eye icon <i class="bi bi-eye"></i> to view application details first.
+    </div>
     <hr>
 
     <!-- Filters -->
@@ -132,6 +136,12 @@
                                     <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}"
                                        class="btn btn-sm btn-warning" title="View Resume">
                                         <i class="bi bi-file-text"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if application.status.value in ['Submitted', 'Under Review'] %}
+                                    <a href="{{ url_for('main.schedule_interview', application_id=application.application_id) }}"
+                                       class="btn btn-sm btn-success" title="Schedule Interview">
+                                        <i class="bi bi-calendar-plus"></i>
                                     </a>
                                     {% endif %}
                                 </div>

@@ -5,6 +5,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-5" style="color:var(--primary-dark); font-weight: 600;">Admin Dashboard</h1>
         <div>
+            <a href="{{ url_for('main.email_settings') }}" class="btn" style="background-color: #6f42c1; color: white;">
+                <i class="bi bi-envelope-at me-1"></i> Email Settings
+            </a>
+            <a href="{{ url_for('admin.all_applications') }}" class="btn" style="background-color: blueviolet; color: white;">
+                <i class="bi bi-file-text"></i> Manage Applications
+            </a>
             <a href="{{ url_for('main.create_job') }}" class="btn" style="background-color: var(--primary-dark); color: white;">
                 <i class="bi bi-plus-circle"></i> Create New Job
             </a>

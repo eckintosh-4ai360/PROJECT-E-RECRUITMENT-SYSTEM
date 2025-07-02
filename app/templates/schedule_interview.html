@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <div class="mb-4">
                         <h5>Application Details</h5>
-                        <p><strong>Candidate:</strong> {{ application.candidate.user.first_name }} {{ application.candidate.user.last_name }}</p>
+                        <p><strong>Candidate:</strong> {{ application.applicant.first_name }} {{ application.applicant.last_name }}</p>
                         <p><strong>Position:</strong> {{ application.job.title }}</p>
                         <p><strong>Department:</strong> {{ application.job.department }}</p>
                         <p><strong>Application Date:</strong> {{ application.application_date.strftime('%Y-%m-%d') }}</p>
@@ -42,20 +42,28 @@
                         </div>
 
                         <div class="mb-3">
-                            {{ form.meeting_link.label(class="form-label") }}
-                            {{ form.meeting_link(class="form-control") }}
-                            {% for error in form.meeting_link.errors %}
+                            {{ form.interview_type.label(class="form-label") }}
+                            {{ form.interview_type(class="form-select") }}
+                            {% for error in form.interview_type.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.location_or_link.label(class="form-label") }}
+                            {{ form.location_or_link(class="form-control") }}
+                            {% for error in form.location_or_link.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
                             <div class="form-text">
-                                Provide the video conferencing link (e.g., Zoom, Google Meet, etc.)
+                                For online interviews, provide the video conferencing link (e.g., Zoom, Google Meet). For in-person interviews, provide the location.
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            {{ form.additional_notes.label(class="form-label") }}
-                            {{ form.additional_notes(class="form-control", rows=3) }}
-                            {% for error in form.additional_notes.errors %}
+                            {{ form.notes.label(class="form-label") }}
+                            {{ form.notes(class="form-control", rows=3) }}
+                            {% for error in form.notes.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
                             <div class="form-text">

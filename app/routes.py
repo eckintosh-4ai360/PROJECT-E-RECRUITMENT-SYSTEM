@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from markupsafe import Markup
-from app import db
+from app import db, login_manager
 from datetime import datetime
 from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus
 from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm, ProfileEditForm
@@ -17,6 +17,10 @@ from app.courses import course_recommender, ds_course, web_course, android_cours
 import uuid
 import json
 from sqlalchemy import and_
+from flask_wtf import FlaskForm
+from wtforms import StringField, BooleanField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, Email
+from app.utils import mail
 
 logger = logging.getLogger(__name__)
 bp = Blueprint("main", __name__)
@@ -872,9 +876,15 @@ def schedule_interview(application_id):
     form = InterviewForm()
     if form.validate_on_submit():
         try:
+            # Combine date and time fields
+            from datetime import datetime
+            date_str = form.interview_date.data.strftime('%Y-%m-%d')
+            time_str = form.interview_time.data
+            scheduled_datetime = datetime.strptime(f"{date_str} {time_str}", '%Y-%m-%d %H:%M')
+            
             interview = Interview(
                 application_id=application_id,
-                scheduled_date=form.scheduled_date.data,
+                scheduled_date=scheduled_datetime,
                 interview_type=form.interview_type.data,
                 location_or_link=form.location_or_link.data,
                 notes=form.notes.data
@@ -928,7 +938,7 @@ def schedule_interview(application_id):
             flash("Error scheduling the interview. Please try again.", "danger")
     
     return render_template(
-        "applications/schedule_interview.html",
+        "schedule_interview.html",
         title="Schedule Interview",
         form=form,
         application=application
@@ -1056,3 +1066,164 @@ def fix_profile_images():
         flash("Error fixing profile images", "danger")
     
     return redirect(url_for("admin.admin_dashboard")) 
+
+@bp.route("/my-interviews")
+@login_required
+def my_interviews():
+    if current_user.role != UserRole.candidate:
+        flash("Access denied.", "danger")
+        return redirect(url_for("main.index"))
+    
+    # Find all applications with interviews
+    applications = Application.query.filter_by(candidate_id=current_user.id)\
+        .filter(Application.status == ApplicationStatus.interview_scheduled)\
+        .join(Interview)\
+        .order_by(Interview.scheduled_date)\
+        .all()
+    
+    # Get upcoming and past interviews
+    from datetime import datetime
+    now = datetime.utcnow()
+    
+    upcoming_interviews = []
+    past_interviews = []
+    
+    for app in applications:
+        if app.interview and app.interview.scheduled_date > now:
+            upcoming_interviews.append(app)
+        elif app.interview:
+            past_interviews.append(app)
+    
+    return render_template(
+        "user/my_interviews.html",
+        title="My Interviews",
+        upcoming_interviews=upcoming_interviews,
+        past_interviews=past_interviews
+    ) 
+
+@bp.route("/admin/email-settings", methods=["GET", "POST"])
+@login_required
+@admin_required
+def email_settings():
+    """Configure email settings for the application."""
+    # Create a simple form to update email settings
+    class EmailSettingsForm(FlaskForm):
+        mail_server = StringField("SMTP Server", validators=[DataRequired()])
+        mail_port = StringField("SMTP Port", validators=[DataRequired()])
+        mail_use_tls = BooleanField("Use TLS")
+        mail_username = StringField("Email Username", validators=[DataRequired(), Email()])
+        mail_password = PasswordField("Email Password", validators=[DataRequired()])
+        mail_default_sender = StringField("Default Sender", validators=[DataRequired(), Email()])
+        test_recipient = StringField("Test Email Address", validators=[Email()], 
+                                    description="Enter an email address to receive a test message")
+        submit = SubmitField("Save Settings")
+        test_email = SubmitField("Send Test Email")
+    
+    # Read current settings from .env file if it exists
+    env_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    current_settings = {}
+    
+    try:
+        if os.path.exists(env_file):
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        current_settings[key] = value
+    except Exception as e:
+        logger.error(f"Error reading .env file: {e}")
+    
+    # Create the form
+    form = EmailSettingsForm()
+    
+    # Pre-fill form with current settings
+    if not form.is_submitted():
+        form.mail_server.data = current_app.config.get('MAIL_SERVER', '')
+        form.mail_port.data = str(current_app.config.get('MAIL_PORT', ''))
+        form.mail_use_tls.data = current_app.config.get('MAIL_USE_TLS', True)
+        form.mail_username.data = current_app.config.get('MAIL_USERNAME', '')
+        form.mail_password.data = current_app.config.get('MAIL_PASSWORD', '')
+        form.mail_default_sender.data = current_app.config.get('MAIL_DEFAULT_SENDER', '')
+    
+    # Handle form submission
+    if form.validate_on_submit():
+        try:
+            # If this is a test email request
+            if form.test_email.data and form.test_recipient.data:
+                # Save temporary config
+                current_app.config['MAIL_SERVER'] = form.mail_server.data
+                current_app.config['MAIL_PORT'] = int(form.mail_port.data)
+                current_app.config['MAIL_USE_TLS'] = form.mail_use_tls.data
+                current_app.config['MAIL_USERNAME'] = form.mail_username.data
+                current_app.config['MAIL_PASSWORD'] = form.mail_password.data
+                current_app.config['MAIL_DEFAULT_SENDER'] = form.mail_default_sender.data
+                
+                # Reinitialize the mail extension with new settings
+                mail.init_app(current_app)
+                
+                # Send test email
+                test_result = send_email(
+                    subject="UMAT Job Portal - Test Email",
+                    recipients=[form.test_recipient.data],
+                    template="email/test_email.html",
+                    user=current_user
+                )
+                
+                if test_result:
+                    flash(f"Test email sent to {form.test_recipient.data}!", "success")
+                else:
+                    flash(f"Failed to send test email. Please check the server logs for details.", "danger")
+                
+                return redirect(url_for('main.email_settings'))
+            
+            # If this is a save settings request
+            elif form.submit.data:
+                # Save settings to .env file
+                env_content = []
+                
+                # Read existing content first
+                if os.path.exists(env_file):
+                    with open(env_file, 'r') as f:
+                        for line in f:
+                            # Skip the lines we'll be replacing
+                            if not line.strip().startswith(('MAIL_SERVER=', 'MAIL_PORT=', 'MAIL_USE_TLS=', 
+                                                          'MAIL_USERNAME=', 'MAIL_PASSWORD=', 
+                                                          'MAIL_DEFAULT_SENDER=')):
+                                env_content.append(line.strip())
+                
+                # Add new settings
+                env_content.append(f"MAIL_SERVER={form.mail_server.data}")
+                env_content.append(f"MAIL_PORT={form.mail_port.data}")
+                env_content.append(f"MAIL_USE_TLS={'true' if form.mail_use_tls.data else 'false'}")
+                env_content.append(f"MAIL_USERNAME={form.mail_username.data}")
+                env_content.append(f"MAIL_PASSWORD={form.mail_password.data}")
+                env_content.append(f"MAIL_DEFAULT_SENDER={form.mail_default_sender.data}")
+                
+                # Write the file
+                with open(env_file, 'w') as f:
+                    f.write('\n'.join(env_content))
+                
+                # Update current app config
+                current_app.config['MAIL_SERVER'] = form.mail_server.data
+                current_app.config['MAIL_PORT'] = int(form.mail_port.data)
+                current_app.config['MAIL_USE_TLS'] = form.mail_use_tls.data
+                current_app.config['MAIL_USERNAME'] = form.mail_username.data
+                current_app.config['MAIL_PASSWORD'] = form.mail_password.data
+                current_app.config['MAIL_DEFAULT_SENDER'] = form.mail_default_sender.data
+                
+                # Reinitialize the mail extension
+                mail.init_app(current_app)
+                
+                flash("Email settings saved successfully!", "success")
+                return redirect(url_for('main.admin_dashboard'))
+        
+        except Exception as e:
+            logger.error(f"Error saving email settings: {e}", exc_info=True)
+            flash(f"Error saving settings: {str(e)}", "danger")
+    
+    return render_template(
+        "admin/email_settings.html",
+        title="Email Settings",
+        form=form
+    ) 

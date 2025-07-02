@@ -76,15 +76,52 @@ def save_profile_image(file):
         logger.error(f"Error saving profile image: {e}", exc_info=True)
         return None
 
-def send_email(to, subject, template, **kwargs):
-    """Send an email using Flask-Mail."""
-    msg = Message(
-        subject,
-        recipients=[to],
-        sender=current_app.config['MAIL_DEFAULT_SENDER']
-    )
-    msg.html = render_template(template, **kwargs)
-    mail.send(msg)
+def send_email(subject, recipients, template, **kwargs):
+    """
+    Send an email using Flask-Mail with better error handling.
+    
+    Args:
+        subject (str): Email subject
+        recipients (list): List of email addresses
+        template (str): Path to the email template
+        **kwargs: Additional parameters to pass to the template
+    """
+    try:
+        msg = Message(
+            subject,
+            recipients=recipients,
+            sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@umat.edu.gh')
+        )
+        msg.html = render_template(template, **kwargs)
+        
+        # Check if mail configuration is set
+        if not current_app.config.get('MAIL_SERVER'):
+            logger.warning("Mail server not configured. Email would have been sent to: %s", recipients)
+            logger.info("Email content: Subject: %s, Template: %s", subject, template)
+            
+            # Create a fallback mechanism for development
+            logger.info("Creating fallback email preview file")
+            preview_dir = os.path.join(current_app.root_path, 'temp_mail')
+            os.makedirs(preview_dir, exist_ok=True)
+            
+            # Save the email content to a file for preview
+            preview_file = os.path.join(preview_dir, f"email_{uuid.uuid4().hex}.html")
+            with open(preview_file, 'w', encoding='utf-8') as f:
+                f.write(f"Subject: {subject}\n")
+                f.write(f"To: {', '.join(recipients)}\n")
+                f.write(f"From: {msg.sender}\n\n")
+                f.write(msg.html)
+            
+            logger.info("Email preview saved to: %s", preview_file)
+            return False
+        
+        # Send the actual email
+        mail.send(msg)
+        logger.info("Email sent successfully to %s", recipients)
+        return True
+    except Exception as e:
+        logger.error("Failed to send email: %s", str(e), exc_info=True)
+        return False
 
 def show_pdf(file_path):
     """Display a PDF file using base64 encoding and HTML iframe."""

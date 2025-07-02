@@ -148,8 +148,13 @@ class ApplicationForm(FlaskForm):
 class InterviewForm(FlaskForm):
     interview_date = DateField('Interview Date', format='%Y-%m-%d', validators=[DataRequired()])
     interview_time = StringField('Interview Time (HH:MM)', validators=[DataRequired()])
-    meeting_link = StringField('Meeting Link', validators=[DataRequired()])
-    additional_notes = TextAreaField('Additional Notes')
+    interview_type = SelectField('Interview Type', choices=[
+        ('online', 'Online / Video Conference'),
+        ('phone', 'Phone Interview'),
+        ('in-person', 'In-Person Interview')
+    ], validators=[DataRequired()])
+    location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()])
+    notes = TextAreaField('Additional Notes')
     submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
 
 # Add forms for profile editing, job posting etc. later
