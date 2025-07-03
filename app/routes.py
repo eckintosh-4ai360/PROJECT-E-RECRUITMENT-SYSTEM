@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from markupsafe import Markup
 from app import db, login_manager
 from datetime import datetime
-from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus
-from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm, ProfileEditForm
+from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus, Event
+from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm, ProfileEditForm, EventForm
 from flask_login import login_user, logout_user, current_user, login_required
 from functools import wraps
 import os
@@ -111,11 +111,11 @@ def upload_resume():
                         logger.warning("Enhanced job matching not available, using basic algorithm")
                         
                         # Perform analysis with basic algorithm
-                        analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
-                        
-                        if not analysis_results:
-                            flash("Resume uploaded, but analysis could not be completed.", "warning")
-                            return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
+                    analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
+                    
+                    if not analysis_results:
+                        flash("Resume uploaded, but analysis could not be completed.", "warning")
+                        return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
                             
                         matches = analysis_results.get("matches", [])
                     
@@ -179,15 +179,13 @@ def allowed_file(filename):
 @bp.route("/")
 @bp.route("/index")
 def index():
-    if current_user.is_authenticated:
-        if current_user.is_admin():
-            return redirect(url_for("main.admin_dashboard"))
-        else:
-            return redirect(url_for("main.view_jobs"))
-            
-    # Show homepage for non-authenticated users
+    # Show homepage with events and jobs for all users
     jobs = Job.query.filter_by(status="open").order_by(Job.posted_date.desc()).limit(5).all()
-    return render_template("index.html", title="Home", jobs=jobs)
+    
+    # Get upcoming events (limit to 6 for the slider)
+    upcoming_events = Event.query.filter_by(status="upcoming").order_by(Event.event_date.asc()).limit(6).all()
+    
+    return render_template("index.html", title="Home", jobs=jobs, events=upcoming_events)
 
 # --- Add routes for REGISTRATION --- 
 @bp.route("/register", methods=["GET", "POST"])
@@ -984,6 +982,7 @@ def my_applications():
 def update_application_status(application_id):
     application = Application.query.get_or_404(application_id)
     new_status = request.form.get("status")
+    feedback = request.form.get("feedback")
     
     if not new_status or not hasattr(ApplicationStatus, new_status):
         flash("Invalid status provided.", "danger")
@@ -992,6 +991,11 @@ def update_application_status(application_id):
     try:
         old_status = application.status
         application.status = getattr(ApplicationStatus, new_status)
+        
+        # Update the feedback if provided
+        if feedback:
+            application.feedback = feedback
+        
         db.session.commit()
         
         # Send email notification
@@ -999,21 +1003,33 @@ def update_application_status(application_id):
             candidate = User.query.get(application.candidate_id)
             job = Job.query.get(application.job_id)
             
+            # Select the appropriate email template based on the new status
+            template = "email/application_status_update.html"
+            subject = "Application Status Updated"
+            
+            if new_status == "accepted":
+                template = "email/application_accepted.html"
+                subject = f"Congratulations! Your Application for {job.title} Has Been Accepted"
+            elif new_status == "rejected":
+                template = "email/application_rejected.html"
+                subject = f"Application Status Update for {job.title}"
+            
             send_email(
-                subject="Application Status Updated",
+                subject=subject,
                 recipients=[candidate.email],
-                template="email/application_status_update.html",
+                template=template,
                 user=candidate,
                 job=job,
                 application=application,
                 old_status=old_status,
                 new_status=application.status
             )
+            
+            flash("Application status and feedback updated successfully! Notification email sent.", "success")
         except Exception as email_err:
             logger.error(f"Failed to send status update email: {email_err}", exc_info=True)
-            # Don't return here, just log the error
+            flash("Application status updated, but there was an issue sending the notification email.", "warning")
         
-        flash("Application status updated successfully!", "success")
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error updating application status: {e}", exc_info=True)
@@ -1226,4 +1242,171 @@ def email_settings():
         "admin/email_settings.html",
         title="Email Settings",
         form=form
-    ) 
+    )
+
+# ===== EVENT MANAGEMENT ROUTES =====
+
+@bp.route("/admin/events")
+@login_required
+@admin_required
+def list_events():
+    """List all events for admin management."""
+    events = Event.query.order_by(Event.event_date.desc()).all()
+    return render_template("admin/events.html", title="Manage Events", events=events)
+
+@bp.route("/admin/events/create", methods=["GET", "POST"])
+@login_required
+@admin_required
+def create_event():
+    """Create a new event."""
+    form = EventForm()
+    if form.validate_on_submit():
+        try:
+            # Handle image upload
+            image_path = None
+            if form.image.data:
+                file = form.image.data
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                image_path_full = os.path.join(current_app.static_folder, 'event_images', unique_filename)
+                file.save(image_path_full)
+                image_path = unique_filename
+                logger.info(f"Saved event image: {image_path_full}")
+            
+            # Handle video upload
+            video_path = None
+            if form.video.data:
+                file = form.video.data
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                video_path_full = os.path.join(current_app.static_folder, 'event_videos', unique_filename)
+                file.save(video_path_full)
+                video_path = unique_filename
+                logger.info(f"Saved event video: {video_path_full}")
+            
+            event = Event(
+                title=form.title.data,
+                description=form.description.data,
+                event_date=form.event_date.data,
+                location=form.location.data,
+                event_type=form.event_type.data,
+                status=form.status.data,
+                image_path=image_path,
+                video_path=video_path,
+                created_by=current_user.id
+            )
+            
+            db.session.add(event)
+            db.session.commit()
+            flash("Event created successfully!", "success")
+            return redirect(url_for("main.list_events"))
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error creating event: {e}", exc_info=True)
+            flash(f"Error creating event: {str(e)}", "danger")
+    
+    return render_template("admin/create_event.html", title="Create Event", form=form)
+
+@bp.route("/admin/events/edit/<int:event_id>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_event(event_id):
+    """Edit an existing event."""
+    event = Event.query.get_or_404(event_id)
+    form = EventForm(obj=event)
+    
+    if form.validate_on_submit():
+        try:
+            # Handle image upload
+            if form.image.data:
+                # Delete old image if it exists
+                if event.image_path:
+                    old_image_path = os.path.join(current_app.static_folder, 'event_images', event.image_path)
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                
+                file = form.image.data
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                image_path_full = os.path.join(current_app.static_folder, 'event_images', unique_filename)
+                file.save(image_path_full)
+                event.image_path = unique_filename
+                logger.info(f"Updated event image: {image_path_full}")
+            
+            # Handle video upload
+            if form.video.data:
+                # Delete old video if it exists
+                if event.video_path:
+                    old_video_path = os.path.join(current_app.static_folder, 'event_videos', event.video_path)
+                    if os.path.exists(old_video_path):
+                        os.remove(old_video_path)
+                
+                file = form.video.data
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                video_path_full = os.path.join(current_app.static_folder, 'event_videos', unique_filename)
+                file.save(video_path_full)
+                event.video_path = unique_filename
+                logger.info(f"Updated event video: {video_path_full}")
+            
+            # Update event fields
+            event.title = form.title.data
+            event.description = form.description.data
+            event.event_date = form.event_date.data
+            event.location = form.location.data
+            event.event_type = form.event_type.data
+            event.status = form.status.data
+            event.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            flash("Event updated successfully!", "success")
+            return redirect(url_for("main.list_events"))
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error updating event: {e}", exc_info=True)
+            flash(f"Error updating event: {str(e)}", "danger")
+    
+    return render_template("admin/edit_event.html", title="Edit Event", form=form, event=event)
+
+@bp.route("/admin/events/delete/<int:event_id>", methods=["POST"])
+@login_required
+@admin_required
+def delete_event(event_id):
+    """Delete an event."""
+    event = Event.query.get_or_404(event_id)
+    try:
+        # Delete associated files
+        if event.image_path:
+            image_path = os.path.join(current_app.static_folder, 'event_images', event.image_path)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        
+        if event.video_path:
+            video_path = os.path.join(current_app.static_folder, 'event_videos', event.video_path)
+            if os.path.exists(video_path):
+                os.remove(video_path)
+        
+        db.session.delete(event)
+        db.session.commit()
+        flash("Event deleted successfully!", "success")
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting event: {e}", exc_info=True)
+        flash(f"Error deleting event: {str(e)}", "danger")
+    
+    return redirect(url_for("main.list_events"))
+
+@bp.route("/events")
+def view_events():
+    """Public view of upcoming events."""
+    upcoming_events = Event.query.filter_by(status="upcoming").order_by(Event.event_date.asc()).all()
+    return render_template("events/events.html", title="Upcoming Events", events=upcoming_events)
+
+@bp.route("/events/<int:event_id>")
+def view_event_detail(event_id):
+    """View detailed information about a specific event."""
+    event = Event.query.get_or_404(event_id)
+    return render_template("events/event_detail.html", title=event.title, event=event)

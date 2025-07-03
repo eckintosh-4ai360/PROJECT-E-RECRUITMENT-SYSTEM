@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, TextAreaField, DateField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, TextAreaField, DateField, DateTimeField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, Optional
 from app.models import User, UserRole
 from flask_wtf.file import FileAllowed
@@ -156,6 +156,38 @@ class InterviewForm(FlaskForm):
     location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()])
     notes = TextAreaField('Additional Notes')
     submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
+
+class EventForm(FlaskForm):
+    title = StringField('Event Title', validators=[DataRequired(), Length(max=255)])
+    description = TextAreaField('Event Description', validators=[DataRequired()], 
+                              render_kw={"rows": 5, "placeholder": "Describe the event details..."})
+    event_date = DateTimeField('Event Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    location = StringField('Event Location', validators=[Optional(), Length(max=255)],
+                         render_kw={"placeholder": "Enter event location or 'Online'"})
+    event_type = SelectField('Event Type', choices=[
+        ('general', 'General'),
+        ('academic', 'Academic'),
+        ('career', 'Career'),
+        ('workshop', 'Workshop'),
+        ('seminar', 'Seminar'),
+        ('conference', 'Conference'),
+        ('social', 'Social')
+    ], validators=[DataRequired()])
+    status = SelectField('Event Status', choices=[
+        ('upcoming', 'Upcoming'),
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ], validators=[DataRequired()], default='upcoming')
+    image = FileField('Event Image', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
+    ])
+    video = FileField('Event Video', validators=[
+        Optional(),
+        FileAllowed(['mp4', 'avi', 'mov', 'wmv'], 'Videos only!')
+    ])
+    submit = SubmitField(Markup('<i class="bi bi-calendar-plus me-1"></i> Create Event'))
 
 # Add forms for profile editing, job posting etc. later
 

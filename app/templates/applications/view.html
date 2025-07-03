@@ -238,7 +238,19 @@
                                 <option value="rejected" {{ 'selected' if application.status == 'rejected' }}>Rejected</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update Status</button>
+                        
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">Personalized Feedback</label>
+                            <textarea name="feedback" id="feedback" class="form-control" rows="5" 
+                                      placeholder="Add personalized feedback for the candidate (especially important for accepted/rejected statuses)">{{ application.feedback }}</textarea>
+                            <small class="form-text text-muted">
+                                This feedback will be included in the email notification to the candidate.
+                                <br>
+                                <strong>Tip:</strong> For rejections, provide constructive feedback. For acceptances, include next steps.
+                            </small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Update Status & Send Email</button>
                     </form>
 
                     <!-- Schedule Interview -->

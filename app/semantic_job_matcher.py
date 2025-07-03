@@ -473,3 +473,4 @@ def enhanced_job_matching(resume_text, resume_analysis, jobs_data):
         except Exception as nested_e:
             logger.error(f"Fallback matching also failed: {nested_e}")
             return []
+ 

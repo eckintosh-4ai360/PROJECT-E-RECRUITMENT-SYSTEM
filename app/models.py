@@ -140,6 +140,7 @@ class Application(db.Model):
     cover_letter_file = db.Column(db.String(512))  # Path to uploaded cover letter file
     status = db.Column(Enum(ApplicationStatus, native_enum=False), nullable=False, default=ApplicationStatus.submitted)
     application_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    feedback = db.Column(db.Text)  # Personalized feedback for the candidate
 
     # Relationship to interviews
     interview = db.relationship("Interview", backref="application", uselist=False)
@@ -175,4 +176,49 @@ class Interview(db.Model):
 
     def __repr__(self):
         return f"<Interview {self.interview_id} for Application {self.application_id}>"
+
+class Event(db.Model):
+    __tablename__ = "events"
+    event_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    event_date = db.Column(db.DateTime, nullable=False)
+    location = db.Column(db.String(255))
+    image_path = db.Column(db.String(512))  # Path to event image
+    video_path = db.Column(db.String(512))  # Path to event video
+    event_type = db.Column(db.String(100), default="general")  # general, academic, career, workshop, etc.
+    status = db.Column(db.String(50), nullable=False, default="upcoming")  # upcoming, ongoing, completed, cancelled
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    creator = db.relationship("User", backref="created_events", lazy=True)
+    
+    def __repr__(self):
+        return f"<Event {self.event_id}: {self.title}>"
+    
+    @property
+    def image_url(self):
+        """Returns the URL for the event's image"""
+        if self.image_path:
+            return f"/static/event_images/{self.image_path}"
+        return None
+    
+    @property
+    def video_url(self):
+        """Returns the URL for the event's video"""
+        if self.video_path:
+            return f"/static/event_videos/{self.video_path}"
+        return None
+    
+    @property
+    def is_upcoming(self):
+        """Check if event is upcoming"""
+        return self.event_date > datetime.utcnow() and self.status == "upcoming"
+    
+    @property 
+    def is_past(self):
+        """Check if event is in the past"""
+        return self.event_date < datetime.utcnow() or self.status == "completed"
 

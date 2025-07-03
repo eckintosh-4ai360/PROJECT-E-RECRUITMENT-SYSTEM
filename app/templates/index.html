@@ -26,6 +26,79 @@
         </div>
     </div>
 
+    <!-- Events Section -->
+    {% if events %}
+    <div class="events-section mb-5">
+        <h3 class="mb-4 section-title" style="color: var(--primary-dark);">
+            <i class="bi bi-calendar-event me-2"></i>Upcoming University Events
+        </h3>
+        
+        <!-- Events Carousel -->
+        <div id="eventsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for event in events %}
+                <button type="button" data-bs-target="#eventsCarousel" data-bs-slide-to="{{ loop.index0 }}" 
+                        {% if loop.first %}class="active"{% endif %} aria-current="true" aria-label="Slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+            
+            <div class="carousel-inner rounded-3">
+                {% for event in events %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <div class="event-slide position-relative">
+                        {% if event.image_path %}
+                        <img src="{{ url_for('static', filename='event_images/' + event.image_path) }}" 
+                             class="d-block w-100 event-slide-image" alt="{{ event.title }}">
+                        {% else %}
+                        <div class="event-slide-placeholder d-flex align-items-center justify-content-center">
+                            <i class="bi bi-calendar-event" style="font-size: 4rem; color: var(--primary);"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="carousel-caption d-none d-md-block event-caption">
+                            <h4 class="fw-bold">{{ event.title }}</h4>
+                            <p class="mb-2">{{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}</p>
+                            <div class="event-details mb-3">
+                                <span class="badge bg-primary me-2">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ event.event_date.strftime('%B %d, %Y') }}
+                                </span>
+                                {% if event.location %}
+                                <span class="badge bg-secondary me-2">
+                                    <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+                                </span>
+                                {% endif %}
+                                <span class="badge bg-info">
+                                    <i class="bi bi-tag me-1"></i>{{ event.event_type.title() }}
+                                </span>
+                            </div>
+                            <a href="{{ url_for('main.view_event_detail', event_id=event.event_id) }}" 
+                               class="btn btn-light btn-sm">
+                                <i class="bi bi-info-circle me-1"></i>Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#eventsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#eventsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('main.view_events') }}" class="btn view-all-btn">
+                <i class="bi bi-calendar-check me-2"></i>View All Events
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="recent-jobs-section mb-5" style="background-color: lavender;">
         <h3 class="mb-4 section-title" style="color: var(--primary-dark);"><i class="bi bi-briefcase me-2"></i>Recent Job Postings</h3>
         {% if jobs %}
@@ -52,6 +125,8 @@
         {% endif %}
     </div>
 
+
+    
     <!-- * features sections * -->
     <section class="container py-5">
         <h3 class="text-center mb-5 fw-bold fs-2" style="color: var(--primary-dark);">Key Features</h3>
