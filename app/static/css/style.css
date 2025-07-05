@@ -717,3 +717,7 @@ h3 .bi {
 .event-card:nth-child(4) {
     animation-delay: 0.3s;
 }
+
+.bg-green-upcoming { background-color: #059226; }  /* Bright green */
+.bg-green-ongoing { background-color: #7cb342; }   /* Yellow-green */
+.bg-green-completed { background-color: #4caf50; } /* Muted green */
