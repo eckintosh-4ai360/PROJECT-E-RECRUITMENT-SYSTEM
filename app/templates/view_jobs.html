@@ -4,6 +4,25 @@
 <div class="container mt-4 mb-4">
     <h2><i class="bi bi-briefcase me-2 text-primary"></i>Open Positions</h2>
     <hr>
+    <!-- Search and Filter Form -->
+    <form method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-md-5">
+            <label for="search" class="form-label">Keyword Search</label>
+            <input type="text" name="search" id="search" class="form-control" placeholder="Search jobs by keyword..." value="{{ request.args.get('search', '') }}">
+        </div>
+        <div class="col-md-4">
+            <label for="department" class="form-label">Filter by Department</label>
+            <select name="department" id="department" class="form-select">
+                <option value="">All Departments</option>
+                {% for dept in departments %}
+                <option value="{{ dept }}" {% if request.args.get('department') == dept %}selected{% endif %}>{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+        </div>
+    </form>
     {% if jobs %}
         <div class="list-group job-listings">
             {% for job in jobs %}

@@ -99,16 +99,16 @@
                                 <tbody>
                                     {% for resume in resumes %}
                                     <tr>
-                                        <td>{{ resume.original_filename }}</td>
-                                        <td>{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                        <td>
+                                        <td class="small">{{ resume.original_filename }}</td>
+                                        <td class="small">{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="small">
                                             {% if resume.is_primary %}
                                             <span class="badge bg-success">Primary</span>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td class="row d-flex">
                                             <a href="{{ url_for('main.resume_analysis', resume_id=resume.resume_id) }}" 
-                                               class="btn btn-sm " style="border: 1px solid var(--primary);">
+                                               class="btn btn-sm mb-1" style="border: 1px solid var(--primary);">
                                                 <i class="bi bi-graph-up"></i> View
                                             </a>
                                             <form action="{{ url_for('main.delete_resume', resume_id=resume.resume_id) }}" 

@@ -185,7 +185,7 @@ class ResumeAnalyzer:
         # This would typically load a custom trained model
         # For now we'll use spaCy's built-in NER with some enhancements
         pass
-    
+
     def analyze_resume(self, text):
         """Perform comprehensive resume analysis."""
         if not text:
@@ -229,7 +229,7 @@ class ResumeAnalyzer:
                 logger.info("Falling back to basic analysis")
 
         return analysis
-    
+
     def preprocess_text(self, text):
         """Advanced text preprocessing for better analysis."""
         if not self.advanced_nlp:
@@ -496,7 +496,7 @@ class ResumeAnalyzer:
             "diverse background": "varied background",
             "minority": "underrepresented group"
         }
-        return alternatives.get(term, "neutral alternative")
+        return alternatives.get(term, "neutral alternative") 
 
     def extract_skills_advanced(self, text):
         """Extract skills using advanced NLP techniques."""

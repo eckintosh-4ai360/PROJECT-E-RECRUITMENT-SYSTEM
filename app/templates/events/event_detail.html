@@ -34,14 +34,14 @@
         <!-- Event Information Section -->
         <div class="col-lg-4">
             <div class="card event-info-card h-100">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header text-white" style="background-color:var(--primary-dark)">
                     <h5 class="mb-0">
                         <i class="bi bi-info-circle me-2"></i>Event Information
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="event-detail-item mb-3">
-                        <h6 class="text-primary mb-1">
+                        <h6 class="text-success mb-1">
                             <i class="bi bi-calendar3 me-2"></i>Date & Time
                         </h6>
                         <p class="mb-0">{{ event.event_date.strftime('%A, %B %d, %Y') }}</p>
@@ -50,7 +50,7 @@
                     
                     {% if event.location %}
                     <div class="event-detail-item mb-3">
-                        <h6 class="text-primary mb-1">
+                        <h6 class="text-success mb-1">
                             <i class="bi bi-geo-alt me-2"></i>Location
                         </h6>
                         <p class="mb-0">{{ event.location }}</p>
@@ -58,14 +58,14 @@
                     {% endif %}
                     
                     <div class="event-detail-item mb-3">
-                        <h6 class="text-primary mb-1">
+                        <h6 class="text-success mb-1">
                             <i class="bi bi-tag me-2"></i>Event Type
                         </h6>
                         <span class="badge bg-secondary fs-6">{{ event.event_type.title() }}</span>
                     </div>
                     
                     <div class="event-detail-item mb-3">
-                        <h6 class="text-primary mb-1">
+                        <h6 class="text-success mb-1">
                             <i class="bi bi-info-circle me-2"></i>Status
                         </h6>
                         <span class="badge bg-{% if event.status == 'upcoming' %}primary{% elif event.status == 'ongoing' %}warning{% elif event.status == 'completed' %}success{% else %}secondary{% endif %} fs-6">
@@ -74,7 +74,7 @@
                     </div>
                     
                     <div class="event-detail-item">
-                        <h6 class="text-primary mb-1">
+                        <h6 class="text-success mb-1">
                             <i class="bi bi-person me-2"></i>Organized By
                         </h6>
                         <p class="mb-0">{{ event.creator.first_name }} {{ event.creator.last_name }}</p>
@@ -98,10 +98,10 @@
                     {% endif %}
                     
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('main.view_events') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('main.view_events') }}" class="btn " style="border: 1px solid var(--primary-dark)">
                             <i class="bi bi-arrow-left me-2"></i>Back to Events
                         </a>
-                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('main.index') }}" class="btn" style="background-color:var(--secondary); color: var(--primary-dark)">
                             <i class="bi bi-house me-2"></i>Home
                         </a>
                     </div>

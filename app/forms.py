@@ -158,12 +158,20 @@ class InterviewForm(FlaskForm):
     submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
 
 class EventForm(FlaskForm):
-    title = StringField('Event Title', validators=[DataRequired(), Length(max=255)])
+    title = StringField('Event Title', validators=[DataRequired(), Length(max=255)], 
+                         render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
     description = TextAreaField('Event Description', validators=[DataRequired()], 
-                              render_kw={"rows": 5, "placeholder": "Describe the event details..."})
-    event_date = DateTimeField('Event Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+                              render_kw={"rows": 5, "placeholder": "Describe the event details...", 
+                                         "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"})
+    event_date = DateTimeField('Event Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()],
+                                render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
     location = StringField('Event Location', validators=[Optional(), Length(max=255)],
-                         render_kw={"placeholder": "Enter event location or 'Online'"})
+                         render_kw={"placeholder": "Enter event location or 'Online'", 
+                                    "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"})
     event_type = SelectField('Event Type', choices=[
         ('general', 'General'),
         ('academic', 'Academic'),
@@ -172,22 +180,34 @@ class EventForm(FlaskForm):
         ('seminar', 'Seminar'),
         ('conference', 'Conference'),
         ('social', 'Social')
-    ], validators=[DataRequired()])
+    ], validators=[DataRequired()], 
+                              render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
     status = SelectField('Event Status', choices=[
         ('upcoming', 'Upcoming'),
         ('ongoing', 'Ongoing'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled')
-    ], validators=[DataRequired()], default='upcoming')
+    ], validators=[DataRequired()], default='upcoming', 
+                          render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
     image = FileField('Event Image', validators=[
         Optional(),
         FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
-    ])
+    ], 
+                       render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
     video = FileField('Event Video', validators=[
         Optional(),
         FileAllowed(['mp4', 'avi', 'mov', 'wmv'], 'Videos only!')
-    ])
-    submit = SubmitField(Markup('<i class="bi bi-calendar-plus me-1"></i> Create Event'))
+    ], 
+                       render_kw={
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
+        ,})
+    submit = SubmitField('Create Event',  render_kw={"class": "btn-primary", "data-icon": "bi-send"})
 
 # Add forms for profile editing, job posting etc. later
 

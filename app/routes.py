@@ -512,8 +512,40 @@ def list_jobs():
 
 @bp.route("/jobs")
 def view_jobs():
-    jobs = Job.query.filter_by(status="open").order_by(Job.posted_date.desc()).all()
-    return render_template("view_jobs.html", title="Open Positions", jobs=jobs)
+    # Get filter parameters
+    search = request.args.get('search', '').strip()
+    department = request.args.get('department', '').strip()
+
+    # Base query: only open jobs
+    query = Job.query.filter_by(status="open")
+
+    # Apply department filter
+    if department:
+        query = query.filter(Job.department == department)
+
+    # Apply keyword search (search in title, description, required_skills)
+    if search:
+        search_pattern = f"%{search}%"
+        query = query.filter(
+            db.or_(
+                Job.title.ilike(search_pattern),
+                Job.description.ilike(search_pattern),
+                Job.required_skills.ilike(search_pattern)
+            )
+        )
+
+    jobs = query.order_by(Job.posted_date.desc()).all()
+
+    # Get unique departments for filter dropdown
+    departments = db.session.query(Job.department).distinct().all()
+    departments = [dept[0] for dept in departments if dept[0]]
+
+    return render_template(
+        "view_jobs.html",
+        title="Open Positions",
+        jobs=jobs,
+        departments=departments
+    )
 
 @bp.route("/jobs/<int:job_id>")
 def view_job_detail(job_id):
