@@ -38,6 +38,8 @@
                                                 <i class="bi bi-building me-1"></i> {{ app.job.department }}
                                             </h5>
                                             <p class="card-text">
+                                                <strong>Interview Level:</strong> 
+                                                <span class="badge bg-info">{{ app.interview.interview_level.value }}</span><br>
                                                 <strong>Interview Type:</strong> {{ app.interview.interview_type.title() }}<br>
                                                 <strong>Location/Link:</strong> 
                                                 {% if app.interview.interview_type == 'online' %}
@@ -54,6 +56,32 @@
                                                     <p class="card-text text-muted">{{ app.interview.notes }}</p>
                                                 </div>
                                             {% endif %}
+
+                                            <!-- Interview Progress -->
+                                            <div class="mt-4">
+                                                <h6>Interview Progress</h6>
+                                                <div class="progress" style="height: 25px;">
+                                                    {% set progress = {
+                                                        'department': 33,
+                                                        'faculty': 66,
+                                                        'university': 100
+                                                    } %}
+                                                    {% set current_level = app.interview.interview_level.value.lower() %}
+                                                    <div class="progress-bar bg-success" 
+                                                         role="progressbar" 
+                                                         style="width: {{ progress[current_level] }}%"
+                                                         aria-valuenow="{{ progress[current_level] }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        {{ app.interview.interview_level.value }} Level
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between mt-2 small text-muted">
+                                                    <span>Department</span>
+                                                    <span>Faculty</span>
+                                                    <span>University</span>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-4 text-md-end">
                                             <a href="{{ url_for('main.view_job_detail', job_id=app.job.job_id) }}" class="btn btn-outline-primary btn-sm">
@@ -89,9 +117,22 @@
                                         <i class="bi bi-building me-1"></i> {{ app.job.department }}
                                     </h5>
                                     <p class="card-text">
+                                        <strong>Interview Level:</strong> 
+                                        <span class="badge bg-info">{{ app.interview.interview_level.value }}</span><br>
                                         <strong>Interview Type:</strong> {{ app.interview.interview_type.title() }}<br>
-                                        <strong>Status:</strong> {{ app.status.value }}
+                                        <strong>Status:</strong> 
+                                        <span class="badge bg-{{ 'success' if app.interview.level_status.value == 'passed' 
+                                                               else 'danger' if app.interview.level_status.value == 'failed'
+                                                               else 'secondary' }}">
+                                            {{ app.interview.level_status.value }}
+                                        </span>
                                     </p>
+                                    {% if app.interview.interviewer_notes %}
+                                        <div class="mt-3">
+                                            <strong>Interviewer Feedback:</strong>
+                                            <p class="card-text text-muted">{{ app.interview.interviewer_notes }}</p>
+                                        </div>
+                                    {% endif %}
                                     <a href="{{ url_for('main.view_application', application_id=app.application_id) }}" 
                                        class="btn btn-outline-secondary btn-sm">
                                         <i class="bi bi-file-text me-1"></i> View Application

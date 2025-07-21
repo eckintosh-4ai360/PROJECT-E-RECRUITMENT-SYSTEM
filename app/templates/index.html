@@ -10,13 +10,12 @@
                 the University of Mines and Technology,
                 especially within the Computer Science department.</p>
             {% if not current_user.is_authenticated %}
-            <a href="{{ url_for('main.register') }}" class="btn btn-lg"
-                style="background-color: var(--primary-dark); border: none; color: white; border-color: none;" type="button">
-                <i class="bi bi-person-plus me-2"></i>Register Now
+            <!-- Update auth links -->
+            <a href="{{ url_for('auth.register') }}" class="btn btn-lg" style="background-color: var(--primary-dark); color: white;">
+                <i class="bi bi-person-plus me-1"></i> Register Now
             </a>
-            <a href="{{ url_for('main.login') }}" class="btn btn-secondary btn-lg "
-                style="background-color: var(--primary); border: none; color: white;" type="button">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-lg" style="background-color: var(--primary); color: white;">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
             </a>
             {% else %}
             <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary btn-lg" type="button">

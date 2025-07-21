@@ -13,7 +13,7 @@ PyMySQL==1.0.2
 spacy==3.8.7
 Pillow
 markupsafe==2.0.1
-# en_core_web_sm is installed via: python -m spacy download en_core_web_sm
+# en_core_web_md is installed via: python -m spacy download en_core_web_md
 # Resume parsing
 pdfminer.six
 python-docx

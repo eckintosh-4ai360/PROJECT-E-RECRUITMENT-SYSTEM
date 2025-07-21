@@ -164,6 +164,25 @@ class JobMatch(db.Model):
     def __repr__(self):
         return f"<Match Resume:{self.resume_id} Job:{self.job_id} Score:{self.match_score:.4f}>"
 
+class InterviewLevel(enum.Enum):
+    department = "Department"
+    faculty = "Faculty"
+    university = "University"
+
+    def __str__(self):
+        return self.value
+
+class InterviewLevelStatus(enum.Enum):
+    pending = "Pending"
+    passed = "Passed"
+    failed = "Failed"
+    scheduled = "Scheduled"
+    in_progress = "In Progress"
+    completed = "Completed"
+
+    def __str__(self):
+        return self.value
+
 class Interview(db.Model):
     __tablename__ = "interviews"
     interview_id = db.Column(db.Integer, primary_key=True)
@@ -173,9 +192,43 @@ class Interview(db.Model):
     location_or_link = db.Column(db.String(512), nullable=False)
     notes = db.Column(db.Text)
     status = db.Column(db.String(50), default="scheduled")  # scheduled, completed, cancelled
+    
+    # New fields for multi-level interviews
+    interview_level = db.Column(Enum(InterviewLevel, native_enum=False), nullable=False, default=InterviewLevel.department)
+    level_status = db.Column(Enum(InterviewLevelStatus, native_enum=False), nullable=False, default=InterviewLevelStatus.pending)
+    next_level_date = db.Column(db.DateTime, nullable=True)
+    interviewer_notes = db.Column(db.Text)
+    interviewer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    
+    # Relationship to interviewer
+    interviewer = db.relationship("User", foreign_keys=[interviewer_id], backref="conducted_interviews")
 
     def __repr__(self):
-        return f"<Interview {self.interview_id} for Application {self.application_id}>"
+        return f"<Interview {self.interview_id} for Application {self.application_id} - Level: {self.interview_level}>"
+
+    def can_proceed_to_next_level(self):
+        """Check if the interview can proceed to the next level"""
+        if self.level_status != InterviewLevelStatus.passed:
+            return False
+            
+        if self.interview_level == InterviewLevel.department:
+            return True
+        elif self.interview_level == InterviewLevel.faculty:
+            return True
+        return False  # University level is the final level
+
+    def get_next_level(self):
+        """Get the next interview level"""
+        if self.interview_level == InterviewLevel.department:
+            return InterviewLevel.faculty
+        elif self.interview_level == InterviewLevel.faculty:
+            return InterviewLevel.university
+        return None  # No next level after university
+
+    @property
+    def current_level_display(self):
+        """Get a display string for the current level and status"""
+        return f"{self.interview_level.value} Level - {self.level_status.value}"
 
 class Event(db.Model):
     __tablename__ = "events"

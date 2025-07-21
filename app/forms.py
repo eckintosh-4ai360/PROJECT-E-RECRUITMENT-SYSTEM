@@ -148,14 +148,27 @@ class ApplicationForm(FlaskForm):
 class InterviewForm(FlaskForm):
     interview_date = DateField('Interview Date', format='%Y-%m-%d', validators=[DataRequired()])
     interview_time = StringField('Interview Time (HH:MM)', validators=[DataRequired()])
+    interview_level = SelectField('Interview Level', choices=[
+        ('department', 'Department Level'),
+        ('faculty', 'Faculty Level'),
+        ('university', 'University Level')
+    ], validators=[DataRequired()])
     interview_type = SelectField('Interview Type', choices=[
         ('online', 'Online / Video Conference'),
         ('phone', 'Phone Interview'),
         ('in-person', 'In-Person Interview')
     ], validators=[DataRequired()])
     location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()])
+    interviewer = SelectField('Interviewer', coerce=int, validators=[DataRequired()])
     notes = TextAreaField('Additional Notes')
     submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
+
+    def __init__(self, *args, **kwargs):
+        super(InterviewForm, self).__init__(*args, **kwargs)
+        # Dynamically load admin users as potential interviewers
+        from app.models import User, UserRole
+        admins = User.query.filter_by(role=UserRole.admin).all()
+        self.interviewer.choices = [(admin.id, f"{admin.first_name} {admin.last_name}") for admin in admins]
 
 class EventForm(FlaskForm):
     title = StringField('Event Title', validators=[DataRequired(), Length(max=255)], 

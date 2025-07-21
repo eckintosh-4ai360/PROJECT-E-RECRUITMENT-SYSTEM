@@ -164,9 +164,16 @@ def generate_password_hash(password):
         password_bytes = password.encode('utf-8')
         print(f"===DEBUG=== Password bytes: {password_bytes!r}")
         print(f"===DEBUG=== Salt bytes: {salt!r}")
+        
+        # Convert salt to hex
+        salt_hex = salt.hex()
+        
+        # Create salted hash
         salted_hash = hashlib.sha256(salt + password_bytes).hexdigest()
         print(f"===DEBUG=== Generated hash: {salted_hash}")
-        final_hash = f"sha256:{base64.b64encode(salt).decode('utf-8')}:{salted_hash}"
+        
+        # Final format: salt_hex:hash_hex
+        final_hash = f"{salt_hex}:{salted_hash}"
         print(f"===DEBUG=== Final stored hash: {final_hash}")
         return final_hash
     except Exception as e:
@@ -182,50 +189,36 @@ def check_password_hash(stored_hash, password):
         
         # Parse the stored hash
         parts = stored_hash.split(':')
-        if len(parts) != 3:
-            print(f"===DEBUG=== Invalid hash format, got {len(parts)} parts instead of 3")
+        if len(parts) != 2:
+            print(f"===DEBUG=== Invalid hash format, got {len(parts)} parts instead of 2")
             print(f"===DEBUG=== Hash parts: {parts}")
             return False
             
-        algorithm, salt_b64, hash_value = parts
+        salt_hex, hash_value = parts
         
-        print(f"===DEBUG=== Hash algorithm: {algorithm}")
-        print(f"===DEBUG=== Salt (b64): {salt_b64}")
-        print(f"===DEBUG=== Expected hash: {hash_value}")
+        # Convert salt from hex back to bytes
+        salt = bytes.fromhex(salt_hex)
+        print(f"===DEBUG=== Decoded salt: {salt!r}")
         
-        # Check if this is a new-style hash
-        if algorithm == 'sha256':
-            try:
-                salt = base64.b64decode(salt_b64)
-                print(f"===DEBUG=== Decoded salt: {salt!r}")
-                password_bytes = password.encode('utf-8')
-                print(f"===DEBUG=== Password bytes: {password_bytes!r}")
-                
-                # Create the combined bytes
-                combined = salt + password_bytes
-                print(f"===DEBUG=== Combined bytes to hash: {combined!r}")
-                
-                calculated_hash = hashlib.sha256(combined).hexdigest()
-                print(f"===DEBUG=== Calculated hash: {calculated_hash}")
-                print(f"===DEBUG=== Expected hash:  {hash_value}")
-                result = calculated_hash == hash_value
-                print(f"===DEBUG=== Hash match: {result}")
-                return result
-            except Exception as e:
-                print(f"===DEBUG=== Error in SHA-256 hash calculation: {e}")
-                print(f"===DEBUG=== Exception type: {type(e)}")
-                import traceback
-                traceback.print_exc()
-                return False
-        else:
-            # Fall back to werkzeug's implementation for old-style hashes
-            print(f"===DEBUG=== Using werkzeug for non-SHA-256 hash")
-            return werkzeug_check_password_hash(stored_hash, password)
+        # Create the hash with the same salt
+        password_bytes = password.encode('utf-8')
+        print(f"===DEBUG=== Password bytes: {password_bytes!r}")
+        
+        # Create the combined bytes
+        combined = salt + password_bytes
+        print(f"===DEBUG=== Combined bytes to hash: {combined!r}")
+        
+        calculated_hash = hashlib.sha256(combined).hexdigest()
+        print(f"===DEBUG=== Calculated hash: {calculated_hash}")
+        print(f"===DEBUG=== Expected hash:  {hash_value}")
+        
+        result = calculated_hash == hash_value
+        print(f"===DEBUG=== Hash match: {result}")
+        return result
     except Exception as e:
         print(f"===DEBUG=== Error checking password hash: {e}")
         print(f"===DEBUG=== Exception type: {type(e)}")
         import traceback
         traceback.print_exc()
-        # If any error occurs, return False (invalid format)
         return False
 

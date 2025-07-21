@@ -22,7 +22,7 @@
             <small>Please use your <strong>email</strong> to log in (not your Username)</small>
         </div>
         
-        <form method="POST" action="{{ url_for('main.login') }}" class="auth-form">
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
             {{ form.hidden_tag() }}
             
             <div class="mb-2">
@@ -55,7 +55,7 @@
             </div>
             
             <div class="text-center">
-                <p class="mb-0 small-text">New User? <a href="{{ url_for('main.register') }}" class="text-decoration-none fw-bold" style="color: var(--primary-dark);">Create an Account</a></p>
+                <p class="mb-0 small-text">New User? <a href="{{ url_for('auth.register') }}" class="text-decoration-none fw-bold" style="color: var(--primary-dark);">Create an Account</a></p>
             </div>
         </form>
         

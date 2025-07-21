@@ -16,7 +16,7 @@ from markupsafe import Markup
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-login_manager.login_view = "main.login" # Use blueprint name
+login_manager.login_view = "auth.login" # Use auth blueprint for login
 login_manager.login_message_category = "info"
 mail = Mail()
 
@@ -46,8 +46,10 @@ def create_app(config_class=Config):
     # Import and register blueprints
     from app.routes import bp as main_bp
     from app.admin_routes import admin as admin_bp
+    from app.auth_routes import auth_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     # Context processor to inject variables into templates
     @app.context_processor

@@ -126,11 +126,13 @@ class ResumeAnalyzer:
     def __init__(self):
         """Initialize the resume analyzer with required NLP models."""
         try:
-            self.nlp = spacy.load("en_core_web_sm")
+            # Updated to use the medium model instead of small
+            self.nlp = spacy.load("en_core_web_md")
+            logger.info("Loaded spaCy medium model for enhanced accuracy")
         except OSError:
-            logger.warning("Downloading spaCy model...")
-            spacy.cli.download("en_core_web_sm")
-            self.nlp = spacy.load("en_core_web_sm")
+            logger.warning("Downloading spaCy medium model...")
+            spacy.cli.download("en_core_web_md")
+            self.nlp = spacy.load("en_core_web_md")
             
         # Initialize advanced features if available
         self.advanced_nlp = ADVANCED_NLP_AVAILABLE

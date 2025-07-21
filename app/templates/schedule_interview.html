@@ -42,6 +42,17 @@
                         </div>
 
                         <div class="mb-3">
+                            {{ form.interview_level.label(class="form-label") }}
+                            {{ form.interview_level(class="form-select") }}
+                            {% for error in form.interview_level.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Select the interview level (Department → Faculty → University)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             {{ form.interview_type.label(class="form-label") }}
                             {{ form.interview_type(class="form-select") }}
                             {% for error in form.interview_type.errors %}
@@ -57,6 +68,17 @@
                             {% endfor %}
                             <div class="form-text">
                                 For online interviews, provide the video conferencing link (e.g., Zoom, Google Meet). For in-person interviews, provide the location.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.interviewer.label(class="form-label") }}
+                            {{ form.interviewer(class="form-select") }}
+                            {% for error in form.interviewer.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Select the interviewer for this interview level
                             </div>
                         </div>
 
