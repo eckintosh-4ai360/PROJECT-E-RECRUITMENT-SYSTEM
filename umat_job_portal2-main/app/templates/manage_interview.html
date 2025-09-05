@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Manage Interview</h2>
+                    <p class="text-muted mb-0">
+                        Application #{{ application.application_id }} - {{ application.job.title }}
+                    </p>
+                </div>
+                <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Application
+                </a>
+            </div>
+
+            <!-- Interview Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-event text-primary"></i>
+                        Current Interview Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Level:</strong> {{ interview.interview_level.value }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-{{ 'success' if interview.level_status.value == 'passed'
+                                                    else 'danger' if interview.level_status.value == 'failed'
+                                                    else 'warning' if interview.level_status.value == 'in_progress'
+                                                    else 'info' }}">
+                                    {{ interview.level_status.value }}
+                                </span>
+                            </p>
+                            <p><strong>Type:</strong> {{ interview.interview_type.title() }}</p>
+                            <p><strong>Location/Link:</strong> {{ interview.location_or_link }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Interviewer:</strong> 
+                                {% if interview.interviewer %}
+                                    {{ interview.interviewer.first_name }} {{ interview.interviewer.last_name }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </p>
+                            <p><strong>Current Date:</strong> {{ interview.scheduled_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            {% if interview.next_level_date %}
+                            <p><strong>Next Level:</strong> {{ interview.next_level_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear text-primary"></i>
+                        Update Interview Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="interviewForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <!-- Date and Time -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_date.label(class="form-label") }}
+                                    {{ form.interview_date(class="form-control") }}
+                                    {% if form.interview_date.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interview_date.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_time.label(class="form-label") }}
+                                    {{ form.interview_time(class="form-control", placeholder="HH:MM") }}
+                                    {% if form.interview_time.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interview_time.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Interview Level and Type -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_level.label(class="form-label") }}
+                                    {{ form.interview_level(class="form-select") }}
+                                    {% if form.interview_level.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interview_level.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_type.label(class="form-label") }}
+                                    {{ form.interview_type(class="form-select") }}
+                                    {% if form.interview_type.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interview_type.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Location and Interviewer -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.location_or_link.label(class="form-label") }}
+                                    {{ form.location_or_link(class="form-control", placeholder="Meeting link or location") }}
+                                    {% if form.location_or_link.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.location_or_link.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interviewer.label(class="form-label") }}
+                                    {{ form.interviewer(class="form-select") }}
+                                    {% if form.interviewer.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interviewer.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interview Status -->
+                        <div class="mb-3">
+                            {{ form.level_status.label(class="form-label") }}
+                            {{ form.level_status(class="form-select") }}
+                            {% if form.level_status.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.level_status.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.notes.label(class="form-label") }}
+                                    {{ form.notes(class="form-control", rows="3", placeholder="Additional notes for the candidate") }}
+                                    {% if form.notes.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.notes.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interviewer_notes.label(class="form-label") }}
+                                    {{ form.interviewer_notes(class="form-control", rows="3", placeholder="Internal feedback and notes") }}
+                                    {% if form.interviewer_notes.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.interviewer_notes.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Level Scheduling -->
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    {{ form.schedule_next_level(class="form-check-input") }}
+                                    {{ form.schedule_next_level.label(class="form-check-label") }}
+                                </div>
+                                
+                                <div id="nextLevelFields" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                {{ form.next_level_date.label(class="form-label") }}
+                                                {{ form.next_level_date(class="form-control") }}
+                                                {% if form.next_level_date.errors %}
+                                                    <div class="text-danger small">
+                                                        {% for error in form.next_level_date.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                {{ form.next_level_time.label(class="form-label") }}
+                                                {{ form.next_level_time(class="form-control", placeholder="HH:MM") }}
+                                                {% if form.next_level_time.errors %}
+                                                    <div class="text-danger small">
+                                                        {% for error in form.next_level_time.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                            {{ form.reschedule(class="btn btn-warning") }}
+                            <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                               class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning text-warning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form method="POST" action="{{ url_for('main.cancel_interview', application_id=application.application_id, interview_id=interview.interview_id) }}" 
+                                  onsubmit="return confirm('Are you sure you want to cancel this interview? This action cannot be undone.')">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="bi bi-x-circle"></i> Cancel Interview
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-info w-100" onclick="sendReminder()">
+                                <i class="bi bi-bell"></i> Send Reminder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scheduleNextLevelCheckbox = document.getElementById('schedule_next_level');
+    const nextLevelFields = document.getElementById('nextLevelFields');
+    
+    // Show/hide next level fields based on checkbox
+    scheduleNextLevelCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            nextLevelFields.style.display = 'block';
+        } else {
+            nextLevelFields.style.display = 'none';
+        }
+    });
+    
+    // Initialize state
+    if (scheduleNextLevelCheckbox.checked) {
+        nextLevelFields.style.display = 'block';
+    }
+});
+
+function sendReminder() {
+    // This would typically make an AJAX call to send a reminder
+    alert('Reminder functionality would be implemented here.');
+}
+</script>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn {
+    font-weight: 500;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+{% endblock %}

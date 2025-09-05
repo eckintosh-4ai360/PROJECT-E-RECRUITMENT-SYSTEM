@@ -1,0 +1,125 @@
+{% extends "auth/base_auth.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<!-- Left side - Image -->
+<div class="auth-image register-bg ">
+</div>
+
+<!-- Right side - Form -->
+<div class="auth-form-container" >
+    <div class="auth-card py-2 px-3">
+        <!-- Centered Logo -->
+        <div class="auth-logo-container">
+            <a href="{{ url_for('main.index') }}" class="auth-logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" height="50" width="50" alt="UMaT Logo">
+            </a>
+        </div>
+        
+        <h2 class="auth-form-title" style="color: var(--primary-dark);">Create Account</h2>
+        
+        <form method="POST" action="" class="auth-form" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    {{ form.first_name.label(class="form-label auth-form-label") }}
+                    {{ form.first_name(class="form-control auth-form-control" + (" is-invalid" if form.first_name.errors else ""), placeholder="First name") }}
+                    {% if form.first_name.errors %}
+                        <div class="invalid-feedback small-text">
+                            {{ form.first_name.errors|join(", ") }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ form.last_name.label(class="form-label auth-form-label") }}
+                    {{ form.last_name(class="form-control auth-form-control" + (" is-invalid" if form.last_name.errors else ""), placeholder="Last name") }}
+                    {% if form.last_name.errors %}
+                        <div class="invalid-feedback small-text">
+                            {{ form.last_name.errors|join(", ") }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                {{ form.username.label(class="form-label auth-form-label") }}
+                {{ form.username(class="form-control auth-form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Username") }}
+                {% if form.username.errors %}
+                    <div class="invalid-feedback small-text">
+                        {{ form.username.errors|join(", ") }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        {{ form.email.label(class="form-label auth-form-label") }}
+                        {{ form.email(class="form-control auth-form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Email address") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback small-text">
+                                {{ form.email.errors|join(", ") }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        {{ form.phone_number.label(class="form-label auth-form-label") }}
+                        {{ form.phone_number(class="form-control auth-form-control" + (" is-invalid" if form.phone_number.errors else ""), placeholder="Phone number") }}
+                        {% if form.phone_number.errors %}
+                            <div class="invalid-feedback small-text">
+                                {{ form.phone_number.errors|join(", ") }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    {{ form.password.label(class="form-label auth-form-label") }}
+                    {{ form.password(class="form-control auth-form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Password") }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback small-text">
+                            {{ form.password.errors|join(", ") }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ form.confirm_password.label(class="form-label auth-form-label") }}
+                    {{ form.confirm_password(class="form-control auth-form-control" + (" is-invalid" if form.confirm_password.errors else ""), placeholder="Confirm") }}
+                    {% if form.confirm_password.errors %}
+                        <div class="invalid-feedback small-text">
+                            {{ form.confirm_password.errors|join(", ") }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                {{ form.profile_image.label(class="form-label auth-form-label") }}
+                {{ form.profile_image(class="form-control auth-form-control" + (" is-invalid" if form.profile_image.errors else "")) }}
+                {% if form.profile_image.errors %}
+                    <div class="invalid-feedback small-text">
+                        {{ form.profile_image.errors|join(", ") }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-lg auth-form-btn">
+                    <i class="bi bi-person-plus me-1"></i> Register
+                </button>
+            </div>
+            
+            <!-- Update login link -->
+            <div class="text-center">
+                <p class="mb-0 small-text">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold" style="color: var(--primary-dark);">Sign In</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

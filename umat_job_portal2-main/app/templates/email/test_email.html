@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>UMAT Job Portal - Test Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #044a10;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>UMAT Job Portal - Email Test</h2>
+    </div>
+    <div class="content">
+        <p>Hello {{ user.first_name }},</p>
+        
+        <p>This is a test email from the UMAT Job Portal system.</p>
+        
+        <p><strong>If you are receiving this email, it means your email configuration is working correctly!</strong></p>
+        
+        <p>You can now use the email notification system for:</p>
+        <ul>
+            <li>Interview scheduling notifications</li>
+            <li>Application status updates</li>
+            <li>Other system notifications</li>
+        </ul>
+        
+        <p>This email was sent at: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        
+        <p>Best regards,<br>
+        UMaT Job Portal Team</p>
+    </div>
+    <div class="footer">
+        <p>This is an automated test message from the UMaT Job Portal.</p>
+        <p>University of Mines and Technology (UMaT)</p>
+    </div>
+</body>
+</html> 

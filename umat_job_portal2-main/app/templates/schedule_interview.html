@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" >
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm" style="border-top: 2px solid green;">
+                <div class="card-header bg-white">
+                    <h2 class="card-title h4 mb-0">Schedule Interview</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Application Details</h5>
+                        <p><strong>Candidate:</strong> {{ application.applicant.first_name }} {{ application.applicant.last_name }}</p>
+                        <p><strong>Position:</strong> {{ application.job.title }}</p>
+                        <p><strong>Department:</strong> {{ application.job.department }}</p>
+                        <p><strong>Application Date:</strong> {{ application.application_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_date.label(class="form-label") }}
+                                    {{ form.interview_date(class="form-control", type="date") }}
+                                    {% for error in form.interview_date.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.interview_time.label(class="form-label") }}
+                                    {{ form.interview_time(class="form-control", type="time") }}
+                                    {% for error in form.interview_time.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.interview_level.label(class="form-label") }}
+                            {{ form.interview_level(class="form-select") }}
+                            {% for error in form.interview_level.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Select the interview level (Department → Faculty → University)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.interview_type.label(class="form-label") }}
+                            {{ form.interview_type(class="form-select") }}
+                            {% for error in form.interview_type.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.location_or_link.label(class="form-label") }}
+                            {{ form.location_or_link(class="form-control") }}
+                            {% for error in form.location_or_link.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                For online interviews, provide the video conferencing link (e.g., Zoom, Google Meet). For in-person interviews, provide the location.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.interviewer.label(class="form-label") }}
+                            {{ form.interviewer(class="form-select") }}
+                            {% for error in form.interviewer.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Select the interviewer for this interview level
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.notes.label(class="form-label") }}
+                            {{ form.notes(class="form-control", rows=3) }}
+                            {% for error in form.notes.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Add any additional instructions or requirements for the interview.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Application
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

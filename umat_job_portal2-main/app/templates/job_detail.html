@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4" style="margin-bottom: 100px; ;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for("main.index") }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for("main.view_jobs") }}">Jobs</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+            </ol>
+        </nav>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.user_profile') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Profile
+        </a>
+        {% else %}
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Home
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm" style="border: 1px solid purple">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">{{ job.title }}</h2>
+                    <h6 class="card-subtitle text-muted">Department: {{ job.department }}</h6>
+                </div>
+                <span class="badge bg-{{ 'success' if job.status == 'open' else 'secondary' }} fs-6">
+                    {{ job.status|title }}
+                </span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="card-title">Job Description</h5>
+                    <div class="mb-4">{{ job.description | safe }}</div>
+
+                    {% if job.required_skills %}
+                    <h5 class="card-title">Required Skills</h5>
+                    <div class="mb-4">{{ job.required_skills }}</div>
+                    {% endif %}
+
+                    {% if job.required_experience %}
+                    <h5 class="card-title">Required Experience</h5>
+                    <div class="mb-4">{{ job.required_experience }}</div>
+                    {% endif %}
+
+                    {% if job.required_education %}
+                    <h5 class="card-title">Required Education</h5>
+                    <div class="mb-4">{{ job.required_education }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Job Details</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-calendar-event text-primary"></i>
+                                    Posted: {{ job.posted_date.strftime("%B %d, %Y") }}
+                                </li>
+                                {% if job.closing_date %}
+                                <li class="mb-2">
+                                    <i class="bi bi-calendar-x text-danger"></i>
+                                    Closes: {{ job.closing_date.strftime("%B %d, %Y") }}
+                                </li>
+                                {% endif %}
+                                <li class="mb-2">
+                                    <i class="bi bi-building text-success"></i>
+                                    Department: {{ job.department }}
+                                </li>
+                                {% if job.salary_range %}
+                                <li class="mb-2">
+                                    <i class="bi bi-cash text-success"></i>
+                                    Salary: {{ job.salary_range }}
+                                </li>
+                                {% endif %}
+                            </ul>
+
+                            {% if current_user.is_authenticated and current_user.role == UserRole.candidate %}
+                                {% if job.status == "open" %}
+                                    <a href="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" 
+                                       class="btn btn-primary w-100">
+                                        <i class="bi bi-send"></i> Apply Now
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="bi bi-x-circle"></i> Applications Closed
+                                    </button>
+                                {% endif %}
+                            {% elif not current_user.is_authenticated %}
+                                <a href="{{ url_for('auth.login', next=request.url) }}" 
+                                   class="btn btn-primary w-100">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Apply
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.view_jobs') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Job Listings
+                </a>
+                {% else %}
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.role == UserRole.candidate and job.status == "open" %}
+                <a href="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" 
+                   class="btn btn-primary">
+                    <i class="bi bi-send"></i> Apply Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

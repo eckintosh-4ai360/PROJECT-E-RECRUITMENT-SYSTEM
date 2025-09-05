@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Updated</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #006a3c 0%, #004c23 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+        }
+        .interview-details {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #006a3c;
+        }
+        .button {
+            display: inline-block;
+            background: #006a3c;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-passed { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-scheduled { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Interview Updated</h2>
+    </div>
+    <div class="content">
+        <p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+        
+        <p>Your interview for the <strong>{{ job.title }}</strong> position has been updated.</p>
+        
+        <div class="interview-details">
+            <h3>Updated Interview Details:</h3>
+            <p><strong>Interview Level:</strong> {{ interview.interview_level.value }}</p>
+            <p><strong>Status:</strong> 
+                <span class="status-badge status-{{ interview.level_status.value }}">
+                    {{ interview.level_status.value }}
+                </span>
+            </p>
+            <p><strong>Date and Time:</strong> {{ interview.scheduled_date.strftime('%A, %B %d, %Y at %I:%M %p') }}</p>
+            <p><strong>Interview Type:</strong> {{ interview.interview_type.title() }}</p>
+            <p><strong>Location/Link:</strong> {{ interview.location_or_link }}</p>
+            
+            {% if interview.interviewer %}
+            <p><strong>Interviewer:</strong> {{ interview.interviewer.first_name }} {{ interview.interviewer.last_name }}</p>
+            {% endif %}
+            
+            {% if interview.notes %}
+            <p><strong>Additional Notes:</strong> {{ interview.notes }}</p>
+            {% endif %}
+        </div>
+        
+        {% if interview.next_level_date %}
+        <div class="interview-details">
+            <h3>Next Level Interview Scheduled:</h3>
+            <p><strong>Date and Time:</strong> {{ interview.next_level_date.strftime('%A, %B %d, %Y at %I:%M %p') }}</p>
+            <p>Please prepare for your next level interview. You will receive additional details closer to the date.</p>
+        </div>
+        {% endif %}
+        
+        <p>Please review the updated details and make note of any changes to the schedule or format.</p>
+        
+        <a href="{{ url_for('main.view_application', application_id=application.application_id, _external=True) }}" class="button">View Application Details</a>
+        
+        <p>If you have any questions or need to reschedule, please contact us as soon as possible.</p>
+        
+        <p>Best regards,<br>
+        UMaT Job Portal System</p>
+    </div>
+    <div class="footer">
+        <p>This is an automated message from the UMaT Job Portal.</p>
+        <p>University of Mines and Technology (UMaT)</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4 justify-content-center align-items-center">
+            <h1 class="display-5" style="color:var(--primary-dark); font-weight: 600; text-align: center;">Admin Dashboard</h1>
+
+    <div class="d-flex justify-content-center align-items-center text-center mb-4">
+        <div>
+             <a href="{{ url_for('main.list_events') }}" class="btn " style="background-color: var(--secondary); color: var(--primary-dark); ">
+                <i class="bi bi-calendar-event"></i> Manage Events
+            </a>
+            <a href="{{ url_for('admin.all_applications') }}" class="btn" style="background-color: blueviolet; color: white;">
+                <i class="bi bi-file-text"></i> Manage Applications
+            </a>
+            <a href="{{ url_for('main.create_job') }}" class="btn" style="background-color: var(--primary-dark); color: white;">
+                <i class="bi bi-plus-circle"></i> Create New Job
+            </a>
+            <a href="{{ url_for('main.list_jobs') }}" class="btn " style="border:1px solid var(--primary); color: var(--primary-dark); ">
+                <i class="bi bi-gear"></i> Manage Jobs
+            </a>
+           <a href="{{ url_for('main.email_settings') }}" class="btn" style="background-color: #6f42c1; color: white;">
+                <i class="bi bi-envelope-at"></i> Email Settings
+            </a>
+        </div>
+    </div>
+    <hr>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.list_users') }}" class="text-decoration-none">
+                <div class="card text-white bg-primary" style="border: 3px solid white; outline: 1px solid blue;">
+                    <div class="card-body position-relative">
+                        <i class="bi bi-people position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title">Total Users</h5>
+                        <h2 class="card-text">{{ total_users }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.active_jobs') }}" class="text-decoration-none">
+            <div class="card text-white bg-success" style="border: 3px solid white; outline: 1px solid green;">
+                <div class="card-body position-relative">
+                    <i class="bi bi-briefcase position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
+                    <h5 class="card-title">Active Jobs</h5>
+                    <h2 class="card-text">{{ total_jobs }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+
+        <!-- Total Applications -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.all_applications') }}" class="text-decoration-none">
+            <div class="card text-white " style="background-color:blueviolet; border: 3px solid white; outline: 1px solid blueviolet; ">
+                <div class="card-body position-relative">
+                    <i class="bi bi-file-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
+                    <h5 class="card-title">Total Applications</h5>
+                    <h2 class="card-text">{{ total_applications  }}</h2>
+                </div>
+            </div>
+            </a>
+        </div>
+
+        <!-- Total Resumes -->  
+        <div class="col-md-3">
+            <div class="card text-white bg-warning" style="border: 3px solid white; outline: 1px solid yellow;">
+                <div class="card-body position-relative">
+                    <i class="bi bi-file-earmark-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
+                    <h5 class="card-title">Total Resumes</h5>
+                    <h2 class="card-text">{{ total_resumes }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <hr>
+<!-- //***
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4 mx-2">
+        <!-- Monthly Activity Chart -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Monthly Activity</h5>
+                </div>
+                <div class="card-body" style="height: 400px;">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Distribution -->
+        <div class="col-md-4" style="border: 3px solid white; outline: 1px solid yellow;">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Jobs by Department</h5>
+                </div>
+                <div class="card-body" style="height: 200px;">
+                    <canvas id="deptChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Application Status -->
+            <div class="card shadow-sm mb-4" style="border: 3px solid white; outline: 1px solid var(--primary);">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Application Status</h5>
+                </div>
+                <div class="card-body" style="height: 200px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Applications Table -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+                <h5 class="card-title mb-0" style="color:var(--primary-dark);">Recent Applications</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="color:var(--primary-dark);">Applicant</th>
+                            <th style="color:var(--primary-dark);">Position</th>
+                            <th style="color:var(--primary-dark);">Department</th>
+                            <th style="color:var(--primary-dark);">Applied Date</th>
+                            <th style="color:var(--primary-dark);">Status</th>
+                            <th style="color:var(--primary-dark);">Match Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in recent_applications.items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if application.applicant.profile_image %}
+                                    <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" 
+                                         class="rounded-circle me-2" 
+                                         width="32" 
+                                         height="32"
+                                         alt="{{ application.applicant.first_name }}'s profile picture">
+                                    {% else %}
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px;">
+                                        {{ application.applicant.first_name[0] }}{{ application.applicant.last_name[0] }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-bold">{{ application.applicant.first_name }} {{ application.applicant.last_name }}</div>
+                                        <div class="small text-muted">{{ application.applicant.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ application.job.title }}</td>
+                            <td>{{ application.job.department }}</td>
+                            <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if application.status.value == 'Accepted' 
+                                                    else 'warning' if application.status.value == 'Under Review' 
+                                                    else 'info' if application.status.value == 'Submitted' 
+                                                    else 'danger' if application.status.value == 'Rejected'
+                                                    else 'secondary' }}">
+                                    {{ application.status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if application.resume and application.resume.matches %}
+                                    {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
+                                    {% if match %}
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-{{ 'success' if match.match_score >= 0.7 
+                                                               else 'warning' if match.match_score >= 0.5 
+                                                               else 'danger' }}" 
+                                             role="progressbar" 
+                                             style="width: {{ (match.match_score * 100)|int }}%" 
+                                             aria-valuenow="{{ (match.match_score * 100)|int }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ "%.0f"|format(match.match_score * 100) }}%</small>
+                                    {% else %}
+                                    <small class="text-muted">No match</small>
+                                    {% endif %}
+                                {% else %}
+                                <small class="text-muted">No resume</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Activity Chart
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyData = {{ monthly_stats|tojson|safe }};
+    
+    new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+            labels: monthlyData.map(item => item.month),
+                datasets: [{
+                    label: 'Applications',
+                data: monthlyData.map(item => item.applications),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Resumes',
+                data: monthlyData.map(item => item.resumes),
+                    borderColor: 'rgb(255, 205, 86)',
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Jobs',
+                data: monthlyData.map(item => item.jobs),
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+    // Department Distribution Chart
+    const deptCtx = document.getElementById('deptChart').getContext('2d');
+    const deptData = {{ dept_stats|tojson|safe }};
+    
+    new Chart(deptCtx, {
+        type: 'doughnut',
+            data: {
+            labels: deptData.labels,
+                datasets: [{
+                data: deptData.values,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+    // Application Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusData = {{ application_stats|tojson|safe }};
+    
+    new Chart(statusCtx, {
+        type: 'pie',
+            data: {
+            labels: statusData.labels,
+                datasets: [{
+                data: statusData.values,
+                    backgroundColor: [
+                    'rgb(75, 192, 192)',  // Success
+                    'rgb(255, 205, 86)',  // Warning
+                    'rgb(54, 162, 235)',  // Info
+                    'rgb(255, 99, 132)',  // Danger
+                    'rgb(153, 102, 255)'  // Other
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+});
+</script>
+{% endblock %}
+
+{% endblock %}
+
