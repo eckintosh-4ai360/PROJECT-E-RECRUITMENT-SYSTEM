@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Modern Resume Header -->
+    <div class="resume-analysis-header">
+        <div class="row align-items-center">
+        <div class="col-md-8">
+                <h1 class="mb-2">Resume Analysis</h1>
+                <p class="lead mb-0">
+                    {{ resume.original_filename }}
+            </p>
+        </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('main.user_profile') }}" class="btn btn-light">
+                <i class="bi bi-arrow-left"></i> Back to Profile
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Analysis Grid -->
+    <div class="row g-4">
+        <!-- Left Column - Resume Content and Completeness -->
+        <div class="col-lg-8">
+            <!-- Resume Preview -->
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text"></i>Resume Content
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if resume.file_path.lower().endswith('.pdf') %}
+                        <div class="pdf-container">
+                            {% if pdf_display %}
+                                {{ pdf_display }}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
+                                    <p class="mt-3">Unable to display PDF preview. You can still download the resume below.</p>
+                                    <a href="{{ url_for('static', filename='uploads/' + resume.file_path) }}" 
+                                       class="btn btn-primary" 
+                                       target="_blank">
+                                        <i class="bi bi-download"></i> Download Resume
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="parsed-content">
+                            <pre class="bg-light p-3 rounded">{{ resume.parsed_text }}</pre>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Completeness Analysis -->
+            {% if analysis and analysis.completeness %}
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-check-circle"></i>Resume Completeness
+                    </h5>
+                        <div class="match-score-badge {{ 'high' if analysis.completeness.completeness_score >= 0.8 else 'medium' if analysis.completeness.completeness_score >= 0.6 else 'low' }}">
+                            <i class="bi bi-pie-chart"></i>
+                        {{ "%.0f"|format(analysis.completeness.completeness_score * 100) }}%
+                        </div>
+                    </div>
+                    <div class="completeness-indicator mt-3">
+                        <div class="completeness-bar bg-{{ 'success' if analysis.completeness.completeness_score >= 0.8 else 'warning' if analysis.completeness.completeness_score >= 0.6 else 'danger' }}"
+                             style="width: {{ analysis.completeness.completeness_score * 100 }}%">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Present Sections -->
+                    {% if analysis.completeness.present_sections %}
+                    <div class="section-status present mb-4">
+                    <h6 class="text-success mb-3">
+                            <i class="bi bi-check2-circle"></i> Present Sections
+                    </h6>
+                        <div>
+                        {% for section in analysis.completeness.present_sections %}
+                            <span class="skill-badge">{{ section|title }}</span>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Missing Sections -->
+                    {% if analysis.completeness.missing_sections %}
+                    <div class="section-status missing">
+                    <h6 class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle"></i> Missing Sections
+                    </h6>
+                    <div class="list-group list-group-flush">
+                        {% for missing in analysis.completeness.missing_sections %}
+                            <div class="p-3 rounded mb-2 bg-white">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">{{ missing.section|title }}</h6>
+                                    <span class="badge bg-{{ 'danger' if missing.importance == 'critical' else 'warning' if missing.importance == 'high' else 'info' }}">
+                                    {{ missing.importance|title }}
+                                    </span>
+                                </div>
+                                <p class="mb-0 text-muted small">{{ missing.tip }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column - Skills and Experience -->
+        <div class="col-lg-4">
+            <!-- Skills Analysis -->
+            {% if analysis and analysis.skills %}
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i>Skills Analysis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for category, skills in analysis.skills.items() %}
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">{{ category|title|replace('_', ' ') }}</h6>
+                        <div>
+                            {% for skill in skills %}
+                            <span class="skill-badge">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Experience Level -->
+            {% if analysis and analysis.experience %}
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-briefcase"></i>Experience Level
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                        <div>
+                            <h6 class="mb-1">Years of Experience</h6>
+                            <p class="h4 mb-0 text-primary">{{ analysis.experience.years }} years</p>
+                        </div>
+                        <span class="match-score-badge {{ 'high' if analysis.experience.years >= 5 else 'medium' if analysis.experience.years >= 2 else 'low' }}">
+                            {{ analysis.experience.level|title }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Job Matches -->
+    {% if matched_jobs %}
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-briefcase"></i>Matching Job Opportunities
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Match Score</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matched_jobs %}
+                        <tr>
+                            <td class="align-middle">{{ match.job.title }}</td>
+                            <td class="align-middle">{{ match.job.department }}</td>
+                            <td class="align-middle" style="width: 200px;">
+                                <div class="match-score-badge {{ 'high' if match.match_score >= 0.7 else 'medium' if match.match_score >= 0.5 else 'low' }}">
+                                    <i class="bi bi-pie-chart-fill"></i>
+                                    {{ "%.0f"|format(match.match_score * 100) }}% Match
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <a href="{{ url_for('main.view_job_detail', job_id=match.job.job_id) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Course Recommendations -->
+    {% if recommended_courses %}
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-book"></i>Recommended Courses
+                    </h5>
+                </div>
+                <div class="card-body">
+            <div class="row g-4">
+                        {% for category, courses in recommended_courses.items() %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="course-card h-100">
+                                <div class="card-body">
+                            <h6 class="card-title text-primary mb-3">{{ category }}</h6>
+                                    <div class="list-group list-group-flush">
+                                        {% for course in courses %}
+                                        <a href="{{ course['Link'] }}" 
+                                           target="_blank" 
+                                   class="course-link">
+                                    <i class="bi bi-play-circle me-2"></i>
+                                            {{ course["Course Name"] }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resume & Interview Tips -->
+    <div class="analysis-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-camera-video"></i>Resume & Interview Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+            <div class="row g-4">
+                        <!-- Resume Writing Tips -->
+                        <div class="col-md-6">
+                    <div class="video-card">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-file-text me-2"></i>Resume Writing Tips
+                        </h6>
+                        <div class="ratio ratio-16x9 rounded overflow-hidden mb-3">
+                                <iframe src="https://www.youtube.com/embed/y8YH0Qbu5h4" 
+                                    allowfullscreen
+                                    class="shadow-sm"></iframe>
+                        </div>
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Keep your resume clear and concise
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Tailor your resume to the job
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Highlight your achievements
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+                        <!-- Interview Tips -->
+                        <div class="col-md-6">
+                    <div class="video-card">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person-video3 me-2"></i>Interview Tips
+                        </h6>
+                        <div class="ratio ratio-16x9 rounded overflow-hidden mb-3">
+                                <iframe src="https://www.youtube.com/embed/Ji46s5BHdr0" 
+                                    allowfullscreen
+                                    class="shadow-sm"></iframe>
+                        </div>
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Research the company beforehand
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Practice common interview questions
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                Prepare relevant examples
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

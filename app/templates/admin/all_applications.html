@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4" style="margin-bottom: 100px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color:var(--primary-dark); "><i class="bi bi-file-text " style="margin-right:6px"></i>All Applications</h2>
+        <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
+                <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
+            </a>
+    </div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>How to schedule interviews:</strong> Find an application with status "Submitted" or "Under Review", then click the green calendar button <i class="bi bi-calendar-plus"></i> in the Actions column or click the eye icon <i class="bi bi-eye"></i> to view application details first.
+    </div>
+    <hr>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Filter by Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        {% for status in ApplicationStatus %}
+                        <option value="{{ status.name }}" {{ 'selected' if request.args.get('status') == status.name }}>
+                            {{ status.value }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="department" class="form-label">Filter by Department</label>
+                    <select name="department" id="department" class="form-select">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}" {{ 'selected' if request.args.get('department') == dept }}>{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr>
+
+    <!-- Applications Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="color: var(--primary-dark);">Applicant</th>
+                            <th style="color: var(--primary-dark);">Position</th>
+                            <th style="color: var(--primary-dark);">Department</th>
+                            <th style="color: var(--primary-dark);">Applied Date</th>
+                            <th style="color: var(--primary-dark);">Status</th>
+                            <th style="color: var(--primary-dark);">Match Score</th>
+                            <th style="color: var(--primary-dark);">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if application.applicant.profile_image %}
+                                    <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" 
+                                         class="rounded-circle me-2" 
+                                         width="32" 
+                                         height="32"
+                                         alt="{{ application.applicant.first_name }}'s profile picture">
+                                    {% else %}
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px;">
+                                        {{ application.applicant.first_name[0] }}{{ application.applicant.last_name[0] }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-bold">{{ application.applicant.first_name }} {{ application.applicant.last_name }}</div>
+                                        <div class="small text-muted">{{ application.applicant.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('main.view_job_detail', job_id=application.job.job_id) }}" class="text-decoration-none">
+                                    {{ application.job.title }}
+                                </a>
+                            </td>
+                            <td>{{ application.job.department }}</td>
+                            <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if application.status == ApplicationStatus.accepted 
+                                                    else 'warning' if application.status == ApplicationStatus.under_review 
+                                                    else 'info' if application.status == ApplicationStatus.submitted 
+                                                    else 'danger' if application.status == ApplicationStatus.rejected
+                                                    else 'secondary' }}">
+                                    {{ application.status.value }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if application.resume and application.resume.matches %}
+                                    {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
+                                    {% if match %}
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-{{ 'success' if match.match_score >= 0.7 
+                                                               else 'warning' if match.match_score >= 0.5 
+                                                               else 'danger' }}" 
+                                             role="progressbar" 
+                                             style="width: {{ (match.match_score * 100)|int }}%" 
+                                             aria-valuenow="{{ (match.match_score * 100)|int }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ "%.0f"|format(match.match_score * 100) }}%</small>
+                                    {% else %}
+                                    <small class="text-muted">No match</small>
+                                    {% endif %}
+                                {% else %}
+                                <small class="text-muted">No resume</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                                       class="btn btn-sm btn-primary" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if application.resume %}
+                                    <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}"
+                                       class="btn btn-sm btn-warning" title="View Resume">
+                                        <i class="bi bi-file-text"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if application.status.value in ['Submitted', 'Under Review'] %}
+                                    <a href="{{ url_for('main.schedule_interview', application_id=application.application_id) }}"
+                                       class="btn btn-sm btn-success" title="Schedule Interview">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if not applications %}
+            <div class="text-center py-4">
+                <p class="text-muted mb-0">No applications found.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Add this style to ensure footer stays at bottom */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}
+</style>
+{% endblock %} 

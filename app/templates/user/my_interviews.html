@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="mb-4">My Interviews</h2>
+            
+            <ul class="nav nav-tabs mb-4" id="interviewTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" 
+                        type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+                        <i class="bi bi-calendar-event me-1"></i> Upcoming Interviews
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" 
+                        type="button" role="tab" aria-controls="past" aria-selected="false">
+                        <i class="bi bi-calendar-check me-1"></i> Past Interviews
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="interviewTabContent">
+                <!-- Upcoming Interviews Tab -->
+                <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                    {% if upcoming_interviews %}
+                        {% for app in upcoming_interviews %}
+                            <div class="card mb-3 border-success">
+                                <div class="card-header bg-success bg-opacity-10 d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">{{ app.job.title }}</span>
+                                    <span class="badge bg-success">{{ app.interview.scheduled_date.strftime('%d %b %Y, %I:%M %p') }}</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="card-title">
+                                                <i class="bi bi-building me-1"></i> {{ app.job.department }}
+                                            </h5>
+                                            <p class="card-text">
+                                                <strong>Interview Level:</strong> 
+                                                <span class="badge bg-info">{{ app.interview.interview_level.value }}</span><br>
+                                                <strong>Interview Type:</strong> {{ app.interview.interview_type.title() }}<br>
+                                                <strong>Location/Link:</strong> 
+                                                {% if app.interview.interview_type == 'online' %}
+                                                    <a href="{{ app.interview.location_or_link }}" target="_blank" class="text-primary">
+                                                        {{ app.interview.location_or_link }}
+                                                    </a>
+                                                {% else %}
+                                                    {{ app.interview.location_or_link }}
+                                                {% endif %}
+                                            </p>
+                                            {% if app.interview.notes %}
+                                                <div class="mt-3">
+                                                    <strong>Additional Notes:</strong>
+                                                    <p class="card-text text-muted">{{ app.interview.notes }}</p>
+                                                </div>
+                                            {% endif %}
+
+                                            <!-- Interview Progress -->
+                                            <div class="mt-4">
+                                                <h6>Interview Progress</h6>
+                                                <div class="progress" style="height: 25px;">
+                                                    {% set progress = {
+                                                        'department': 33,
+                                                        'faculty': 66,
+                                                        'university': 100
+                                                    } %}
+                                                    {% set current_level = app.interview.interview_level.value.lower() %}
+                                                    <div class="progress-bar bg-success" 
+                                                         role="progressbar" 
+                                                         style="width: {{ progress[current_level] }}%"
+                                                         aria-valuenow="{{ progress[current_level] }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        {{ app.interview.interview_level.value }} Level
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between mt-2 small text-muted">
+                                                    <span>Department</span>
+                                                    <span>Faculty</span>
+                                                    <span>University</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <a href="{{ url_for('main.view_job_detail', job_id=app.job.job_id) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-briefcase me-1"></i> View Job Details
+                                            </a>
+                                            <a href="{{ url_for('main.view_application', application_id=app.application_id) }}" 
+                                               class="btn btn-outline-success btn-sm mt-2">
+                                                <i class="bi bi-file-text me-1"></i> View Application
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> You don't have any upcoming interviews scheduled.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Past Interviews Tab -->
+                <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                    {% if past_interviews %}
+                        {% for app in past_interviews %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-secondary bg-opacity-10 d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">{{ app.job.title }}</span>
+                                    <span class="badge bg-secondary">{{ app.interview.scheduled_date.strftime('%d %b %Y, %I:%M %p') }}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-building me-1"></i> {{ app.job.department }}
+                                    </h5>
+                                    <p class="card-text">
+                                        <strong>Interview Level:</strong> 
+                                        <span class="badge bg-info">{{ app.interview.interview_level.value }}</span><br>
+                                        <strong>Interview Type:</strong> {{ app.interview.interview_type.title() }}<br>
+                                        <strong>Status:</strong> 
+                                        <span class="badge bg-{{ 'success' if app.interview.level_status.value == 'passed' 
+                                                               else 'danger' if app.interview.level_status.value == 'failed'
+                                                               else 'secondary' }}">
+                                            {{ app.interview.level_status.value }}
+                                        </span>
+                                    </p>
+                                    {% if app.interview.interviewer_notes %}
+                                        <div class="mt-3">
+                                            <strong>Interviewer Feedback:</strong>
+                                            <p class="card-text text-muted">{{ app.interview.interviewer_notes }}</p>
+                                        </div>
+                                    {% endif %}
+                                    <a href="{{ url_for('main.view_application', application_id=app.application_id) }}" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-file-text me-1"></i> View Application
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> You don't have any past interviews.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application Status Update - {{ job.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #044a10;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .job-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .feedback {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #6c757d;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            background-color: #044a10;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Application Status Update</h2>
+    </div>
+    <div class="content">
+        <p>Dear {{ user.first_name }},</p>
+        
+        <p>Thank you for your interest in the position of <strong>{{ job.title }}</strong> at the University of Mines and Technology.</p>
+        
+        <div class="job-details">
+            <h3>Position Details:</h3>
+            <p><strong>Job Title:</strong> {{ job.title }}</p>
+            <p><strong>Department:</strong> {{ job.department }}</p>
+            <p><strong>Application Date:</strong> {{ application.application_date.strftime('%B %d, %Y') }}</p>
+        </div>
+        
+        <p>After careful consideration of all applications received, we regret to inform you that your application has not been selected to proceed further in the recruitment process for this position.</p>
+        
+        {% if application.feedback %}
+        <div class="feedback">
+            <h3>Feedback from the Hiring Team:</h3>
+            <p>{{ application.feedback }}</p>
+        </div>
+        {% endif %}
+        
+        <p>We appreciate your interest in working with us and encourage you to apply for future positions that match your qualifications and experience. We will keep your application on file for consideration should a suitable position become available in the future.</p>
+        
+        <p>We wish you all the best in your job search and professional endeavors.</p>
+        
+        <p>Best regards,<br>
+        University of Mines and Technology<br>
+        Hiring Team</p>
+    </div>
+    <div class="footer">
+        <p>University of Mines and Technology (UMaT) Job Portal</p>
+        <p>This is an automated message. Please do not reply directly to this email.</p>
+    </div>
+</body>
+</html> 
