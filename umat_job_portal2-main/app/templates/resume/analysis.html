@@ -201,33 +201,6 @@
                     </div>
                     {% endif %}
                     
-                    {% if analysis.experience.work_experiences %}
-                    <div class="mt-3">
-                        <h6 class="mb-2">Work History</h6>
-                        <div class="list-group list-group-flush">
-                            {% for exp in analysis.experience.work_experiences %}
-                            <div class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-bold">{{ exp.position }}</div>
-                                    <div class="text-muted">{{ exp.company }}</div>
-                                    {% if exp.start_date and exp.end_date %}
-                                    <small class="text-muted">
-                                        {{ exp.start_date.strftime('%b %Y') if exp.start_date else 'Unknown' }} - 
-                                        {{ exp.end_date.strftime('%b %Y') if exp.end_date and not exp.is_current else 'Present' }}
-                                        {% if exp.duration_months %}
-                                        ({{ exp.duration_months }} months)
-                                        {% endif %}
-                                    </small>
-                                    {% endif %}
-                                </div>
-                                {% if exp.is_current %}
-                                <span class="badge bg-success">Current</span>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
                     
                     {% if analysis.experience.gaps_detected %}
                     <div class="mt-3">

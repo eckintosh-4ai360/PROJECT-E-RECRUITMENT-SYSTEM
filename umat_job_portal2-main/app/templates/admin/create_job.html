@@ -16,7 +16,7 @@
         
         <div class="mb-3">
             {{ form.department.label(class="form-label") }}
-            {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else "")) }}
+            {{ form.department(class="form-select" + (" is-invalid" if form.department.errors else "")) }}
             {% for error in form.department.errors %}
                 <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
@@ -32,6 +32,20 @@
             {{ form.required_skills.label(class="form-label") }}
             {{ form.required_skills(class="form-control" + (" is-invalid" if form.required_skills.errors else ""), rows=5) }}
             {% for error in form.required_skills.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.location.label(class="form-label") }}
+            {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else "")) }}
+            {% for error in form.location.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.salary_range.label(class="form-label") }}
+            {{ form.salary_range(class="form-control" + (" is-invalid" if form.salary_range.errors else "")) }}
+            {% for error in form.salary_range.errors %}
                 <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>

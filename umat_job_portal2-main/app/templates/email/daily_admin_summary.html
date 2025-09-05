@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Applications Summary - UMAT Job Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e9ecef;
+        }
+        .stats-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stats-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stats-label {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .priority-section {
+            background-color: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .summary-icon {
+            font-size: 36px;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="summary-icon">📊</div>
+        <h1>Daily Applications Summary</h1>
+        <p>{{ summary_date.strftime('%B %d, %Y') }}</p>
+    </div>
+    
+    <div class="content">
+        <p>Dear Admin Team,</p>
+        
+        <p>Here's your daily summary of application activity for the UMAT Job Portal:</p>
+        
+        <div class="stats-card">
+            <div>
+                <div class="stats-label">New Applications Today</div>
+                <div class="stats-number">{{ new_applications_today }}</div>
+            </div>
+            <div style="font-size: 2em;">📥</div>
+        </div>
+        
+        <div class="stats-card" style="border-left-color: #ffc107;">
+            <div>
+                <div class="stats-label">Pending Review</div>
+                <div class="stats-number" style="color: #ffc107;">{{ pending_applications }}</div>
+            </div>
+            <div style="font-size: 2em;">⏳</div>
+        </div>
+        
+        <div class="stats-card" style="border-left-color: #6f42c1;">
+            <div>
+                <div class="stats-label">Under Review</div>
+                <div class="stats-number" style="color: #6f42c1;">{{ under_review }}</div>
+            </div>
+            <div style="font-size: 2em;">🔍</div>
+        </div>
+        
+        {% if pending_applications > 0 or under_review > 0 %}
+        <div class="priority-section">
+            <h4>⚠️ Action Required</h4>
+            {% if pending_applications > 0 %}
+            <p>• <strong>{{ pending_applications }}</strong> application(s) are waiting for initial review</p>
+            {% endif %}
+            {% if under_review > 0 %}
+            <p>• <strong>{{ under_review }}</strong> application(s) are currently under review</p>
+            {% endif %}
+            <p><em>Please log into the admin dashboard to review and process these applications.</em></p>
+        </div>
+        {% endif %}
+        
+        {% if new_applications_today == 0 and pending_applications == 0 %}
+        <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
+            <h4>✅ All Caught Up!</h4>
+            <p>No new applications today and no pending applications requiring immediate attention.</p>
+        </div>
+        {% endif %}
+        
+        <p>Thank you for maintaining an efficient and responsive hiring process.</p>
+        
+        <p>Best regards,<br>
+        <strong>UMAT Job Portal System</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>This is an automated daily summary from the UMAT Job Portal system.</p>
+        <p>University of Mines and Technology (UMaT)</p>
+    </div>
+</body>
+</html>

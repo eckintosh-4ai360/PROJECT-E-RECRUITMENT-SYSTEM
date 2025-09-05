@@ -2,7 +2,7 @@
 import os
 from flask import Flask
 from config import Config
-from flask_bootstrap import Bootstrap
+# from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -27,7 +27,7 @@ def create_app(config_class=Config):
     # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
-    Bootstrap(app)
+    # Bootstrap(app)
     mail.init_app(app)
 
     # Initialize app-specific configurations
@@ -48,7 +48,7 @@ def create_app(config_class=Config):
     from app.admin_routes import admin as admin_bp
     from app.auth_routes import auth_bp
     app.register_blueprint(main_bp)
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
     # Context processor to inject variables into templates

@@ -104,10 +104,21 @@
 
                         <!-- Actions -->
                         <div class="col-md-1 text-end">
-                            <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                
+                                <!-- Only show delete button for certain statuses -->
+                                {% if application.status.value in ['Submitted', 'Under Review', 'Rejected'] and application.interviews.count() == 0 %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        title="Delete Application"
+                                        onclick="confirmDelete('{{ application.application_id }}', '{{ application.job.title }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -133,4 +144,20 @@
     </div>
     {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(applicationId, jobTitle) {
+    if (confirm(`Are you sure you want to delete your application for "${jobTitle}"? This action cannot be undone.`)) {
+        // Create a form and submit it to delete the application
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/my-applications/${applicationId}/delete`;
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

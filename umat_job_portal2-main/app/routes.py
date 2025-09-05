@@ -370,6 +370,9 @@ def view_jobs():
     # Get filter parameters
     search = request.args.get('search', '').strip()
     department = request.args.get('department', '').strip()
+    location = request.args.get('location', '').strip()
+    salary_range = request.args.get('salary_range', '').strip()
+    sort_by = request.args.get('sort_by', 'newest')
 
     # Base query: only open jobs
     query = Job.query.filter_by(status="open")
@@ -377,6 +380,16 @@ def view_jobs():
     # Apply department filter
     if department:
         query = query.filter(Job.department == department)
+        
+    # Apply location filter
+    if location:
+        location_pattern = f"%{location}%"
+        query = query.filter(Job.location.ilike(location_pattern))
+        
+    # Apply salary range filter (basic filtering by salary text)
+    if salary_range:
+        salary_pattern = f"%{salary_range}%"
+        query = query.filter(Job.salary_range.ilike(salary_pattern))
 
     # Apply keyword search (search in title, description, required_skills)
     if search:
@@ -388,18 +401,35 @@ def view_jobs():
                 Job.required_skills.ilike(search_pattern)
             )
         )
+        
+    # Apply sorting
+    if sort_by == 'oldest':
+        query = query.order_by(Job.posted_date.asc())
+    elif sort_by == 'title':
+        query = query.order_by(Job.title.asc())
+    else:  # default to newest
+        query = query.order_by(Job.posted_date.desc())
 
-    jobs = query.order_by(Job.posted_date.desc()).all()
+    jobs = query.all()
 
-    # Get unique departments for filter dropdown
+    # Get unique values for filter dropdowns
     departments = db.session.query(Job.department).distinct().all()
     departments = [dept[0] for dept in departments if dept[0]]
+    
+    locations = db.session.query(Job.location).distinct().all()
+    locations = [loc[0] for loc in locations if loc[0]]
+    
+    # Get basic salary ranges (you can customize this)
+    salary_ranges = ['Below 5000', '5000-10000', '10000-15000', '15000-20000', 'Above 20000']
 
     return render_template(
         "view_jobs.html",
         title="Open Positions",
         jobs=jobs,
-        departments=departments
+        departments=departments,
+        locations=locations,
+        salary_ranges=salary_ranges,
+        total_jobs=len(jobs)
     )
 
 @bp.route("/jobs/<int:job_id>")
@@ -492,6 +522,80 @@ def create_job():
         try:
             db.session.add(job)
             db.session.commit()
+            
+            # Trigger job matching for existing resumes against this new job
+            try:
+                logger.info(f"Triggering job matching for newly created job {job.job_id}")
+                
+                # Get all existing resumes
+                resumes = Resume.query.all()
+                
+                if resumes:
+                    # Initialize analyzer
+                    resume_analyzer = ResumeAnalyzer()
+                    
+                    # Prepare job data for this specific job
+                    job_data = [{
+                        "job_id": job.job_id,
+                        "title": job.title,
+                        "description": job.description,
+                        "requirements": getattr(job, 'required_skills', '')
+                    }]
+                    
+                    matches_created = 0
+                    
+                    for resume in resumes:
+                        if not resume.parsed_text:
+                            continue
+                            
+                        # Check if JobMatch already exists for this job-resume pair
+                        existing_match = JobMatch.query.filter_by(
+                            resume_id=resume.resume_id,
+                            job_id=job.job_id
+                        ).first()
+                        
+                        if existing_match:
+                            continue  # Skip if match already exists
+                        
+                        try:
+                            # Perform resume analysis
+                            analysis = resume_analyzer.analyze_resume(resume.parsed_text)
+                            
+                            # Use enhanced semantic job matching
+                            from app.semantic_job_matcher import enhanced_job_matching
+                            
+                            # Generate job matches with enhanced algorithm
+                            matches = enhanced_job_matching(
+                                resume_text=resume.parsed_text,
+                                resume_analysis=analysis,
+                                jobs_data=job_data
+                            )
+                            
+                            # Save the match if we got results
+                            if matches and len(matches) > 0:
+                                match = matches[0]  # Should only be one match since we're matching one job
+                                
+                                new_match = JobMatch(
+                                    resume_id=resume.resume_id,
+                                    job_id=job.job_id,
+                                    match_score=match["match_score"],
+                                    match_details=match["match_details"]
+                                )
+                                db.session.add(new_match)
+                                matches_created += 1
+                                
+                        except Exception as match_err:
+                            logger.error(f"Error matching resume {resume.resume_id} with new job {job.job_id}: {match_err}")
+                            continue
+                    
+                    if matches_created > 0:
+                        db.session.commit()
+                        logger.info(f"Created {matches_created} JobMatch records for new job {job.job_id}")
+                    
+            except Exception as matching_err:
+                logger.error(f"Error during job matching for new job {job.job_id}: {matching_err}", exc_info=True)
+                # Don't fail the job creation if matching fails
+                
             flash("Job posting created successfully!", "success")
             return redirect(url_for("main.list_jobs"))
         except Exception as e:
@@ -512,7 +616,7 @@ def edit_job(job_id):
         try:
             job.title = form.title.data
             job.description = form.description.data
-            job.requirements = form.requirements.data
+            job.required_skills = form.required_skills.data
             job.department = form.department.data
             job.location = form.location.data
             job.salary_range = form.salary_range.data
@@ -720,6 +824,81 @@ def apply_for_job(job_id):
             db.session.add(application)
             db.session.commit()
             
+            # Send confirmation email to candidate
+            try:
+                from app.notifications import send_application_notification
+                send_application_notification(application, 'new_application')
+            except Exception as email_err:
+                logger.error(f"Failed to send application confirmation email: {email_err}", exc_info=True)
+                # Don't fail the application process if email fails
+            
+            # Trigger job matching for this specific job-resume pair
+            try:
+                resume = Resume.query.get(form.resume.data)
+                if resume and resume.parsed_text:
+                    logger.info(f"Triggering job matching for resume {resume.resume_id} and job {job_id}")
+                    
+                    # Check if JobMatch already exists for this job-resume pair
+                    existing_match = JobMatch.query.filter_by(
+                        resume_id=resume.resume_id,
+                        job_id=job_id
+                    ).first()
+                    
+                    if not existing_match:
+                        # Initialize analyzers
+                        resume_analyzer = ResumeAnalyzer()
+                        
+                        # Perform resume analysis
+                        analysis = resume_analyzer.analyze_resume(resume.parsed_text)
+                        
+                        # Prepare job data for this specific job
+                        job_data = [{
+                            "job_id": job.job_id,
+                            "title": job.title,
+                            "description": job.description,
+                            "requirements": getattr(job, 'required_skills', '')
+                        }]
+                        
+                        # Use enhanced semantic job matching
+                        try:
+                            from app.semantic_job_matcher import enhanced_job_matching
+                            
+                            # Generate job matches with enhanced algorithm
+                            matches = enhanced_job_matching(
+                                resume_text=resume.parsed_text,
+                                resume_analysis=analysis,
+                                jobs_data=job_data
+                            )
+                            
+                            # Save the match if we got results
+                            if matches and len(matches) > 0:
+                                match = matches[0]  # Should only be one match since we're matching one job
+                                
+                                new_match = JobMatch(
+                                    resume_id=resume.resume_id,
+                                    job_id=job_id,
+                                    match_score=match["match_score"],
+                                    match_details=match["match_details"]
+                                )
+                                db.session.add(new_match)
+                                db.session.commit()
+                                
+                                logger.info(f"Created JobMatch record: Resume {resume.resume_id} <-> Job {job_id}, Score: {match['match_score']:.4f}")
+                            else:
+                                logger.warning(f"No matches generated for resume {resume.resume_id} and job {job_id}")
+                                
+                        except ImportError:
+                            logger.warning("Enhanced job matching not available, using basic matching")
+                            # Fall back to basic matching if needed
+                            
+                    else:
+                        logger.info(f"JobMatch already exists for resume {resume.resume_id} and job {job_id} with score {existing_match.match_score:.4f}")
+                        
+            except Exception as matching_err:
+                # Don't fail the application if matching fails
+                logger.error(f"Error during job matching for application {application.application_id}: {matching_err}", exc_info=True)
+                # Continue without failing the application process
+            
             flash("Your application has been submitted successfully!", "success")
             return redirect(url_for("main.view_application", application_id=application.application_id))
             
@@ -781,35 +960,10 @@ def schedule_interview(application_id):
             db.session.add(interview)
             db.session.commit()
             
-            # Send email notifications
+            # Send interview scheduled notification
             try:
-                candidate = User.query.get(application.candidate_id)
-                job = Job.query.get(application.job_id)
-                
-                # Notify candidate
-                send_email(
-                    subject="Interview Scheduled",
-                    recipients=[candidate.email],
-                    template="email/interview_scheduled.html",
-                    user=candidate,
-                    job=job,
-                    interview=interview,
-                    application=application
-                )
-                
-                # Notify admin
-                admin_users = User.query.filter_by(role=UserRole.admin).all()
-                admin_emails = [admin.email for admin in admin_users]
-                if admin_emails:
-                    send_email(
-                        subject=f"Interview Scheduled - {job.title}",
-                        recipients=admin_emails,
-                        template="email/interview_scheduled_admin.html",
-                        candidate=candidate,
-                        job=job,
-                        interview=interview,
-                        application=application
-                    )
+                from app.notifications import send_application_notification
+                send_application_notification(application, 'interview_scheduled', interview=interview)
             except Exception as email_err:
                 logger.error(f"Failed to send interview notification emails: {email_err}", exc_info=True)
                 # Don't return here, just log the error
@@ -1048,6 +1202,49 @@ def my_applications():
         departments=departments
     )
 
+@bp.route("/my-applications/<int:application_id>/delete", methods=["POST"])
+@login_required
+def delete_my_application(application_id):
+    if current_user.role != UserRole.candidate:
+        flash("Access denied.", "danger")
+        return redirect(url_for("main.index"))
+    
+    application = Application.query.get_or_404(application_id)
+    
+    # Ensure the user owns this application
+    if application.candidate_id != current_user.id:
+        flash("You can only delete your own applications.", "danger")
+        return redirect(url_for("main.my_applications"))
+    
+    # Business logic: Prevent deletion of certain applications
+    cannot_delete_statuses = [ApplicationStatus.interview_scheduled, ApplicationStatus.accepted]
+    
+    if application.status in cannot_delete_statuses:
+        flash(f"Cannot delete application with status '{application.status.value}'. Please contact admin for assistance.", "warning")
+        return redirect(url_for("main.my_applications"))
+    
+    # Check if there are any interviews scheduled
+    if application.interviews.count() > 0:
+        flash("Cannot delete application with scheduled interviews. Please contact admin for assistance.", "warning")
+        return redirect(url_for("main.my_applications"))
+    
+    try:
+        job_title = application.job.title
+        
+        # Delete the application (this will also cascade to related records if properly configured)
+        db.session.delete(application)
+        db.session.commit()
+        
+        flash(f"Your application for '{job_title}' has been successfully deleted.", "success")
+        logger.info(f"User {current_user.id} deleted application {application_id} for job '{job_title}'")
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting application {application_id} by user {current_user.id}: {e}", exc_info=True)
+        flash("Error deleting application. Please try again.", "danger")
+    
+    return redirect(url_for("main.my_applications"))
+
 @bp.route("/applications/<int:application_id>/update-status", methods=["POST"])
 @login_required
 @admin_required
@@ -1070,32 +1267,23 @@ def update_application_status(application_id):
         
         db.session.commit()
         
-        # Send email notification
+        # Send notification email using the centralized notification system
         try:
-            candidate = User.query.get(application.candidate_id)
-            job = Job.query.get(application.job_id)
+            from app.notifications import send_application_notification
             
-            # Select the appropriate email template based on the new status
-            template = "email/application_status_update.html"
-            subject = "Application Status Updated"
-            
+            # Map the new status to notification types
+            notification_type = None
             if new_status == "accepted":
-                template = "email/application_accepted.html"
-                subject = f"Congratulations! Your Application for {job.title} Has Been Accepted"
+                notification_type = 'accepted'
             elif new_status == "rejected":
-                template = "email/application_rejected.html"
-                subject = f"Application Status Update for {job.title}"
+                notification_type = 'rejected'
+            elif new_status == "under_review":
+                notification_type = 'under_review'
+            else:
+                notification_type = 'status_update'
             
-            send_email(
-                subject=subject,
-                recipients=[candidate.email],
-                template=template,
-                user=candidate,
-                job=job,
-                application=application,
-                old_status=old_status,
-                new_status=application.status
-            )
+            # Send the notification
+            send_application_notification(application, notification_type)
             
             flash("Application status and feedback updated successfully! Notification email sent.", "success")
         except Exception as email_err:

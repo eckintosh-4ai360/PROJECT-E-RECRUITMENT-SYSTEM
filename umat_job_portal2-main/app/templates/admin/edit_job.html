@@ -25,7 +25,7 @@
 
                 <div class="mb-3">
                     {{ form.department.label(class="form-label") }}
-                    {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else "")) }}
+                    {{ form.department(class="form-select" + (" is-invalid" if form.department.errors else "")) }}
                     {% for error in form.department.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
                     {% endfor %}

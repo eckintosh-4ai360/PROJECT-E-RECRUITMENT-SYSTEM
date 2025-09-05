@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color:var(--primary-dark);">
+            <i class="bi bi-person-circle" style="margin-right:6px"></i>User Profile
+        </h2>
+        <div>
+            <a href="{{ url_for('admin.list_users') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
+                <i class="bi bi-arrow-left-short me-1"></i>Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Basic Information -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm" style="border: 2px solid #e9ecef;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-person me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body text-center">
+                    <!-- Profile Image -->
+                    <div class="mb-3">
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image_url }}" 
+                             class="rounded-circle img-thumbnail" 
+                             width="120" 
+                             height="120"
+                             alt="{{ user.username }}"
+                             style="object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white"
+                             style="width: 120px; height: 120px; font-size: 2rem; font-weight: bold;">
+                            {{ user.first_name[0] if user.first_name else 'U' }}{{ user.last_name[0] if user.last_name else '' }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- User Details -->
+                    <h4 class="mb-2">{{ user.first_name or '' }} {{ user.last_name or '' }}</h4>
+                    <p class="text-muted mb-1">@{{ user.username }}</p>
+                    <span class="badge bg-{{ 'success' if user.role.value == 'admin' else 'secondary' }} mb-3">
+                        {{ user.role.value|title }}
+                    </span>
+                    
+                    <div class="mt-3">
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ user.email }}" class="text-decoration-none">{{ user.email }}</a>
+                    </div>
+                    
+                    {% if user.candidate_profile and user.candidate_profile.phone_number %}
+                    <div class="mt-2">
+                        <strong>Phone:</strong><br>
+                        {{ user.candidate_profile.phone_number }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-2">
+                        <strong>Member Since:</strong><br>
+                        {{ user_stats.member_since.strftime('%B %d, %Y') }}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="card-footer bg-light">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('admin.send_user_email', user_id=user.id) }}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="bi bi-envelope me-1"></i>Send Email
+                        </a>
+                        {% if user.role.value == 'candidate' %}
+                        <a href="{{ url_for('admin.view_user_applications', user_id=user.id) }}" 
+                           class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-file-text me-1"></i>View Applications ({{ user_stats.total_applications }})
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics and Additional Info -->
+        <div class="col-lg-8 mb-4">
+            <!-- Statistics Cards -->
+            {% if user.role.value == 'candidate' %}
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center" style="border: 2px solid #007bff;">
+                        <div class="card-body">
+                            <h4 class="card-title text-primary">{{ user_stats.total_applications }}</h4>
+                            <p class="card-text text-muted">Applications</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center" style="border: 2px solid #28a745;">
+                        <div class="card-body">
+                            <h4 class="card-title text-success">{{ user_stats.total_interviews }}</h4>
+                            <p class="card-text text-muted">Interviews</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center" style="border: 2px solid #6f42c1;">
+                        <div class="card-body">
+                            <h4 class="card-title" style="color: #6f42c1;">{{ user_stats.total_resumes }}</h4>
+                            <p class="card-text text-muted">Resumes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center" style="border: 2px solid #ffc107;">
+                        <div class="card-body">
+                            <h4 class="card-title text-warning">
+                                {{ (now - user_stats.member_since).days }}
+                            </h4>
+                            <p class="card-text text-muted">Days Active</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Candidate Profile Details -->
+            {% if user.candidate_profile %}
+            <div class="card shadow-sm mb-4" style="border: 2px solid #e9ecef;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Candidate Profile</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.candidate_profile.address %}
+                    <div class="mb-3">
+                        <strong>Address:</strong><br>
+                        {{ user.candidate_profile.address }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if user.candidate_profile.profile_summary %}
+                    <div class="mb-3">
+                        <strong>Profile Summary:</strong><br>
+                        <p class="text-muted">{{ user.candidate_profile.profile_summary|nl2br }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        {% if user.candidate_profile.portfolio_url %}
+                        <div class="col-md-6 mb-2">
+                            <strong>Portfolio:</strong><br>
+                            <a href="{{ user.candidate_profile.portfolio_url }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>View Portfolio
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if user.candidate_profile.linkedin_url %}
+                        <div class="col-md-6 mb-2">
+                            <strong>LinkedIn:</strong><br>
+                            <a href="{{ user.candidate_profile.linkedin_url }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-linkedin me-1"></i>View LinkedIn
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Applications -->
+            {% if recent_applications %}
+            <div class="card shadow-sm mb-4" style="border: 2px solid #e9ecef;">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Recent Applications</h5>
+                    <a href="{{ url_for('admin.view_user_applications', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Department</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in recent_applications %}
+                                <tr>
+                                    <td>{{ application.job.title }}</td>
+                                    <td>{{ application.job.department }}</td>
+                                    <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 
+                                            'success' if application.status.value == 'accepted' else
+                                            'danger' if application.status.value == 'rejected' else
+                                            'warning' if application.status.value == 'interview_scheduled' else
+                                            'info' if application.status.value == 'under_review' else
+                                            'secondary'
+                                        }}">
+                                            {{ application.status.value }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="View Application">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- User's Resumes -->
+            {% if resumes %}
+            <div class="card shadow-sm" style="border: 2px solid #e9ecef;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>Uploaded Resumes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for resume in resumes %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-left-primary">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-1">{{ resume.original_filename }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}
+                                        {% if resume.is_primary %}
+                                        <span class="badge bg-primary ms-2">Primary</span>
+                                        {% endif %}
+                                    </small>
+                                    <div class="mt-2">
+                                        {% if resume.applications %}
+                                        <small class="text-info">
+                                            <i class="bi bi-file-text me-1"></i>Used in {{ resume.applications|length }} application(s)
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

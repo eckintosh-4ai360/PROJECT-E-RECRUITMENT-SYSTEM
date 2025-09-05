@@ -4,9 +4,16 @@
 <div class="container mt-4" style="margin-bottom: 100px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color:var(--primary-dark); "><i class="bi bi-file-text " style="margin-right:6px"></i>All Applications</h2>
-        <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
+        <div>
+            <form method="POST" action="{{ url_for('admin.regenerate_job_matches') }}" class="d-inline">
+                <button type="submit" class="btn btn-info me-2" title="Regenerate all job match scores">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Regenerate Matches
+                </button>
+            </form>
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn" style="border: 1px solid green; color: var(--primary-dark)">
                 <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
             </a>
+        </div>
     </div>
     <div class="alert alert-info">
         <i class="bi bi-info-circle-fill me-2"></i>
@@ -104,26 +111,24 @@
                                 </span>
                             </td>
                             <td>
-                                {% if application.resume and application.resume.matches %}
-                                    {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
-                                    {% if match %}
+                                {% if match_scores.get(application.application_id) %}
+                                    {% set match_data = match_scores[application.application_id] %}
                                     <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-{{ 'success' if match.match_score >= 0.7 
-                                                               else 'warning' if match.match_score >= 0.5 
+                                        <div class="progress-bar bg-{{ 'success' if match_data.score >= 0.7 
+                                                               else 'warning' if match_data.score >= 0.5 
                                                                else 'danger' }}" 
                                              role="progressbar" 
-                                             style="width: {{ (match.match_score * 100)|int }}%" 
-                                             aria-valuenow="{{ (match.match_score * 100)|int }}" 
+                                             style="width: {{ (match_data.score * 100)|int }}%" 
+                                             aria-valuenow="{{ (match_data.score * 100)|int }}" 
                                              aria-valuemin="0" 
                                              aria-valuemax="100">
                                         </div>
                                     </div>
-                                    <small class="text-muted">{{ "%.0f"|format(match.match_score * 100) }}%</small>
-                                    {% else %}
-                                    <small class="text-muted">No match</small>
-                                    {% endif %}
+                                    <small class="text-muted">{{ "%.0f"|format(match_data.score * 100) }}%</small>
+                                {% elif application.resume %}
+                                    <small class="text-muted">Calculating...</small>
                                 {% else %}
-                                <small class="text-muted">No resume</small>
+                                    <small class="text-muted">No resume</small>
                                 {% endif %}
                             </td>
                             <td>

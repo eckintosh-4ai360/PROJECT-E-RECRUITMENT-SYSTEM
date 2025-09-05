@@ -3,16 +3,114 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2  style="color:var(--primary-dark); "><i class="bi bi-people " style="margin-right:6px"></i>User Management</h2>
-          <div class="d-flex justify-content-between align-items-center mb-4">
-        
+        <h2 style="color:var(--primary-dark);"><i class="bi bi-people" style="margin-right:6px"></i>User Management</h2>
         <div>
-           
             <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
                 <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
             </a>
         </div>
     </div>
+    
+    <!-- Statistics Cards -->
+    {% if search_stats %}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center" style="border: 2px solid #28a745;">
+                <div class="card-body">
+                    <h5 class="card-title text-success">{{ search_stats.total_found }}</h5>
+                    <p class="card-text text-muted">Found Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center" style="border: 2px solid #007bff;">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ search_stats.total_users }}</h5>
+                    <p class="card-text text-muted">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center" style="border: 2px solid #6f42c1;">
+                <div class="card-body">
+                    <h5 class="card-title" style="color: #6f42c1;">{{ search_stats.total_candidates }}</h5>
+                    <p class="card-text text-muted">Candidates</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center" style="border: 2px solid #dc3545;">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">{{ search_stats.total_admins }}</h5>
+                    <p class="card-text text-muted">Admins</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Search and Filter Form -->
+    <div class="card mb-4" style="border: 2px solid #e9ecef;">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Search & Filter Users</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.list_users') }}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Search by name, email, or username" 
+                               value="{{ current_filters.search or '' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role">
+                            <option value="">All Roles</option>
+                            <option value="candidate" {{ 'selected' if current_filters.role == 'candidate' else '' }}>Candidate</option>
+                            <option value="admin" {{ 'selected' if current_filters.role == 'admin' else '' }}>Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="date_from" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="date_from" name="date_from" 
+                               value="{{ current_filters.date_from or '' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="date_to" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="date_to" name="date_to" 
+                               value="{{ current_filters.date_to or '' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="sort_by" class="form-label">Sort By</label>
+                        <select class="form-select" id="sort_by" name="sort_by">
+                            <option value="created_at" {{ 'selected' if current_filters.sort_by == 'created_at' else '' }}>Join Date</option>
+                            <option value="username" {{ 'selected' if current_filters.sort_by == 'username' else '' }}>Username</option>
+                            <option value="email" {{ 'selected' if current_filters.sort_by == 'email' else '' }}>Email</option>
+                            <option value="full_name" {{ 'selected' if current_filters.sort_by == 'full_name' else '' }}>Full Name</option>
+                            <option value="role" {{ 'selected' if current_filters.sort_by == 'role' else '' }}>Role</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label for="sort_order" class="form-label">Order</label>
+                        <select class="form-select" id="sort_order" name="sort_order">
+                            <option value="desc" {{ 'selected' if current_filters.sort_order == 'desc' else '' }}>Descending</option>
+                            <option value="asc" {{ 'selected' if current_filters.sort_order == 'asc' else '' }}>Ascending</option>
+                        </select>
+                    </div>
+                    <div class="col-md-10 d-flex align-items-end mb-3">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                        <a href="{{ url_for('admin.list_users') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card shadow-sm" style="border: 3px solid white; outline: 1px solid green;">
@@ -28,9 +126,11 @@
                             <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Phone Number</th>
                             <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Role</th>
                             <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Joined Date</th>
+                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% if users %}
                         {% for user in users %}
                         <tr>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
@@ -44,13 +144,13 @@
                                     {% else %}
                                     <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
                                          style="width: 30px; height: 30px; font-size: 0.8rem;">
-                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                        {{ user.first_name[0] if user.first_name else 'U' }}{{ user.last_name[0] if user.last_name else '' }}
                                     </div>
                                     {% endif %}
                                 </div>
                             </td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.username }}</td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.first_name }} {{ user.last_name }}</td>
+                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.first_name or '' }} {{ user.last_name or '' }}</td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.email }}</td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
@@ -59,12 +159,188 @@
                                 </span>
                             </td>
                             <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    {% if user.role.value == 'candidate' %}
+                                    <a href="{{ url_for('admin.view_user_profile', user_id=user.id) }}" 
+                                       class="btn btn-outline-primary btn-sm" 
+                                       title="View Profile">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if user.applications %}
+                                    <a href="{{ url_for('admin.view_user_applications', user_id=user.id) }}" 
+                                       class="btn btn-outline-info btn-sm" 
+                                       title="View Applications ({{ user.applications|length }})">
+                                        <i class="bi bi-file-text"></i>
+                                        <span class="badge bg-info text-dark ms-1">{{ user.applications|length }}</span>
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                            type="button" 
+                                            data-bs-toggle="dropdown" 
+                                            aria-expanded="false" 
+                                            title="More Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('admin.send_user_email', user_id=user.id) }}">
+                                                <i class="bi bi-envelope me-2"></i>Send Email
+                                            </a>
+                                        </li>
+                                        {% if user.role.value != 'admin' or current_user.id != user.id %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button class="dropdown-item text-warning" 
+                                                    onclick="toggleUserStatus({{ user.id }}, '{{ user.username }}')">
+                                                <i class="bi bi-person-slash me-2"></i>Suspend User
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item text-danger" 
+                                                    onclick="confirmDeleteUser({{ user.id }}, '{{ user.username }}')">
+                                                <i class="bi bi-trash me-2"></i>Delete User
+                                            </button>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-people-fill me-2" style="font-size: 2rem;"></i>
+                                    <h5>No users found</h5>
+                                    <p>Try adjusting your search criteria or reset the filters.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-{% endblock %} 
+
+<!-- Modals for confirmation dialogs -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmModalAction">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to show confirmation modal
+    function showConfirmModal(title, message, actionCallback) {
+        document.getElementById('confirmModalLabel').textContent = title;
+        document.getElementById('confirmModalBody').innerHTML = message;
+        
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const actionButton = document.getElementById('confirmModalAction');
+        
+        // Remove any existing event listeners
+        actionButton.replaceWith(actionButton.cloneNode(true));
+        const newActionButton = document.getElementById('confirmModalAction');
+        
+        newActionButton.addEventListener('click', () => {
+            confirmModal.hide();
+            actionCallback();
+        });
+        
+        confirmModal.show();
+    }
+    
+    // Function to handle user suspension/activation
+    function toggleUserStatus(userId, username) {
+        const title = 'Suspend User';
+        const message = `
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Are you sure you want to suspend user <strong>${username}</strong>?
+            </div>
+            <p>This action will prevent the user from accessing their account.</p>
+        `;
+        
+        showConfirmModal(title, message, () => {
+            // For now, just show a notification that this feature needs to be implemented
+            alert('User suspension feature will be implemented in the backend.');
+            // In a real implementation, this would make an AJAX call to suspend the user
+            // fetch(`/admin/users/${userId}/toggle-status`, { method: 'POST' })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         if (data.success) {
+            //             location.reload();
+            //         }
+            //     });
+        });
+    }
+    
+    // Function to handle user deletion
+    function confirmDeleteUser(userId, username) {
+        const title = 'Delete User';
+        const message = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Are you sure you want to permanently delete user <strong>${username}</strong>?
+            </div>
+            <p><strong>Warning:</strong> This action cannot be undone. All user data, applications, and associated records will be permanently removed.</p>
+        `;
+        
+        showConfirmModal(title, message, () => {
+            // For now, just show a notification that this feature needs to be implemented
+            alert('User deletion feature will be implemented in the backend.');
+            // In a real implementation, this would make an AJAX call to delete the user
+            // fetch(`/admin/users/${userId}/delete`, { method: 'DELETE' })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         if (data.success) {
+            //             location.reload();
+            //         }
+            //     });
+        });
+    }
+    
+    
+    // Auto-submit search form when filters change (optional enhancement)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to auto-submit on filter changes
+        const autoSubmitElements = ['role', 'sort_by', 'sort_order'];
+        
+        autoSubmitElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.addEventListener('change', function() {
+                    // Optional: Auto-submit on filter changes
+                    // this.form.submit();
+                });
+            }
+        });
+        
+        // Add keyboard shortcut for search (Ctrl+F or Cmd+F to focus search)
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+                event.preventDefault();
+                document.getElementById('search').focus();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

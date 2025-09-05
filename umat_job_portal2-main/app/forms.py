@@ -120,7 +120,13 @@ class ResumeUploadForm(FlaskForm):
 
 class JobForm(FlaskForm):
     title = StringField("Job Title", validators=[DataRequired()])
-    department = StringField("Department", validators=[DataRequired()])
+    department = SelectField("Department", choices=[
+        ("Computer Science", "Computer Science"),
+        ("Electricals and Electronics", "Electricals and Electronics"),
+        ("Cyber Security", "Cyber Security"),
+        ("Information System", "Information System"),
+        ("Statistical Data Science", "Statistical Data Science")
+    ], validators=[DataRequired()])
     description = TextAreaField("Job Description", validators=[DataRequired()])
     required_skills = TextAreaField("Required Skills", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
