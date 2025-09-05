@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # UMaT Job Portal - Final Year Project
 
 This project is a web-based job portal for the University of Mines and Technology (UMaT), featuring user management (candidates, admins), job postings, resume uploads, and an AI-powered resume analysis module to match candidates with suitable Computer Science department jobs.
@@ -243,3 +244,7 @@ def display_video_section(videos, section_title):
             st.error(f"Could not display video. [Click here to watch]({video})")
     except Exception as e:
         st.info("Video content is temporarily unavailable. Please check back later.")  -->
+=======
+# umat-final-project
+final year web app for ATS system 
+>>>>>>> ac8878c0d5d7c0fd00bc07ad49392b3363bbb5e9
