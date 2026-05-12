@@ -41,13 +41,12 @@ def add_initial_data():
             last_name="User",
             role=UserRole.admin
         )
-        admin_user.set_password("adminpassword") # Use a strong password in production!
+        admin_user.set_password("adminpassword") 
         db.session.add(admin_user)
         logger.info("Admin user created.")
     else:
         logger.info("Admin user already exists. Verifying password...")
-        # If the hashing algorithm changed, the old hash will fail. 
-        # Reset it to ensure the admin can log in.
+        
         if not admin_user.check_password("adminpassword"):
             logger.info("Admin password incorrect or hashing algorithm changed. Resetting...")
             admin_user.set_password("adminpassword")
@@ -69,7 +68,7 @@ def add_initial_data():
     if not sample_job:
         logger.info("Creating sample CS job...")
         if not admin_user.id:
-             db.session.flush() # Ensure admin_user has an ID
+             db.session.flush()
         sample_job = Job(
             title="Sample CS Lecturer Position",
             description="Seeking a lecturer for the Computer Science department. Responsibilities include teaching undergraduate courses in programming (Python, Java), data structures, and algorithms. Must have a Master's degree in CS or related field. PhD preferred. Strong communication skills required.",

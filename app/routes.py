@@ -263,6 +263,7 @@ def admin_dashboard():
 
         # Get active jobs with their applications
         active_jobs = Job.query.filter_by(status='open').order_by(Job.posted_date.desc()).all()
+        active_jobs_count = len(active_jobs)
 
         # Get recent applications with related data
         page = request.args.get('page', 1, type=int)
@@ -294,25 +295,36 @@ def admin_dashboard():
         # Get monthly statistics for the past 12 months
         now = datetime.utcnow()
         monthly_stats = []
-        
-        for i in range(12):
-            month_start = datetime(now.year, now.month - i if now.month - i > 0 else 12 - (i - now.month), 1)
-            month_end = datetime(month_start.year, month_start.month + 1, 1) if month_start.month < 12 else datetime(month_start.year + 1, 1, 1)
-            
+
+        for offset in range(11, -1, -1):
+            year = now.year
+            month = now.month - offset
+
+            while month <= 0:
+                month += 12
+                year -= 1
+
+            month_start = datetime(year, month, 1)
+            month_end = datetime(year + 1, 1, 1) if month == 12 else datetime(year, month + 1, 1)
+
             applications = Application.query.filter(
-                Application.application_date.between(month_start, month_end)
+                Application.application_date >= month_start,
+                Application.application_date < month_end
             ).count()
-            
+
             resumes = Resume.query.filter(
-                Resume.upload_date.between(month_start, month_end)
+                Resume.upload_date >= month_start,
+                Resume.upload_date < month_end
             ).count()
-            
+
             jobs = Job.query.filter(
-                Job.posted_date.between(month_start, month_end)
+                Job.posted_date >= month_start,
+                Job.posted_date < month_end
             ).count()
-            
-            monthly_stats.insert(0, {
+
+            monthly_stats.append({
                 'month': month_start.strftime('%B %Y'),
+                'short_month': month_start.strftime('%b'),
                 'applications': int(applications),
                 'resumes': int(resumes),
                 'jobs': int(jobs)
@@ -340,6 +352,23 @@ def admin_dashboard():
             'values': [int(status[1]) for status in status_stats]
         }
 
+        status_totals = {
+            (status.value if hasattr(status, "value") else str(status)): int(count)
+            for status, count in status_stats
+        }
+
+        submitted_count = status_totals.get(ApplicationStatus.submitted.value, 0)
+        review_count = status_totals.get(ApplicationStatus.under_review.value, 0)
+        interview_count = status_totals.get(ApplicationStatus.interview_scheduled.value, 0)
+        accepted_count = status_totals.get(ApplicationStatus.accepted.value, 0)
+        rejected_count = status_totals.get(ApplicationStatus.rejected.value, 0)
+
+        latest_month = monthly_stats[-1] if monthly_stats else None
+        peak_month = max(monthly_stats, key=lambda item: item['applications']) if monthly_stats else None
+        acceptance_rate = round((accepted_count / total_applications) * 100, 1) if total_applications else 0
+        resume_coverage_rate = round((total_resumes / total_users) * 100, 1) if total_users else 0
+        department_count = len(department_stats['labels'])
+
         return render_template(
             "admin/dashboard.html",
             title="Admin Dashboard",
@@ -347,11 +376,22 @@ def admin_dashboard():
             total_jobs=total_jobs,
             total_applications=total_applications,
             total_resumes=total_resumes,
+            active_jobs_count=active_jobs_count,
+            department_count=department_count,
             monthly_stats=monthly_stats,
             dept_stats=department_stats,
             application_stats=application_stats,
             recent_applications=recent_applications,
-            active_jobs=active_jobs
+            active_jobs=active_jobs,
+            latest_month=latest_month,
+            peak_month=peak_month,
+            acceptance_rate=acceptance_rate,
+            resume_coverage_rate=resume_coverage_rate,
+            submitted_count=submitted_count,
+            review_count=review_count,
+            interview_count=interview_count,
+            accepted_count=accepted_count,
+            rejected_count=rejected_count
         )
     except Exception as e:
         logger.error(f"Error in admin dashboard: {str(e)}", exc_info=True)

@@ -1,94 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4" style="margin-bottom: 100px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="color:var(--primary-dark); "><i class="bi bi-briefcase " style="margin-right:6px"></i>Active Jobs</h2>
-        <div>
-            <a href="{{ url_for('main.create_job') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-1"></i>Create New Job
-            </a>
-            <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
-                <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
-            </a>
+<div class="page-shell">
+    <section class="page-hero page-hero--compact">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+            <div>
+                <span class="page-hero__eyebrow">Open Hiring</span>
+                <h1 class="page-hero__title">Active Jobs</h1>
+                <p class="page-hero__subtitle">Track currently open roles, see how many applications are tied to each, and jump into quick admin actions.</p>
+            </div>
+            <div class="action-cluster">
+                <a href="{{ url_for('main.create_job') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Create New Job
+                </a>
+                <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
         </div>
-    </div>
-    <hr>
+    </section>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <section class="card surface-card--padded">
+        {% if active_jobs %}
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Title</th>
                             <th>Department</th>
-                            <th>Posted Date</th>
-                            <th>Closing Date</th>
+                            <th>Posted</th>
+                            <th>Closing</th>
                             <th>Applications</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for job in active_jobs %}
-                        <tr>
-                            <td>
-                                <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="text-decoration-none">
-                                    <i class="bi bi-file-earmark-text me-1"></i>{{ job.title }}
-                                </a>
-                            </td>
-                            <td><i class="bi bi-building me-1"></i>{{ job.department }}</td>
-                            <td><i class="bi bi-calendar3 me-1"></i>{{ job.posted_date.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                {% if job.closing_date %}
-                                    <i class="bi bi-calendar-x me-1"></i>{{ job.closing_date.strftime('%Y-%m-%d') }}
-                                {% else %}
-                                    <span class="text-muted">N/A</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge bg-info">
-                                    {{ job.applications|length }} applications
-                                </span>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ url_for('main.edit_job', job_id=job.job_id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                    <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="btn btn-sm btn-primary" title="View">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td><a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}">{{ job.title }}</a></td>
+                                <td>{{ job.department }}</td>
+                                <td>{{ job.posted_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ job.closing_date.strftime('%Y-%m-%d') if job.closing_date else 'N/A' }}</td>
+                                <td><span class="badge bg-info">{{ job.applications|length }} applications</span></td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ url_for('main.edit_job', job_id=job.job_id) }}" class="btn btn-outline-warning btn-sm" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="btn btn-outline-primary btn-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            {% if not active_jobs %}
-            <div class="text-center py-4">
-                <p class="text-muted mb-0">No active jobs found.</p>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-briefcase"></i>
+                <h2 class="h5">No active jobs found</h2>
+                <p class="mb-0">Roles currently accepting applications will appear here.</p>
             </div>
-            {% endif %}
-        </div>
-    </div>
+        {% endif %}
+    </section>
 </div>
-
-<style>
-/* Add this style to ensure footer stays at bottom */
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.container {
-    flex: 1;
-}
-
-footer {
-    margin-top: auto;
-}
-</style>
-{% endblock %} 
+{% endblock %}

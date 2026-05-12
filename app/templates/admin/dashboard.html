@@ -1,320 +1,1611 @@
 {% extends "base.html" %}
 
+{% block additional_styles %}
+:root {
+    --dashboard-bg: #07111f;
+    --dashboard-surface: rgba(11, 22, 40, 0.9);
+    --dashboard-surface-strong: rgba(14, 28, 50, 0.98);
+    --dashboard-surface-soft: rgba(17, 34, 60, 0.72);
+    --dashboard-border: rgba(120, 146, 188, 0.18);
+    --dashboard-text: #ecf3ff;
+    --dashboard-muted: #8f9fbd;
+    --dashboard-grid: rgba(118, 145, 188, 0.07);
+    --dashboard-shadow: 0 30px 60px rgba(1, 8, 20, 0.38);
+    --tone-cyan: #55d6ff;
+    --tone-blue: #3386ff;
+    --tone-emerald: #3dd5a8;
+    --tone-teal: #0ea5a5;
+    --tone-violet: #9f6bff;
+    --tone-indigo: #5a63ff;
+    --tone-amber: #ffcd5a;
+    --tone-orange: #ff8f3f;
+    --tone-rose: #ff5f9e;
+    --tone-crimson: #ef4444;
+}
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(61, 213, 168, 0.16), transparent 26%),
+        radial-gradient(circle at 85% 12%, rgba(85, 214, 255, 0.16), transparent 24%),
+        radial-gradient(circle at 80% 80%, rgba(159, 107, 255, 0.14), transparent 22%),
+        linear-gradient(180deg, #050d19 0%, #081223 45%, #060e1b 100%);
+    color: var(--dashboard-text);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--dashboard-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--dashboard-grid) 1px, transparent 1px);
+    background-size: 34px 34px;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.navbar {
+    background: rgba(6, 15, 29, 0.82) !important;
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(126, 149, 189, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18) !important;
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand,
+.navbar .navbar-toggler {
+    color: rgba(236, 243, 255, 0.88) !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #ffffff !important;
+}
+
+.navbar .navbar-toggler {
+    border-color: rgba(126, 149, 189, 0.2);
+}
+
+.navbar .navbar-toggler-icon {
+    filter: invert(1) brightness(1.5);
+}
+
+#umatTitle {
+    color: #f4f8ff;
+    letter-spacing: 0.04em;
+}
+
+main.container {
+    position: relative;
+    z-index: 1;
+    max-width: 100% !important;
+    padding: 0 1.25rem 3rem;
+}
+
+footer {
+    position: relative;
+    z-index: 1;
+    background-color: #07101d !important;
+}
+
+footer section:first-child {
+    background: linear-gradient(135deg, rgba(15, 118, 110, 0.9), rgba(37, 99, 235, 0.85)) !important;
+}
+
+footer section:last-child {
+    background: rgba(11, 22, 40, 0.95) !important;
+}
+
+.alert {
+    background: rgba(12, 23, 40, 0.92);
+    color: var(--dashboard-text);
+    border: 1px solid rgba(126, 149, 189, 0.16);
+}
+
+.alert-success { border-left: 4px solid var(--tone-emerald); }
+.alert-danger { border-left: 4px solid var(--tone-crimson); }
+.alert-warning { border-left: 4px solid var(--tone-amber); }
+.alert-info { border-left: 4px solid var(--tone-cyan); }
+
+.btn-close {
+    filter: invert(1);
+}
+
+.admin-dashboard {
+    position: relative;
+    padding: 0.75rem 0 0;
+}
+
+.dashboard-shell {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.dashboard-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    padding: 2rem;
+    background:
+        linear-gradient(135deg, rgba(10, 23, 43, 0.96), rgba(8, 18, 34, 0.88)),
+        linear-gradient(120deg, rgba(61, 213, 168, 0.12), rgba(85, 214, 255, 0.08));
+    border: 1px solid var(--dashboard-border);
+    box-shadow: var(--dashboard-shadow);
+}
+
+.dashboard-hero::before,
+.dashboard-hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(12px);
+    opacity: 0.8;
+    animation: floatGlow 9s ease-in-out infinite;
+}
+
+.dashboard-hero::before {
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(85, 214, 255, 0.24), transparent 70%);
+    top: -60px;
+    right: -30px;
+}
+
+.dashboard-hero::after {
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(159, 107, 255, 0.18), transparent 70%);
+    bottom: -80px;
+    left: -30px;
+    animation-delay: -3s;
+}
+
+.dashboard-hero__content,
+.dashboard-hero__actions {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(10, 22, 41, 0.7);
+    border: 1px solid rgba(85, 214, 255, 0.16);
+    color: #9fe8ff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.dashboard-eyebrow::before {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--tone-cyan), var(--tone-emerald));
+    box-shadow: 0 0 16px rgba(85, 214, 255, 0.5);
+}
+
+.dashboard-hero h1 {
+    margin: 1rem 0 0.85rem;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.dashboard-hero p {
+    max-width: 760px;
+    margin-bottom: 1.4rem;
+    color: var(--dashboard-muted);
+    font-size: 1.04rem;
+    line-height: 1.8;
+}
+
+.dashboard-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+}
+
+.dashboard-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    background: rgba(15, 30, 54, 0.76);
+    border: 1px solid rgba(126, 149, 189, 0.16);
+    color: rgba(236, 243, 255, 0.88);
+    font-size: 0.92rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.dashboard-meta-pill strong {
+    color: #ffffff;
+}
+
+.dashboard-meta-pill i {
+    color: var(--tone-cyan);
+}
+
+.dashboard-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+}
+
+.hero-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.95rem 1.15rem;
+    border-radius: 18px;
+    text-decoration: none;
+    color: #f5f9ff;
+    background: linear-gradient(135deg, rgba(22, 42, 73, 0.88), rgba(10, 22, 41, 0.82));
+    border: 1px solid rgba(130, 154, 196, 0.18);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 16px 36px rgba(2, 10, 24, 0.3);
+}
+
+.hero-action:hover {
+    transform: translateY(-4px);
+    color: #ffffff;
+    border-color: rgba(85, 214, 255, 0.36);
+    box-shadow: 0 22px 42px rgba(2, 10, 24, 0.4);
+}
+
+.hero-action i {
+    width: 2.1rem;
+    height: 2.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(85, 214, 255, 0.12);
+    color: var(--tone-cyan);
+}
+
+.dashboard-stat {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 24px;
+    padding: 1.7rem;
+    background:
+        linear-gradient(180deg, rgba(14, 26, 47, 0.96), rgba(10, 20, 38, 0.88)),
+        linear-gradient(var(--dashboard-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--dashboard-grid) 1px, transparent 1px);
+    background-size: auto, 26px 26px, 26px 26px;
+    border: 1px solid var(--dashboard-border);
+    box-shadow: var(--dashboard-shadow);
+    transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+    animation: slideUp 0.65s ease both;
+}
+
+.dashboard-stat:hover {
+    transform: translateY(-7px);
+    border-color: rgba(126, 149, 189, 0.28);
+    box-shadow: 0 28px 56px rgba(1, 8, 20, 0.48);
+}
+
+.dashboard-stat__badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    opacity: 0.96;
+}
+
+.dashboard-stat__icon {
+    position: absolute;
+    top: 1.6rem;
+    right: 1.6rem;
+    width: 4.2rem;
+    height: 4.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    font-size: 1.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.dashboard-stat__label {
+    margin-top: 1.35rem;
+    color: rgba(230, 238, 250, 0.62);
+    font-size: 0.9rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.dashboard-stat__value {
+    margin-top: 0.85rem;
+    font-size: clamp(2.3rem, 4vw, 3.4rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.dashboard-stat__footer {
+    margin-top: 4.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    color: var(--dashboard-muted);
+}
+
+.dashboard-stat__link {
+    width: 3.2rem;
+    height: 3.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    background: rgba(7, 15, 29, 0.7);
+    border: 1px solid rgba(126, 149, 189, 0.14);
+    color: #d6e3ff;
+}
+
+.tone-cyan .dashboard-stat__badge,
+.tone-cyan .dashboard-stat__value-accent,
+.tone-cyan .dashboard-stat__icon { color: var(--tone-cyan); }
+.tone-cyan .dashboard-stat__icon { background: rgba(85, 214, 255, 0.12); }
+
+.tone-emerald .dashboard-stat__badge,
+.tone-emerald .dashboard-stat__value-accent,
+.tone-emerald .dashboard-stat__icon { color: var(--tone-emerald); }
+.tone-emerald .dashboard-stat__icon { background: rgba(61, 213, 168, 0.12); }
+
+.tone-violet .dashboard-stat__badge,
+.tone-violet .dashboard-stat__value-accent,
+.tone-violet .dashboard-stat__icon { color: var(--tone-violet); }
+.tone-violet .dashboard-stat__icon { background: rgba(159, 107, 255, 0.12); }
+
+.tone-amber .dashboard-stat__badge,
+.tone-amber .dashboard-stat__value-accent,
+.tone-amber .dashboard-stat__icon { color: var(--tone-amber); }
+.tone-amber .dashboard-stat__icon { background: rgba(255, 205, 90, 0.12); }
+
+.dashboard-panel {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 28px;
+    padding: 1.55rem;
+    background: linear-gradient(180deg, var(--dashboard-surface) 0%, rgba(8, 18, 34, 0.92) 100%);
+    border: 1px solid var(--dashboard-border);
+    box-shadow: var(--dashboard-shadow);
+    animation: slideUp 0.75s ease both;
+}
+
+.dashboard-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right, rgba(85, 214, 255, 0.08), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(159, 107, 255, 0.08), transparent 24%);
+    pointer-events: none;
+}
+
+.dashboard-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.panel-heading__copy {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+}
+
+.panel-heading__copy i {
+    color: var(--tone-cyan);
+    font-size: 1.25rem;
+    margin-top: 0.2rem;
+}
+
+.panel-heading h2,
+.panel-heading h3 {
+    margin: 0;
+    font-size: clamp(1.35rem, 2vw, 2rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+}
+
+.panel-heading p {
+    margin: 0.35rem 0 0;
+    color: var(--dashboard-muted);
+}
+
+.panel-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(13, 28, 51, 0.76);
+    border: 1px solid rgba(126, 149, 189, 0.15);
+    color: #d7e4ff;
+    font-size: 0.84rem;
+    white-space: nowrap;
+}
+
+.panel-chart {
+    position: relative;
+    min-height: 310px;
+}
+
+.panel-chart--tall {
+    min-height: 430px;
+}
+
+.panel-chart--medium {
+    min-height: 290px;
+}
+
+.dashboard-empty {
+    min-height: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    color: var(--dashboard-muted);
+    text-align: center;
+    border: 1px dashed rgba(126, 149, 189, 0.2);
+    border-radius: 20px;
+    background: rgba(9, 19, 36, 0.56);
+}
+
+.dashboard-empty i {
+    font-size: 1.6rem;
+    color: var(--tone-cyan);
+}
+
+.legend-stack,
+.pipeline-stack,
+.roles-stack {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+}
+
+.legend-row,
+.pipeline-row,
+.role-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    background: rgba(15, 29, 53, 0.62);
+    border: 1px solid rgba(126, 149, 189, 0.08);
+}
+
+.legend-row__left,
+.pipeline-row__left,
+.role-row__left {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+}
+
+.legend-row__left span:last-child,
+.pipeline-row__left span:last-child,
+.role-row__title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.legend-dot {
+    width: 0.78rem;
+    height: 0.78rem;
+    border-radius: 50%;
+    box-shadow: 0 0 14px currentColor;
+}
+
+.legend-dot-0 { color: #55d6ff; background: #55d6ff; }
+.legend-dot-1 { color: #3dd5a8; background: #3dd5a8; }
+.legend-dot-2 { color: #9f6bff; background: #9f6bff; }
+.legend-dot-3 { color: #ffcd5a; background: #ffcd5a; }
+.legend-dot-4 { color: #ff8f3f; background: #ff8f3f; }
+.legend-dot-5 { color: #ff5f9e; background: #ff5f9e; }
+
+.legend-row strong,
+.pipeline-row strong {
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+.legend-row small,
+.pipeline-row small,
+.role-row small {
+    color: var(--dashboard-muted);
+}
+
+.panel-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.95rem;
+    margin-top: 1.4rem;
+    padding-top: 1.3rem;
+    border-top: 1px solid rgba(126, 149, 189, 0.12);
+}
+
+.panel-mini-stat {
+    padding: 1rem 1.05rem;
+    border-radius: 20px;
+    background: rgba(15, 29, 53, 0.6);
+    border: 1px solid rgba(126, 149, 189, 0.08);
+}
+
+.panel-mini-stat span {
+    display: block;
+    color: var(--dashboard-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+}
+
+.panel-mini-stat strong {
+    font-size: 1.7rem;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.panel-mini-stat small {
+    display: block;
+    margin-top: 0.45rem;
+    color: var(--dashboard-muted);
+}
+
+.dashboard-table-wrap {
+    border-radius: 22px;
+    border: 1px solid rgba(126, 149, 189, 0.08);
+    overflow: hidden;
+    background: rgba(9, 19, 36, 0.46);
+}
+
+.dashboard-table {
+    margin-bottom: 0;
+    color: var(--dashboard-text);
+}
+
+.dashboard-table thead th {
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid rgba(126, 149, 189, 0.1);
+    background: rgba(10, 22, 41, 0.9);
+    color: rgba(236, 243, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.dashboard-table tbody tr {
+    border-color: rgba(126, 149, 189, 0.08);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-table tbody tr:hover {
+    background: rgba(18, 36, 64, 0.75);
+}
+
+.dashboard-table td {
+    padding: 1rem 1.1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(126, 149, 189, 0.06);
+}
+
+.candidate-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 240px;
+}
+
+.candidate-avatar,
+.candidate-placeholder {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 18px;
+    flex: 0 0 auto;
+}
+
+.candidate-avatar {
+    object-fit: cover;
+    border: 1px solid rgba(126, 149, 189, 0.16);
+}
+
+.candidate-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(85, 214, 255, 0.2), rgba(159, 107, 255, 0.24));
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.candidate-name {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.candidate-email,
+.job-meta,
+.role-row small {
+    color: var(--dashboard-muted);
+    font-size: 0.88rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.78rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.status-pill--accepted {
+    background: rgba(61, 213, 168, 0.12);
+    color: #6ef0c5;
+    border-color: rgba(61, 213, 168, 0.18);
+}
+
+.status-pill--review {
+    background: rgba(255, 205, 90, 0.12);
+    color: #ffd879;
+    border-color: rgba(255, 205, 90, 0.18);
+}
+
+.status-pill--submitted {
+    background: rgba(85, 214, 255, 0.12);
+    color: #9fe8ff;
+    border-color: rgba(85, 214, 255, 0.18);
+}
+
+.status-pill--rejected {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ff9191;
+    border-color: rgba(239, 68, 68, 0.18);
+}
+
+.status-pill--other {
+    background: rgba(159, 107, 255, 0.12);
+    color: #ccb1ff;
+    border-color: rgba(159, 107, 255, 0.18);
+}
+
+.score-wrap {
+    min-width: 140px;
+}
+
+.score-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.5rem;
+    padding: 0.38rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(10, 23, 43, 0.82);
+    border: 1px solid rgba(126, 149, 189, 0.14);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.score-track {
+    width: 100%;
+    height: 0.38rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    border-radius: inherit;
+}
+
+.score-fill--high {
+    background: linear-gradient(90deg, #3dd5a8, #55d6ff);
+}
+
+.score-fill--medium {
+    background: linear-gradient(90deg, #ffcd5a, #ff8f3f);
+}
+
+.score-fill--low {
+    background: linear-gradient(90deg, #ff6b6b, #ef4444);
+}
+
+.dashboard-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1.25rem;
+}
+
+.dashboard-pagination a,
+.dashboard-pagination span {
+    min-width: 2.6rem;
+    height: 2.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.9rem;
+    border-radius: 14px;
+    text-decoration: none;
+    background: rgba(15, 29, 53, 0.65);
+    border: 1px solid rgba(126, 149, 189, 0.12);
+    color: rgba(236, 243, 255, 0.84);
+}
+
+.dashboard-pagination a:hover,
+.dashboard-pagination a.is-active {
+    background: linear-gradient(135deg, rgba(14, 165, 165, 0.9), rgba(37, 99, 235, 0.85));
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.dashboard-pagination .ellipsis {
+    background: transparent;
+    border-color: transparent;
+    color: var(--dashboard-muted);
+}
+
+.roles-stack .role-row {
+    align-items: flex-start;
+}
+
+.role-row__index {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(85, 214, 255, 0.12);
+    color: var(--tone-cyan);
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.role-row__title {
+    display: block;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.role-row__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.62rem;
+    border-radius: 999px;
+    background: rgba(12, 24, 43, 0.72);
+    color: var(--dashboard-muted);
+    font-size: 0.78rem;
+}
+
+.panel-link {
+    color: #9fe8ff;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.panel-link:hover {
+    color: #ffffff;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatGlow {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+        transform: translate3d(0, 12px, 0) scale(1.04);
+    }
+}
+
+@media (max-width: 1199.98px) {
+    .dashboard-hero {
+        padding: 1.6rem;
+    }
+
+    .panel-chart--tall {
+        min-height: 360px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    main.container {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+    }
+
+    .dashboard-hero,
+    .dashboard-stat,
+    .dashboard-panel {
+        border-radius: 22px;
+    }
+
+    .dashboard-hero__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .hero-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .panel-chart,
+    .panel-chart--tall,
+    .panel-chart--medium {
+        min-height: 260px;
+    }
+
+    .dashboard-table thead {
+        display: none;
+    }
+
+    .dashboard-table tbody,
+    .dashboard-table tr,
+    .dashboard-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .dashboard-table tbody tr {
+        padding: 1rem;
+    }
+
+    .dashboard-table td {
+        padding: 0.5rem 0;
+        border: 0;
+    }
+}
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid py-4 justify-content-center align-items-center">
-            <h1 class="display-5" style="color:var(--primary-dark); font-weight: 600; text-align: center;">Admin Dashboard</h1>
+{% set department_total = dept_stats['values'] | sum %}
+{% set status_total = application_stats['values'] | sum %}
 
-    <div class="d-flex justify-content-center align-items-center text-center mb-4">
-        <div>
-             <a href="{{ url_for('main.list_events') }}" class="btn " style="background-color: var(--secondary); color: var(--primary-dark); ">
-                <i class="bi bi-calendar-event"></i> Manage Events
-            </a>
-            <a href="{{ url_for('admin.all_applications') }}" class="btn" style="background-color: blueviolet; color: white;">
-                <i class="bi bi-file-text"></i> Manage Applications
-            </a>
-            <a href="{{ url_for('main.create_job') }}" class="btn" style="background-color: var(--primary-dark); color: white;">
-                <i class="bi bi-plus-circle"></i> Create New Job
-            </a>
-            <a href="{{ url_for('main.list_jobs') }}" class="btn " style="border:1px solid var(--primary); color: var(--primary-dark); ">
-                <i class="bi bi-gear"></i> Manage Jobs
-            </a>
-           <a href="{{ url_for('main.email_settings') }}" class="btn" style="background-color: #6f42c1; color: white;">
-                <i class="bi bi-envelope-at"></i> Email Settings
-            </a>
-        </div>
-    </div>
-    <hr>
-
-    <!-- Statistics Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <a href="{{ url_for('admin.list_users') }}" class="text-decoration-none">
-                <div class="card text-white bg-primary" style="border: 3px solid white; outline: 1px solid blue;">
-                    <div class="card-body position-relative">
-                        <i class="bi bi-people position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
-                        <h5 class="card-title">Total Users</h5>
-                        <h2 class="card-text">{{ total_users }}</h2>
+<div class="admin-dashboard">
+    <div class="dashboard-shell">
+        <section class="dashboard-hero">
+            <div class="row g-4 align-items-end">
+                <div class="col-xl-8">
+                    <div class="dashboard-hero__content">
+                        <span class="dashboard-eyebrow">Recruitment Command Center</span>
+                        <h1>Admin Dashboard</h1>
+                        <p>
+                            A sharper, corporate view of your hiring pipeline with live recruitment metrics,
+                            cleaner actions, and a dark ambient visual system that works well in both day and night settings.
+                        </p>
+                        <div class="dashboard-meta">
+                            <span class="dashboard-meta-pill">
+                                <i class="bi bi-briefcase"></i>
+                                <strong>{{ active_jobs_count }}</strong> live roles
+                            </span>
+                            <span class="dashboard-meta-pill">
+                                <i class="bi bi-diagram-3"></i>
+                                <strong>{{ department_count }}</strong> departments
+                            </span>
+                            <span class="dashboard-meta-pill">
+                                <i class="bi bi-patch-check"></i>
+                                <strong>{{ acceptance_rate }}%</strong> acceptance rate
+                            </span>
+                            <span class="dashboard-meta-pill">
+                                <i class="bi bi-file-earmark-person"></i>
+                                <strong>{{ resume_coverage_rate }}%</strong> resume coverage
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </a>
-        </div>
-        
-        <div class="col-md-3">
-            <a href="{{ url_for('admin.active_jobs') }}" class="text-decoration-none">
-            <div class="card text-white bg-success" style="border: 3px solid white; outline: 1px solid green;">
-                <div class="card-body position-relative">
-                    <i class="bi bi-briefcase position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
-                    <h5 class="card-title">Active Jobs</h5>
-                    <h2 class="card-text">{{ total_jobs }}</h2>
+                <div class="col-xl-4">
+                    <div class="dashboard-hero__actions">
+                        <a href="{{ url_for('main.create_job') }}" class="hero-action">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Create Job</span>
+                        </a>
+                        <a href="{{ url_for('admin.all_applications') }}" class="hero-action">
+                            <i class="bi bi-files"></i>
+                            <span>Review Applications</span>
+                        </a>
+                        <a href="{{ url_for('main.list_jobs') }}" class="hero-action">
+                            <i class="bi bi-briefcase"></i>
+                            <span>Manage Jobs</span>
+                        </a>
+                        <a href="{{ url_for('main.list_events') }}" class="hero-action">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Manage Events</span>
+                        </a>
+                        <a href="{{ url_for('main.email_settings') }}" class="hero-action">
+                            <i class="bi bi-envelope-paper"></i>
+                            <span>Email Settings</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-            </a>
-        </div>
+        </section>
 
-        <!-- Total Applications -->
-        <div class="col-md-3">
-            <a href="{{ url_for('admin.all_applications') }}" class="text-decoration-none">
-            <div class="card text-white " style="background-color:blueviolet; border: 3px solid white; outline: 1px solid blueviolet; ">
-                <div class="card-body position-relative">
-                    <i class="bi bi-file-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
-                    <h5 class="card-title">Total Applications</h5>
-                    <h2 class="card-text">{{ total_applications  }}</h2>
-                </div>
+        <section class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+                <article class="dashboard-stat tone-cyan">
+                    <span class="dashboard-stat__badge">Candidates</span>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="dashboard-stat__label">Total Users</div>
+                    <div class="dashboard-stat__value">{{ total_users }}</div>
+                    <div class="dashboard-stat__footer">
+                        <span>Candidate profiles in the talent pool</span>
+                        <a href="{{ url_for('admin.list_users') }}" class="dashboard-stat__link" aria-label="View users">
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </article>
             </div>
-            </a>
-        </div>
-
-        <!-- Total Resumes -->  
-        <div class="col-md-3">
-            <div class="card text-white bg-warning" style="border: 3px solid white; outline: 1px solid yellow;">
-                <div class="card-body position-relative">
-                    <i class="bi bi-file-earmark-text position-absolute top-0 end-0 me-2 mt-2" style="font-size: 1.5rem;"></i>
-                    <h5 class="card-title">Total Resumes</h5>
-                    <h2 class="card-text">{{ total_resumes }}</h2>
-                </div>
+            <div class="col-sm-6 col-xl-3">
+                <article class="dashboard-stat tone-emerald">
+                    <span class="dashboard-stat__badge">Open Roles</span>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div class="dashboard-stat__label">Active Jobs</div>
+                    <div class="dashboard-stat__value">{{ active_jobs_count }}</div>
+                    <div class="dashboard-stat__footer">
+                        <span>Hiring across {{ department_count }} departments</span>
+                        <a href="{{ url_for('admin.active_jobs') }}" class="dashboard-stat__link" aria-label="View active jobs">
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </article>
             </div>
-        </div>
-    </div>
-    
-    <hr>
-<!-- //***
-
-    <!-- Charts Row -->
-    <div class="row g-4 mb-4 mx-2">
-        <!-- Monthly Activity Chart -->
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Monthly Activity</h5>
-                </div>
-                <div class="card-body" style="height: 400px;">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
+            <div class="col-sm-6 col-xl-3">
+                <article class="dashboard-stat tone-violet">
+                    <span class="dashboard-stat__badge">Pipeline</span>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-file-text"></i>
+                    </div>
+                    <div class="dashboard-stat__label">Applications</div>
+                    <div class="dashboard-stat__value">{{ total_applications }}</div>
+                    <div class="dashboard-stat__footer">
+                        <span>{{ latest_month.applications if latest_month else 0 }} submitted this month</span>
+                        <a href="{{ url_for('admin.all_applications') }}" class="dashboard-stat__link" aria-label="View applications">
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </article>
             </div>
-        </div>
-
-        <!-- Department Distribution -->
-        <div class="col-md-4" style="border: 3px solid white; outline: 1px solid yellow;">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Jobs by Department</h5>
-                </div>
-                <div class="card-body" style="height: 200px;">
-                    <canvas id="deptChart"></canvas>
-                </div>
+            <div class="col-sm-6 col-xl-3">
+                <article class="dashboard-stat tone-amber">
+                    <span class="dashboard-stat__badge">Readiness</span>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-file-earmark-richtext"></i>
+                    </div>
+                    <div class="dashboard-stat__label">Resumes On File</div>
+                    <div class="dashboard-stat__value">{{ total_resumes }}</div>
+                    <div class="dashboard-stat__footer">
+                        <span>{{ resume_coverage_rate }}% of candidates have resumes</span>
+                        <a href="{{ url_for('admin.all_applications') }}" class="dashboard-stat__link" aria-label="Review resumes">
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </article>
             </div>
+        </section>
 
-            <!-- Application Status -->
-            <div class="card shadow-sm mb-4" style="border: 3px solid white; outline: 1px solid var(--primary);">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0" style="color:var(--primary-dark);">Application Status</h5>
-                </div>
-                <div class="card-body" style="height: 200px;">
-                    <canvas id="statusChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Applications Table -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white">
-                <h5 class="card-title mb-0" style="color:var(--primary-dark);">Recent Applications</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th style="color:var(--primary-dark);">Applicant</th>
-                            <th style="color:var(--primary-dark);">Position</th>
-                            <th style="color:var(--primary-dark);">Department</th>
-                            <th style="color:var(--primary-dark);">Applied Date</th>
-                            <th style="color:var(--primary-dark);">Status</th>
-                            <th style="color:var(--primary-dark);">Match Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for application in recent_applications.items %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    {% if application.applicant.profile_image %}
-                                    <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" 
-                                         class="rounded-circle me-2" 
-                                         width="32" 
-                                         height="32"
-                                         alt="{{ application.applicant.first_name }}'s profile picture">
-                                    {% else %}
-                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
-                                         style="width: 32px; height: 32px;">
-                                        {{ application.applicant.first_name[0] }}{{ application.applicant.last_name[0] }}
+        <section class="row g-4">
+            <div class="col-xl-4">
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div class="panel-heading__copy">
+                            <i class="bi bi-pie-chart"></i>
+                            <div>
+                                <h2>Jobs by Department</h2>
+                                <p>Distribution of current positions across academic units.</p>
+                            </div>
+                        </div>
+                        <span class="panel-tag">{{ total_jobs }} total jobs</span>
+                    </div>
+                    <div class="panel-chart panel-chart--medium">
+                        <canvas id="deptChart"></canvas>
+                    </div>
+                    <div class="legend-stack">
+                        {% if dept_stats['labels'] %}
+                            {% for label in dept_stats['labels'] %}
+                                {% set value = dept_stats['values'][loop.index0] %}
+                                {% set percent = ((value / department_total) * 100) if department_total else 0 %}
+                                <div class="legend-row">
+                                    <div class="legend-row__left">
+                                        <span class="legend-dot legend-dot-{{ loop.index0 % 6 }}"></span>
+                                        <span>{{ label }}</span>
                                     </div>
-                                    {% endif %}
-                                    <div>
-                                        <div class="fw-bold">{{ application.applicant.first_name }} {{ application.applicant.last_name }}</div>
-                                        <div class="small text-muted">{{ application.applicant.email }}</div>
+                                    <div class="text-end">
+                                        <strong>{{ value }}</strong>
+                                        <small>{{ '%.1f'|format(percent) }}%</small>
                                     </div>
                                 </div>
-                            </td>
-                            <td>{{ application.job.title }}</td>
-                            <td>{{ application.job.department }}</td>
-                            <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <span class="badge bg-{{ 'success' if application.status.value == 'Accepted' 
-                                                    else 'warning' if application.status.value == 'Under Review' 
-                                                    else 'info' if application.status.value == 'Submitted' 
-                                                    else 'danger' if application.status.value == 'Rejected'
-                                                    else 'secondary' }}">
-                                    {{ application.status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if application.resume and application.resume.matches %}
-                                    {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
-                                    {% if match %}
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-{{ 'success' if match.match_score >= 0.7 
-                                                               else 'warning' if match.match_score >= 0.5 
-                                                               else 'danger' }}" 
-                                             role="progressbar" 
-                                             style="width: {{ (match.match_score * 100)|int }}%" 
-                                             aria-valuenow="{{ (match.match_score * 100)|int }}" 
-                                             aria-valuemin="0" 
-                                             aria-valuemax="100">
+                            {% endfor %}
+                        {% else %}
+                            <div class="dashboard-empty">
+                                <i class="bi bi-building"></i>
+                                <p>No department data is available yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-xl-8">
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div class="panel-heading__copy">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <div>
+                                <h2>Monthly Recruitment Flow</h2>
+                                <p>Applications, resumes, and new jobs tracked across the last 12 months.</p>
+                            </div>
+                        </div>
+                        <span class="panel-tag">{{ peak_month.month if peak_month else 'No activity yet' }}</span>
+                    </div>
+                    <div class="panel-chart panel-chart--tall">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    <div class="panel-stat-grid">
+                        <div class="panel-mini-stat">
+                            <span>Applications This Month</span>
+                            <strong>{{ latest_month.applications if latest_month else 0 }}</strong>
+                            <small>Current month submissions</small>
+                        </div>
+                        <div class="panel-mini-stat">
+                            <span>Peak Hiring Month</span>
+                            <strong>{{ peak_month.applications if peak_month else 0 }}</strong>
+                            <small>{{ peak_month.month if peak_month else 'No data yet' }}</small>
+                        </div>
+                        <div class="panel-mini-stat">
+                            <span>Jobs Posted This Month</span>
+                            <strong>{{ latest_month.jobs if latest_month else 0 }}</strong>
+                            <small>Fresh opportunities opened</small>
+                        </div>
+                        <div class="panel-mini-stat">
+                            <span>Resumes Uploaded</span>
+                            <strong>{{ latest_month.resumes if latest_month else 0 }}</strong>
+                            <small>Candidate readiness this month</small>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="row g-4">
+            <div class="col-xl-8">
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div class="panel-heading__copy">
+                            <i class="bi bi-clock-history"></i>
+                            <div>
+                                <h2>Recent Applications</h2>
+                                <p>Latest candidates moving through the portal.</p>
+                            </div>
+                        </div>
+                        <span class="panel-tag">{{ recent_applications.total }} total applications</span>
+                    </div>
+
+                    {% if recent_applications.items %}
+                        <div class="dashboard-table-wrap">
+                            <table class="table dashboard-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Applicant</th>
+                                        <th>Position</th>
+                                        <th>Applied</th>
+                                        <th>Status</th>
+                                        <th>Match Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in recent_applications.items %}
+                                        {% set first_name = application.applicant.first_name or application.applicant.username or 'User' %}
+                                        {% set last_name = application.applicant.last_name or '' %}
+                                        {% set match = none %}
+                                        {% if application.resume and application.resume.matches %}
+                                            {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
+                                        {% endif %}
+                                        <tr>
+                                            <td>
+                                                <div class="candidate-cell">
+                                                    {% if application.applicant.profile_image %}
+                                                        <img
+                                                            src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}"
+                                                            alt="{{ first_name }} {{ last_name }}"
+                                                            class="candidate-avatar"
+                                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                                                        >
+                                                        <span class="candidate-placeholder" style="display: none;">
+                                                            {{ first_name[0] }}{{ last_name[0] if last_name else '' }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="candidate-placeholder">
+                                                            {{ first_name[0] }}{{ last_name[0] if last_name else '' }}
+                                                        </span>
+                                                    {% endif %}
+                                                    <div>
+                                                        <div class="candidate-name">{{ first_name }} {{ last_name }}</div>
+                                                        <div class="candidate-email">{{ application.applicant.email }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="candidate-name">{{ application.job.title }}</div>
+                                                <div class="job-meta">{{ application.job.department }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="candidate-name">{{ application.application_date.strftime('%b %d, %Y') }}</div>
+                                                <div class="job-meta">{{ application.application_date.strftime('%I:%M %p') }}</div>
+                                            </td>
+                                            <td>
+                                                {% set status_text = application.status_display %}
+                                                <span class="status-pill
+                                                    {% if status_text == 'Accepted' %}status-pill--accepted
+                                                    {% elif status_text == 'Under Review' or status_text == 'Interview Scheduled' %}status-pill--review
+                                                    {% elif status_text == 'Submitted' %}status-pill--submitted
+                                                    {% elif status_text == 'Rejected' %}status-pill--rejected
+                                                    {% else %}status-pill--other{% endif %}">
+                                                    {{ status_text }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="score-wrap">
+                                                    {% if match %}
+                                                        {% set score = (match.match_score * 100)|int %}
+                                                        <span class="score-pill">
+                                                            <i class="bi bi-stars"></i>
+                                                            {{ score }}%
+                                                        </span>
+                                                        <div class="score-track">
+                                                            <div
+                                                                class="score-fill {% if match.match_score >= 0.7 %}score-fill--high{% elif match.match_score >= 0.5 %}score-fill--medium{% else %}score-fill--low{% endif %}"
+                                                                style="width: {{ score }}%;"
+                                                            ></div>
+                                                        </div>
+                                                    {% else %}
+                                                        <span class="job-meta">No scored resume match yet</span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if recent_applications.pages > 1 %}
+                            <div class="dashboard-pagination">
+                                {% if recent_applications.has_prev %}
+                                    <a href="{{ url_for('main.admin_dashboard', page=recent_applications.prev_num) }}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                {% endif %}
+                                {% for page_num in recent_applications.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+                                    {% if page_num %}
+                                        <a
+                                            href="{{ url_for('main.admin_dashboard', page=page_num) }}"
+                                            class="{% if page_num == recent_applications.page %}is-active{% endif %}"
+                                        >
+                                            {{ page_num }}
+                                        </a>
+                                    {% else %}
+                                        <span class="ellipsis">...</span>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if recent_applications.has_next %}
+                                    <a href="{{ url_for('main.admin_dashboard', page=recent_applications.next_num) }}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="dashboard-empty" style="min-height: 280px;">
+                            <i class="bi bi-inbox"></i>
+                            <p>No applications have been submitted yet.</p>
+                        </div>
+                    {% endif %}
+                </article>
+            </div>
+
+            <div class="col-xl-4">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div class="panel-heading__copy">
+                                    <i class="bi bi-kanban"></i>
+                                    <div>
+                                        <h3>Application Pipeline</h3>
+                                        <p>Where candidates currently sit in the review process.</p>
+                                    </div>
+                                </div>
+                                <span class="panel-tag">{{ status_total }} tracked</span>
+                            </div>
+                            <div class="panel-chart panel-chart--medium">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                            <div class="pipeline-stack">
+                                {% if application_stats['labels'] %}
+                                    {% for label in application_stats['labels'] %}
+                                        {% set value = application_stats['values'][loop.index0] %}
+                                        {% set percent = ((value / status_total) * 100) if status_total else 0 %}
+                                        <div class="pipeline-row">
+                                            <div class="pipeline-row__left">
+                                                <span class="legend-dot legend-dot-{{ loop.index0 % 6 }}"></span>
+                                                <div>
+                                                    <span>{{ label }}</span>
+                                                    <small>{{ '%.1f'|format(percent) }}% of all applications</small>
+                                                </div>
+                                            </div>
+                                            <strong>{{ value }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="dashboard-empty">
+                                        <i class="bi bi-kanban"></i>
+                                        <p>No application status data is available yet.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12">
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div class="panel-heading__copy">
+                                    <i class="bi bi-lightning-charge"></i>
+                                    <div>
+                                        <h3>Open Roles Snapshot</h3>
+                                        <p>Quick glance at the latest active positions.</p>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('main.list_jobs') }}" class="panel-link">View all</a>
+                            </div>
+                            <div class="roles-stack">
+                                {% for job in active_jobs[:4] %}
+                                    <div class="role-row">
+                                        <div class="role-row__left">
+                                            <span class="role-row__index">{{ loop.index }}</span>
+                                            <div>
+                                                <span class="role-row__title">{{ job.title }}</span>
+                                                <div class="role-row__meta">
+                                                    <span class="role-chip"><i class="bi bi-diagram-3"></i>{{ job.department }}</span>
+                                                    {% if job.location %}
+                                                        <span class="role-chip"><i class="bi bi-geo-alt"></i>{{ job.location }}</span>
+                                                    {% endif %}
+                                                    {% if job.closing_date %}
+                                                        <span class="role-chip"><i class="bi bi-hourglass-split"></i>{{ job.closing_date.strftime('%b %d') }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <small class="text-muted">{{ "%.0f"|format(match.match_score * 100) }}%</small>
-                                    {% else %}
-                                    <small class="text-muted">No match</small>
-                                    {% endif %}
                                 {% else %}
-                                <small class="text-muted">No resume</small>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                    <div class="dashboard-empty">
+                                        <i class="bi bi-briefcase"></i>
+                                        <p>No active jobs are available right now.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Monthly Activity Chart
-    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+document.addEventListener("DOMContentLoaded", function () {
     const monthlyData = {{ monthly_stats|tojson|safe }};
-    
-    new Chart(monthlyCtx, {
-            type: 'line',
+    const deptData = {{ dept_stats|tojson|safe }};
+    const statusData = {{ application_stats|tojson|safe }};
+
+    Chart.defaults.color = "#90a2c2";
+    Chart.defaults.borderColor = "rgba(144, 162, 194, 0.14)";
+    Chart.defaults.font.family = "Sora";
+
+    function renderEmptyState(canvasId, icon, message) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const container = canvas.parentElement;
+        container.innerHTML = `
+            <div class="dashboard-empty">
+                <i class="bi ${icon}"></i>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+
+    function buildGradient(context, topColor, bottomColor) {
+        const gradient = context.createLinearGradient(0, 0, 0, 340);
+        gradient.addColorStop(0, topColor);
+        gradient.addColorStop(1, bottomColor);
+        return gradient;
+    }
+
+    const sharedTicks = {
+        color: "#8fa2c1",
+        font: {
+            size: 11
+        }
+    };
+
+    const sharedGrid = {
+        color: "rgba(143, 162, 193, 0.16)",
+        drawTicks: false
+    };
+
+    const hasMonthlyData = monthlyData.length && monthlyData.some(item => item.applications || item.resumes || item.jobs);
+    if (hasMonthlyData) {
+        const monthlyCanvas = document.getElementById("monthlyChart");
+        const monthlyContext = monthlyCanvas.getContext("2d");
+        const barGradient = buildGradient(monthlyContext, "rgba(85, 214, 255, 0.88)", "rgba(51, 134, 255, 0.2)");
+        const lineGradient = buildGradient(monthlyContext, "rgba(159, 107, 255, 0.95)", "rgba(159, 107, 255, 0.15)");
+        const jobGradient = buildGradient(monthlyContext, "rgba(255, 205, 90, 0.94)", "rgba(255, 143, 63, 0.18)");
+
+        new Chart(monthlyContext, {
             data: {
-            labels: monthlyData.map(item => item.month),
-                datasets: [{
-                    label: 'Applications',
-                data: monthlyData.map(item => item.applications),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    fill: false
-                }, {
-                    label: 'Resumes',
-                data: monthlyData.map(item => item.resumes),
-                    borderColor: 'rgb(255, 205, 86)',
-                    tension: 0.1,
-                    fill: false
-                }, {
-                    label: 'Jobs',
-                data: monthlyData.map(item => item.jobs),
-                    borderColor: 'rgb(54, 162, 235)',
-                    tension: 0.1,
-                    fill: false
-                }]
+                labels: monthlyData.map(item => item.short_month),
+                datasets: [
+                    {
+                        type: "bar",
+                        label: "Applications",
+                        data: monthlyData.map(item => item.applications),
+                        backgroundColor: barGradient,
+                        borderRadius: 12,
+                        borderSkipped: false,
+                        maxBarThickness: 34
+                    },
+                    {
+                        type: "line",
+                        label: "Resumes",
+                        data: monthlyData.map(item => item.resumes),
+                        borderColor: "#9f6bff",
+                        backgroundColor: lineGradient,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: "#d4b8ff"
+                    },
+                    {
+                        type: "line",
+                        label: "Jobs",
+                        data: monthlyData.map(item => item.jobs),
+                        borderColor: "#ffcd5a",
+                        backgroundColor: jobGradient,
+                        fill: false,
+                        borderDash: [6, 6],
+                        tension: 0.28,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: "#ffdf94"
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
+                interaction: {
+                    intersect: false,
+                    mode: "index"
                 },
                 plugins: {
                     legend: {
-                        position: 'top'
+                        align: "start",
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "rgba(7, 15, 29, 0.94)",
+                        borderColor: "rgba(143, 162, 193, 0.14)",
+                        borderWidth: 1,
+                        padding: 12,
+                        titleColor: "#ffffff",
+                        bodyColor: "#d9e4f6"
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: sharedTicks
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            ...sharedTicks,
+                            precision: 0
+                        },
+                        grid: sharedGrid
                     }
                 }
             }
         });
+    } else {
+        renderEmptyState("monthlyChart", "bi-bar-chart-line", "Monthly recruitment activity will appear here once data comes in.");
+    }
 
-    // Department Distribution Chart
-    const deptCtx = document.getElementById('deptChart').getContext('2d');
-    const deptData = {{ dept_stats|tojson|safe }};
-    
-    new Chart(deptCtx, {
-        type: 'doughnut',
+    const hasDepartmentData = deptData.labels && deptData.labels.length && deptData.values.some(value => value > 0);
+    if (hasDepartmentData) {
+        const departmentCanvas = document.getElementById("deptChart");
+        const departmentContext = departmentCanvas.getContext("2d");
+
+        new Chart(departmentContext, {
+            type: "doughnut",
             data: {
-            labels: deptData.labels,
+                labels: deptData.labels,
                 datasets: [{
-                data: deptData.values,
+                    data: deptData.values,
+                    borderWidth: 0,
+                    hoverOffset: 10,
                     backgroundColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(54, 162, 235)',
-                        'rgb(255, 205, 86)',
-                        'rgb(75, 192, 192)',
-                        'rgb(153, 102, 255)',
-                        'rgb(255, 159, 64)'
+                        "#55d6ff",
+                        "#3dd5a8",
+                        "#9f6bff",
+                        "#ffcd5a",
+                        "#ff8f3f",
+                        "#ff5f9e"
                     ]
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: "68%",
                 plugins: {
                     legend: {
-                        position: 'right'
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgba(7, 15, 29, 0.94)",
+                        borderColor: "rgba(143, 162, 193, 0.14)",
+                        borderWidth: 1,
+                        padding: 12,
+                        titleColor: "#ffffff",
+                        bodyColor: "#d9e4f6"
                     }
                 }
             }
         });
+    } else {
+        renderEmptyState("deptChart", "bi-pie-chart", "Department distribution will show up once jobs are assigned.");
+    }
 
-    // Application Status Chart
-    const statusCtx = document.getElementById('statusChart').getContext('2d');
-    const statusData = {{ application_stats|tojson|safe }};
-    
-    new Chart(statusCtx, {
-        type: 'pie',
+    const hasStatusData = statusData.labels && statusData.labels.length && statusData.values.some(value => value > 0);
+    if (hasStatusData) {
+        const statusCanvas = document.getElementById("statusChart");
+        const statusContext = statusCanvas.getContext("2d");
+
+        new Chart(statusContext, {
+            type: "bar",
             data: {
-            labels: statusData.labels,
+                labels: statusData.labels,
                 datasets: [{
-                data: statusData.values,
+                    label: "Applications",
+                    data: statusData.values,
+                    borderRadius: 12,
+                    borderSkipped: false,
                     backgroundColor: [
-                    'rgb(75, 192, 192)',  // Success
-                    'rgb(255, 205, 86)',  // Warning
-                    'rgb(54, 162, 235)',  // Info
-                    'rgb(255, 99, 132)',  // Danger
-                    'rgb(153, 102, 255)'  // Other
+                        "#55d6ff",
+                        "#3dd5a8",
+                        "#9f6bff",
+                        "#ffcd5a",
+                        "#ff5f9e",
+                        "#ff8f3f"
                     ]
                 }]
             },
             options: {
+                indexAxis: "y",
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right'
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgba(7, 15, 29, 0.94)",
+                        borderColor: "rgba(143, 162, 193, 0.14)",
+                        borderWidth: 1,
+                        padding: 12,
+                        titleColor: "#ffffff",
+                        bodyColor: "#d9e4f6"
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            ...sharedTicks,
+                            precision: 0
+                        },
+                        grid: sharedGrid
+                    },
+                    y: {
+                        ticks: sharedTicks,
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
         });
+    } else {
+        renderEmptyState("statusChart", "bi-kanban", "Status analytics will appear once applications are processed.");
+    }
 });
 </script>
 {% endblock %}
-
-{% endblock %}
-

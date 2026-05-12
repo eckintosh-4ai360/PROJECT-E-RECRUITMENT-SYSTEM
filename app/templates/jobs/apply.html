@@ -1,67 +1,89 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h2 class="h4 mb-0">Apply for {{ job.title }}</h2>
-                </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        <h5>Job Details</h5>
-                        <p><strong>Department:</strong> {{ job.department }}</p>
-                        <p><strong>Description:</strong></p>
-                        <p>{{ job.description|nl2br }}</p>
-                    </div>
+<div class="page-shell">
+    <section class="page-hero page-hero--compact">
+        <span class="page-hero__eyebrow">Application Form</span>
+        <h1 class="page-hero__title">Apply for {{ job.title }}</h1>
+        <p class="page-hero__subtitle">Submit the right resume, add a cover letter, and move into the hiring pipeline from a cleaner application flow.</p>
+        <div class="metric-strip">
+            <span class="metric-pill"><i class="bi bi-building"></i>{{ job.department }}</span>
+            {% if job.closing_date %}
+                <span class="metric-pill"><i class="bi bi-hourglass-split"></i>Closes {{ job.closing_date.strftime('%B %d, %Y') }}</span>
+            {% endif %}
+        </div>
+    </section>
 
-                    <form method="POST" action="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" enctype="multipart/form-data">
-                        {{ form.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            <label for="resume" class="form-label">Select Resume</label>
-                            {{ form.resume(class="form-select") }}
-                            {% for error in form.resume.errors %}
+    <div class="row g-4">
+        <div class="col-xl-4">
+            <article class="card surface-card--padded h-100">
+                <div class="section-header">
+                    <div>
+                        <h2 class="surface-section__title">Role Summary</h2>
+                        <p class="surface-section__subtitle">A quick review of the position before you submit.</p>
+                    </div>
+                </div>
+                <div class="job-card__meta mb-3">
+                    <div><i class="bi bi-building me-2"></i>{{ job.department }}</div>
+                    <div><i class="bi bi-briefcase me-2"></i>{{ job.title }}</div>
+                </div>
+                <div class="text-secondary">{{ job.description|nl2br }}</div>
+            </article>
+        </div>
+
+        <div class="col-xl-8">
+            <article class="card surface-card--padded">
+                <div class="section-header">
+                    <div>
+                        <h2 class="surface-section__title">Submit Your Application</h2>
+                        <p class="surface-section__subtitle">Choose a resume, include a cover letter, and complete the application in one step.</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label for="resume" class="form-label">Select Resume</label>
+                        {{ form.resume(class="form-select") }}
+                        {% for error in form.resume.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                            {% if not form.resume.choices %}
-                            <div class="alert alert-warning mt-2">
-                                <i class="bi bi-exclamation-triangle"></i>
+                        {% endfor %}
+                        {% if not form.resume.choices %}
+                            <div class="alert alert-warning mt-3 mb-0">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
                                 You need to <a href="{{ url_for('main.user_profile') }}">upload a resume</a> before applying.
                             </div>
-                            {% endif %}
-                        </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="cover_letter" class="form-label">Cover Letter</label>
-                            {{ form.cover_letter(class="form-control") }}
-                            {% for error in form.cover_letter.errors %}
+                    <div class="mb-3">
+                        <label for="cover_letter" class="form-label">Cover Letter</label>
+                        {{ form.cover_letter(class="form-control", rows=7, placeholder="Introduce your interest, fit, and motivation for this role.") }}
+                        {% for error in form.cover_letter.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
+                        {% endfor %}
+                    </div>
 
-                        <div class="mb-4">
-                            <label for="cover_letter_file" class="form-label">
-                                <i class="bi bi-upload me-1"></i>Upload Cover Letter
-                            </label>
-                            {{ form.cover_letter_file(class="form-control") }}
-                            {% for error in form.cover_letter_file.errors %}
+                    <div class="mb-4">
+                        <label for="cover_letter_file" class="form-label"><i class="bi bi-upload me-1"></i>Upload Cover Letter</label>
+                        {{ form.cover_letter_file(class="form-control") }}
+                        {% for error in form.cover_letter_file.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
+                        {% endfor %}
+                    </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-send me-2"></i>Submit Application
-                            </button>
-                            <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" 
-                               class="btn btn-outline-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                    <div class="action-cluster">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-1"></i>Submit Application
+                        </button>
+                        <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </article>
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

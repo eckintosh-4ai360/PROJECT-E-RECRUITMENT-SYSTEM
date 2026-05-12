@@ -1,179 +1,236 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4 " style="background-color: #ffffff;">
-    <div class="p-5 mb-4 rounded-3 main-container">
-        <div class="container-fluid py-5">
-            <h4 class="display-5 " style="color: var(--primary); font-family: Blacksword;">Welcome to the</h4>
-            <h1 class="display-5 fw-bold" style="color: var(--primary-dark);"><span>UMaT Job Portal</span> </h1>
-            <p class="col-md-8 fs-4">Your gateway to career opportunities at 
-                the University of Mines and Technology,
-                especially within the Computer Science department.</p>
-            {% if not current_user.is_authenticated %}
-            <!-- Update auth links -->
-            <a href="{{ url_for('auth.register') }}" class="btn btn-lg" style="background-color: var(--primary-dark); color: white;">
-                <i class="bi bi-person-plus me-1"></i> Register Now
-            </a>
-            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-lg" style="background-color: var(--primary); color: white;">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-            </a>
+<div class="page-shell">
+    <section class="page-hero">
+        <div class="row g-4 align-items-center">
+            <div class="col-xl-7">
+                <span class="page-hero__eyebrow">University Recruitment Hub</span>
+                <h1 class="page-hero__title">A sharper, more modern hiring experience for UMaT.</h1>
+                <p class="page-hero__subtitle">
+                    Discover academic opportunities, upload resumes, track applications, and stay close to university events
+                    through one polished recruitment platform designed to feel clear and confident at any hour.
+                </p>
+
+                <div class="metric-strip">
+                    <span class="metric-pill "><i class="bi bi-briefcase "></i><strong>{{ jobs|length }}</strong> live roles</span>
+                    <span class="metric-pill "><i class="bi bi-calendar-event"></i><strong>{{ events|length }}</strong> upcoming events</span>
+                    <span class="metric-pill "><i class="bi bi-stars"></i><strong>AI-assisted</strong> resume insights</span>
+                </div>
+
+                <div class="page-actions">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary">
+                            <i class="bi bi-briefcase me-1"></i>Browse Opportunities
+                        </a>
+                        {% if current_user.is_admin() %}
+                            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-speedometer2 me-1"></i>Go to Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('main.user_profile') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-person-circle me-1"></i>Open My Profile
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-1"></i>Create Account
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-xl-5">
+                <div class="card surface-card--padded">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="surface-section__title">What this portal gives you</h3>
+                            <p class="surface-section__subtitle">A single destination for application, analysis, and interview readiness.</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-card__label">Resume Review</span>
+                            <strong class="stat-card__value text-white">Smart</strong>
+                            <small class="text-secondary">Parsing, extraction, and match scoring</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-card__label">Application Flow</span>
+                            <strong class="stat-card__value text-white">Tracked</strong>
+                            <small class="text-secondary">Status updates and interview visibility</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-card__label">Event Feed</span>
+                            <strong class="stat-card__value text-white">Live</strong>
+                            <small class="text-secondary">University activities and opportunities</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-card__label">Admin Oversight</span>
+                            <strong class="stat-card__value text-white">Clear</strong>
+                            <small class="text-secondary">Corporate dashboard with reporting</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="card surface-card--padded mb-4">
+        <div class="section-header">
+            <div>
+                <h2 class="surface-section__title">Platform Highlights</h2>
+                <p class="surface-section__subtitle">Core capabilities shaped into one consistent candidate and admin experience.</p>
+            </div>
+        </div>
+        <div class="page-card-grid">
+            <article class="feature-card">
+                <div class="feature-card__body">
+                    <span class="feature-card__icon"><i class="bi bi-file-earmark-text"></i></span>
+                    <h3 class="h5">Resume Analysis</h3>
+                    <p class="text-secondary mb-0">AI-assisted parsing, skill extraction, completeness feedback, and job relevance scoring.</p>
+                </div>
+            </article>
+            <article class="feature-card">
+                <div class="feature-card__body">
+                    <span class="feature-card__icon"><i class="bi bi-diagram-3"></i></span>
+                    <h3 class="h5">Application Tracking</h3>
+                    <p class="text-secondary mb-0">Follow every application through submission, review, interview scheduling, and outcome.</p>
+                </div>
+            </article>
+            <article class="feature-card">
+                <div class="feature-card__body">
+                    <span class="feature-card__icon"><i class="bi bi-camera-video"></i></span>
+                    <h3 class="h5">Interview Readiness</h3>
+                    <p class="text-secondary mb-0">Stay aligned on interview timing, venue links, level progression, and next steps.</p>
+                </div>
+            </article>
+            <article class="feature-card">
+                <div class="feature-card__body">
+                    <span class="feature-card__icon"><i class="bi bi-bar-chart-line"></i></span>
+                    <h3 class="h5">Recruitment Analytics</h3>
+                    <p class="text-secondary mb-0">Administrative metrics, pipeline visibility, and cleaner hiring operations for the team.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="events-section">
+        <div class="card surface-card--padded mb-4">
+            <div class="section-header">
+                <div>
+                    <h2 class="surface-section__title">Upcoming University Events</h2>
+                    <p class="surface-section__subtitle">Stay close to the academic and career moments happening around campus.</p>
+                </div>
+                <a href="{{ url_for('main.view_events') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-calendar-check me-1"></i>View All Events
+                </a>
+            </div>
+
+            {% if events %}
+                <div class="events-grid">
+                    {% for event in events %}
+                        <article class="event-card">
+                            {% if event.image_path %}
+                                <div class="event-card-image">
+                                    <img src="{{ url_for('static', filename='event_images/' + event.image_path) }}" alt="{{ event.title }}">
+                                </div>
+                            {% else %}
+                                <div class="event-card-image">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                            {% endif %}
+                            <div class="event-card-body">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                    <h3 class="h5 mb-0">{{ event.title }}</h3>
+                                    <span class="badge {% if event.status == 'upcoming' %}bg-green-upcoming{% elif event.status == 'ongoing' %}bg-green-ongoing{% elif event.status == 'completed' %}bg-green-completed{% else %}bg-secondary{% endif %}">
+                                        {{ event.status.title() }}
+                                    </span>
+                                </div>
+                                <p class="event-card-description mb-3">
+                                    {{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}
+                                </p>
+                                <div class="event-meta">
+                                    <div><i class="bi bi-calendar3 me-2"></i>{{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                                    {% if event.location %}
+                                        <div><i class="bi bi-geo-alt me-2"></i>{{ event.location }}</div>
+                                    {% endif %}
+                                    <div><i class="bi bi-tag me-2"></i>{{ event.event_type.title() }}</div>
+                                </div>
+                            </div>
+                            <div class="event-card-footer">
+                                <a href="{{ url_for('main.view_event_detail', event_id=event.event_id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-arrow-up-right me-1"></i>Learn More
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
             {% else %}
-            <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary btn-lg" type="button">
-                <i class="bi bi-briefcase me-2"></i>View Open Positions
-            </a>
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <h3 class="h5">No upcoming events right now</h3>
+                    <p class="mb-0">Fresh university events will appear here as they are published.</p>
+                </div>
             {% endif %}
         </div>
-    </div>
+    </section>
 
-    <!-- Events Section -->
-    {% if events %}
-    <div class="events-section mb-5">
-        <h3 class="mb-4 section-title" style="color: var(--primary-dark);">
-            <i class="bi bi-calendar-event me-2"></i>Upcoming University Events
-        </h3>
-        
-        <!-- Events Carousel -->
-        <div id="eventsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <!-- <div class="carousel-indicators">
-                {% for event in events %}
-                <button type="button" data-bs-target="#eventsCarousel" data-bs-slide-to="{{ loop.index0 }}" 
-                        {% if loop.first %}class="active"{% endif %} aria-current="true" aria-label="Slide {{ loop.index }}"></button>
-                {% endfor %}
-            </div> -->
-            
-            <div class="carousel-inner rounded-3">
-                {% for event in events %}
-                <div class="carousel-item {% if loop.first %}active{% endif %}">
-                    <div class="event-slide position-relative" >
-                        {% if event.image_path %}
-                        <img src="{{ url_for('static', filename='event_images/' + event.image_path) }}" 
-                             class="d-block w-100 event-slide-image" alt="{{ event.title }}">
-                        {% else %}
-                        <div class="event-slide-placeholder d-flex align-items-center justify-content-center">
-                            <i class="bi bi-calendar-event" style="font-size: 4rem; color: var(--primary);"></i>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="carousel-caption d-none d-md-block event-caption" style="background: linear-gradient(to right, rgba(130, 255, 47, 0.3));">
-                            <h4 class="fw-bold">{{ event.title }}</h4>
-                            <p class="mb-2">{{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}</p>
-                            <div class="event-details mb-3">
-                                <span class="badge me-2" style="background-color: var(--primary-dark); color: white;">
-                                    <i class="bi bi-calendar3 me-1"></i>{{ event.event_date.strftime('%B %d, %Y') }}
-                                </span>
-                                {% if event.location %}
-                                <span class="badge me-2" style="background-color: var(--secondary); color: white;">
-                                    <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
-                                </span>
-                                {% endif %}
-                                <span class="badge" style="background-color: var(--primary); color: white;">
-                                    <i class="bi bi-tag me-1"></i>{{ event.event_type.title() }}
+    <section class="card surface-card--padded">
+        <div class="section-header">
+            <div>
+                <h2 class="surface-section__title">Recent Job Postings</h2>
+                <p class="surface-section__subtitle">Explore the latest opportunities currently open across the university.</p>
+            </div>
+            <a href="{{ url_for('main.view_jobs') }}" class="btn btn-primary">
+                <i class="bi bi-search me-1"></i>Browse All Jobs
+            </a>
+        </div>
+
+        {% if jobs %}
+            <div class="page-card-grid">
+                {% for job in jobs %}
+                    <article class="job-card">
+                        <div class="job-card__body">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <h3 class="h5 mb-0">{{ job.title }}</h3>
+                                <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ job.status|title }}
                                 </span>
                             </div>
-                            <a href="{{ url_for('main.view_event_detail', event_id=event.event_id) }}" 
-                               class="btn btn-light btn-lg" style="background-color: white; color: var(--secondary);">
-                                <i class="bi bi-info-circle me-1"></i>Learn More
-                            </a>
+                            <div class="job-card__meta mb-4">
+                                <div><i class="bi bi-building me-2"></i>{{ job.department }}</div>
+                                <div><i class="bi bi-calendar3 me-2"></i>Posted {{ job.posted_date.strftime('%B %d, %Y') }}</div>
+                                {% if job.closing_date %}
+                                    <div><i class="bi bi-hourglass-split me-2"></i>Closes {{ job.closing_date.strftime('%B %d, %Y') }}</div>
+                                {% endif %}
+                            </div>
+                            <p class="text-secondary mb-4">
+                                {{ job.description[:140] }}{% if job.description|length > 140 %}...{% endif %}
+                            </p>
                         </div>
-                    </div>
-                </div>
+                        <div class="job-card__footer">
+                            <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i>View Role
+                            </a>
+                            {% if current_user.is_authenticated and not current_user.is_admin() and job.status == 'open' %}
+                                <a href="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-send me-1"></i>Apply
+                                </a>
+                            {% endif %}
+                        </div>
+                    </article>
                 {% endfor %}
             </div>
-            
-            <button class="carousel-control-prev" type="button" data-bs-target="#eventsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#eventsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-        
-        <div class="mt-4 text-center">
-            <a href="{{ url_for('main.view_events') }}" class="btn view-all-btn">
-                <i class="bi bi-calendar-check me-2"></i>View All Events
-            </a>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="recent-jobs-section mb-5" style="background-color: lavender;">
-        <h3 class="mb-4 section-title" style="color: var(--primary-dark);"><i class="bi bi-briefcase me-2"></i>Recent Job Postings</h3>
-        {% if jobs %}
-        <div class="list-group job-listings">
-            {% for job in jobs %}
-            <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}"
-                class="list-group-item list-group-item-action job-item">
-                <div class="d-flex w-100 justify-content-between new">
-                    <h5 class="mb-1"><i class="bi bi-file-earmark-text me-2 text-primary"></i>{{ job.title }}</h5>
-                    <small><i class="bi bi-calendar3 me-1"></i>{{ job.posted_date.strftime("%Y-%m-%d") }}</small>
-                </div>
-                <p class="mb-1"><i class="bi bi-building me-2 text-muted"></i>Department: {{ job.department }}</p>
-                <small><i class="bi bi-tag me-2 text-success"></i>Status: {{ job.status }}</small>
-            </a>
-            {% endfor %}
-        </div>
-        <div class="mt-4 text-center">
-            <a href="{{ url_for('main.view_jobs') }}" class="btn view-all-btn">
-                <i class="bi bi-search me-2"></i>View All Open Positions
-            </a>
-        </div>
         {% else %}
-        <p>No recent job postings found.</p>
+            <div class="empty-state">
+                <i class="bi bi-briefcase"></i>
+                <h3 class="h5">No current openings</h3>
+                <p class="mb-0">Open positions will appear here as soon as they are published.</p>
+            </div>
         {% endif %}
-    </div>
-
-
-    
-    <!-- * features sections * -->
-    <section class="container py-5">
-        <h3 class="text-center mb-5 fw-bold fs-2" style="color: var(--primary-dark);">Key Features</h3>
-        <div class="row g-4">
-            <!-- Resume Analysis -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border: 1px solid green;">
-                    <div class="card-body">
-                        <i class="bi bi-file-earmark-text fs-1 text-primary mb-3"></i>
-                        <h5 class="card-title" style="color: #1c2331;">Resume Analysis</h5>
-                        <p class="card-text small">AI-powered resume parsing and skill extraction with detailed feedback</p>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Application Tracking -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border: 1px solid greenyellow;">
-                    <div class="card-body">
-                        <i class="bi bi-people fs-1 text-success mb-3"></i>
-                        <h5 class="card-title" style="color: #1c2331;">Application Tracking</h5>
-                        <p class="card-text small">Track your applications and manage your career journey in one place</p>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Interview Management -->
-            <div class="col-md-6 col-lg-3" >
-                <div class="card text-center h-100" style="border: 1px solid green;">
-                    <div class="card-body">
-                        <i class="bi bi-calendar2-check fs-1 text-purple mb-3" ></i>
-                        <h5 class="card-title" style="color: #1c2331;">Interview Management</h5>
-                        <p class="card-text small">Schedule and conduct interviews with built-in video conferencing</p>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Analytics -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100" style="border: 1px solid greenyellow;">
-                    <div class="card-body">
-                        <i class="bi bi-bar-chart-line fs-1 text-warning mb-3"></i>
-                        <h5 class="card-title" style="color: #1c2331;">Analytics</h5>
-                        <p class="card-text small">Detailed insights and analytics on hiring metrics and trends</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
 </div>
 {% endblock %}

@@ -1,70 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2  style="color:var(--primary-dark); "><i class="bi bi-people " style="margin-right:6px"></i>User Management</h2>
-          <div class="d-flex justify-content-between align-items-center mb-4">
-        
-        <div>
-           
-            <a href="{{ url_for('main.admin_dashboard') }}" class="btn ms-2" style="border: 1px solid green; color: var(--primary-dark)">
-                <i class="bi bi-arrow-left-short me-1"></i>Back to Dashboard
-            </a>
-        </div>
-    </div>
-    </div>
-
-    <div class="card shadow-sm" style="border: 3px solid white; outline: 1px solid green;">
-        <div class="card-body">
-            <div class="table-responsive h-200 overflow-auto">
-                <table class="table table-hover table-sm">
-                    <thead>
-                        <tr>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Profile</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Username</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Full Name</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Email</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Phone Number</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Role</th>
-                            <th style="padding: 0.25rem 0.5rem; color:var(--primary-dark);">Joined Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
-                                <div class="d-flex align-items-center">
-                                    {% if user.profile_image %}
-                                    <img src="{{ user.profile_image_url }}" 
-                                         class="rounded-circle" 
-                                         width="30" 
-                                         height="30"
-                                         alt="{{ user.username }}">
-                                    {% else %}
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
-                                         style="width: 30px; height: 30px; font-size: 0.8rem;">
-                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.username }}</td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.first_name }} {{ user.last_name }}</td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.email }}</td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">
-                                <span class="badge bg-{{ 'success' if user.role.value == 'admin' else 'secondary' }}">
-                                    {{ user.role.value }}
-                                </span>
-                            </td>
-                            <td style="padding: 0.25rem 0.5rem; vertical-align: middle;">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="page-shell">
+    <section class="page-hero page-hero--compact">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+            <div>
+                <span class="page-hero__eyebrow">People Directory</span>
+                <h1 class="page-hero__title">User Management</h1>
+                <p class="page-hero__subtitle">Review registered users, profile details, contact records, and role assignments from one corporate-style admin view.</p>
+            </div>
+            <div class="action-cluster">
+                <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="card surface-card--padded">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>
+                                {% if user.profile_image %}
+                                    <img src="{{ user.profile_image_url }}" class="candidate-avatar rounded-circle" width="38" height="38" alt="{{ user.username }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                                    <span class="candidate-placeholder rounded-circle" style="display: none; width: 38px; height: 38px;">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
+                                {% else %}
+                                    <span class="candidate-placeholder rounded-circle" style="width: 38px; height: 38px;">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
+                            <td><span class="badge {% if user.role.value == 'admin' %}bg-success{% else %}bg-secondary{% endif %}">{{ user.role.value|title }}</span></td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
-{% endblock %} 
+{% endblock %}

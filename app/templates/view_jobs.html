@@ -1,47 +1,89 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4 mb-4">
-    <h2><i class="bi bi-briefcase me-2 text-primary"></i>Open Positions</h2>
-    <hr>
-    <!-- Search and Filter Form -->
-    <form method="get" class="row g-3 align-items-end mb-4">
-        <div class="col-md-5">
-            <label for="search" class="form-label">Keyword Search</label>
-            <input type="text" name="search" id="search" class="form-control" placeholder="Search jobs by keyword..." value="{{ request.args.get('search', '') }}">
+<div class="page-shell">
+    <section class="page-hero page-hero--compact">
+        <span class="page-hero__eyebrow">Opportunity Search</span>
+        <h1 class="page-hero__title">Open Positions</h1>
+        <p class="page-hero__subtitle">
+            Search active roles across the university, filter by department, and move directly from discovery to application.
+        </p>
+        <div class="metric-strip">
+            <span class="metric-pill"><i class="bi bi-briefcase"></i><strong>{{ jobs|length }}</strong> positions found</span>
+            <span class="metric-pill"><i class="bi bi-diagram-3"></i><strong>{{ departments|length }}</strong> departments</span>
         </div>
-        <div class="col-md-4">
-            <label for="department" class="form-label">Filter by Department</label>
-            <select name="department" id="department" class="form-select">
-                <option value="">All Departments</option>
-                {% for dept in departments %}
-                <option value="{{ dept }}" {% if request.args.get('department') == dept %}selected{% endif %}>{{ dept }}</option>
-                {% endfor %}
-            </select>
+    </section>
+
+    <section class="card surface-card--padded mb-4">
+        <div class="section-header">
+            <div>
+                <h2 class="surface-section__title">Filter Roles</h2>
+                <p class="surface-section__subtitle">Refine the list by keyword or academic unit.</p>
+            </div>
         </div>
-        <div class="col-md-3 d-grid">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
-        </div>
-    </form>
+        <form method="get" class="filter-grid">
+            <div>
+                <label for="search" class="form-label">Keyword Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search jobs by keyword..." value="{{ request.args.get('search', '') }}">
+            </div>
+            <div>
+                <label for="department" class="form-label">Department</label>
+                <select name="department" id="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept }}" {% if request.args.get('department') == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+    </section>
+
     {% if jobs %}
-        <div class="list-group job-listings">
+        <section class="page-card-grid">
             {% for job in jobs %}
-                <a href="{{ url_for("main.view_job_detail", job_id=job.job_id) }}" class="list-group-item list-group-item-action flex-column align-items-start job-item">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1"><i class="bi bi-file-earmark-text me-2 text-primary"></i>{{ job.title }}</h5>
-                        <small><i class="bi bi-calendar3 me-1"></i>Posted: {{ job.posted_date.strftime("%Y-%m-%d") }}</small>
+                <article class="job-card">
+                    <div class="job-card__body">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <h2 class="h5 mb-0">{{ job.title }}</h2>
+                            <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ job.status|title }}
+                            </span>
+                        </div>
+                        <div class="job-card__meta mb-4">
+                            <div><i class="bi bi-building me-2"></i>{{ job.department }}</div>
+                            <div><i class="bi bi-calendar3 me-2"></i>Posted {{ job.posted_date.strftime('%B %d, %Y') }}</div>
+                            {% if job.closing_date %}
+                                <div><i class="bi bi-hourglass-split me-2"></i>Closes {{ job.closing_date.strftime('%B %d, %Y') }}</div>
+                            {% endif %}
+                        </div>
+                        <p class="text-secondary mb-0">
+                            {{ job.description[:180] }}{% if job.description|length > 180 %}...{% endif %}
+                        </p>
                     </div>
-                    <p class="mb-1"><i class="bi bi-building me-2 text-muted"></i>Department: {{ job.department }}</p>
-                    <small><i class="bi bi-tag me-2 text-success"></i>Status: <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status }}</span></small>
-                    {% if job.closing_date %}
-                        <small class="ms-2"><i class="bi bi-calendar-x me-1 text-danger"></i>Closes: {{ job.closing_date.strftime("%Y-%m-%d") }}</small>
-                    {% endif %}
-                </a>
+                    <div class="job-card__footer">
+                        <a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Role
+                        </a>
+                        {% if current_user.is_authenticated and current_user.role == UserRole.candidate and job.status == 'open' %}
+                            <a href="{{ url_for('main.apply_for_job', job_id=job.job_id) }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-send me-1"></i>Apply
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
             {% endfor %}
-        </div>
+        </section>
     {% else %}
-        <p class="alert alert-info"><i class="bi bi-info-circle me-2"></i>There are currently no open positions listed.</p>
+        <section class="card surface-card--padded">
+            <div class="empty-state">
+                <i class="bi bi-search"></i>
+                <h2 class="h5">No open positions matched your search</h2>
+                <p class="mb-0">Try adjusting the keyword or department filter and check again.</p>
+            </div>
+        </section>
     {% endif %}
 </div>
 {% endblock %}
-

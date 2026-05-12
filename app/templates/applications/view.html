@@ -1,233 +1,171 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Application Header -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="display-5 fw-bold text-primary mb-3">Application Details</h1>
-            <p class="lead text-muted">
-                Application for: {{ application.job.title }}
-            </p>
-        </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ url_for('main.my_applications') }}" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left"></i> Back to My Applications
-            </a>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Application Details -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-file-text me-2"></i>Application Information
-                    </h5>
+<div class="page-shell">
+    <section class="page-hero page-hero--compact">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+            <div>
+                <span class="page-hero__eyebrow">Application Record</span>
+                <h1 class="page-hero__title">Application Details</h1>
+                <p class="page-hero__subtitle">Review the submitted materials, linked role, status timeline, and interview progress from one unified view.</p>
+                <div class="metric-strip">
+                    <span class="metric-pill"><i class="bi bi-briefcase"></i>{{ application.job.title }}</span>
+                    <span class="metric-pill"><i class="bi bi-calendar3"></i>{{ application.application_date.strftime('%B %d, %Y') }}</span>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <!-- Status -->
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-1">Status</h6>
-                            <span class="badge bg-{{ 'success' if application.status == 'accepted' 
-                                                else 'warning' if application.status == 'under_review' 
-                                                else 'info' if application.status == 'submitted' 
-                                                else 'danger' if application.status == 'rejected' 
-                                                else 'secondary' }} px-3 py-2">
-                                {{ application.status|replace('_', ' ')|title }}
-                            </span>
-                        </div>
+            </div>
+            <div class="action-cluster">
+                <a href="{{ url_for('main.my_applications') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to My Applications
+                </a>
+            </div>
+        </div>
+    </section>
 
-                        <!-- Application Date -->
-                        <div class="col-md-6">
-                            <h6 class="text-muted mb-1">Application Date</h6>
-                            <p class="mb-0">{{ application.application_date.strftime('%B %d, %Y') }}</p>
-                        </div>
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <article class="card surface-card--padded mb-4">
+                <div class="section-header">
+                    <div>
+                        <h2 class="surface-section__title">Application Information</h2>
+                        <p class="surface-section__subtitle">Submitted files, cover letter details, and current review status.</p>
+                    </div>
+                </div>
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <span class="stat-card__label">Status</span>
+                        <strong class="stat-card__value" style="font-size: 1.25rem;">{{ application.status_display }}</strong>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card__label">Application Date</span>
+                        <strong class="stat-card__value" style="font-size: 1.25rem;">{{ application.application_date.strftime('%B %d, %Y') }}</strong>
+                    </div>
+                </div>
 
-                        <!-- Cover Letter -->
-                        <div class="col-12">
-                            <h6 class="text-muted mb-2">Cover Letter</h6>
-                            <div class="row">
-                                {% if application.cover_letter %}
-                                <div class="col-12 {% if application.cover_letter_file %}col-lg-6{% endif %} mb-3">
-                                    <div class="border rounded p-3 bg-light">
-                                        {{ application.cover_letter|nl2br }}
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                {% if application.cover_letter_file %}
-                                <div class="col-12 {% if application.cover_letter %}col-lg-6{% endif %} mb-3">
-                                    <div class="border rounded p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-file-earmark-text fs-4 me-2"></i>
-                                            <div class="flex-grow-1">
-                                                <p class="mb-0">Uploaded Cover Letter</p>
-                                                <small class="text-muted">
-                                                    {{ application.cover_letter_file.split('/')[-1] }}
-                                                </small>
-                                            </div>
-                                            <div class="ms-2">
-                                                <a href="{{ url_for('admin.download_cover_letter', application_id=application.application_id) }}" 
-                                                   class="btn btn-sm btn-outline-primary me-2" 
-                                                   target="_blank">
-                                                    <i class="bi bi-download"></i> Download
-                                                </a>
-                                                {% if current_user.is_admin() %}
-                                                <a href="{{ url_for('admin.view_cover_letter', application_id=application.application_id) }}" 
-                                                   class="btn btn-sm btn-outline-secondary"
-                                                   target="_blank">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
+                <div class="row g-4">
+                    {% if application.cover_letter %}
+                        <div class="col-12 {% if application.cover_letter_file %}col-lg-6{% endif %}">
+                            <div class="card surface-card--padded h-100">
+                                <h3 class="h6 mb-3">Written Cover Letter</h3>
+                                <div class="text-secondary">{{ application.cover_letter|nl2br }}</div>
                             </div>
                         </div>
+                    {% endif %}
 
-                        <!-- Attached Resume -->
-                        {% if application.resume %}
-                        <div class="col-12">
-                            <h6 class="text-muted mb-2">Attached Resume</h6>
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-text fs-4 me-2"></i>
-                                <div>
-                                    <p class="mb-0">{{ application.resume.original_filename }}</p>
-                                    <small class="text-muted">
-                                        Uploaded on {{ application.resume.upload_date.strftime('%B %d, %Y') }}
-                                    </small>
+                    {% if application.cover_letter_file %}
+                        <div class="col-12 {% if application.cover_letter %}col-lg-6{% endif %}">
+                            <div class="card surface-card--padded h-100">
+                                <h3 class="h6 mb-3">Uploaded Cover Letter</h3>
+                                <div class="job-card__meta mb-3">
+                                    <div><i class="bi bi-file-earmark-text me-2"></i>{{ application.cover_letter_file.split('/')[-1] }}</div>
                                 </div>
-                                <div class="ms-auto">
-                                    <a href="{{ url_for('admin.download_resume', application_id=application.application_id) }}" 
-                                       class="btn btn-sm btn-outline-primary me-2" 
-                                       target="_blank">
-                                        <i class="bi bi-download"></i> Download
+                                <div class="action-cluster">
+                                    <a href="{{ url_for('admin.download_cover_letter', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                        <i class="bi bi-download me-1"></i>Download
                                     </a>
                                     {% if current_user.is_admin() %}
-                                    <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}" 
-                                       class="btn btn-sm btn-outline-secondary"
-                                       target="_blank">
-                                        <i class="bi bi-eye"></i> View Resume
-                                    </a>
+                                        <a href="{{ url_for('admin.view_cover_letter', application_id=application.application_id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
-            </div>
 
-            <!-- Job Details -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-briefcase me-2"></i>Job Details
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <h4 class="mb-3">{{ application.job.title }}</h4>
-                    <div class="mb-4">
-                        <span class="badge bg-primary me-2">{{ application.job.department }}</span>
-                        <span class="badge bg-secondary me-2">{{ application.job.location }}</span>
-                        {% if application.job.salary_range %}
-                        <span class="badge bg-info">{{ application.job.salary_range }}</span>
-                        {% endif %}
+                {% if application.resume %}
+                    <div class="card surface-card--padded mt-4">
+                        <h3 class="h6 mb-3">Attached Resume</h3>
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                            <div class="job-card__meta">
+                                <div><i class="bi bi-file-earmark-richtext me-2"></i>{{ application.resume.original_filename }}</div>
+                                <div><i class="bi bi-calendar3 me-2"></i>Uploaded {{ application.resume.upload_date.strftime('%B %d, %Y') }}</div>
+                            </div>
+                            <div class="action-cluster">
+                                <a href="{{ url_for('admin.download_resume', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                    <i class="bi bi-download me-1"></i>Download
+                                </a>
+                                {% if current_user.is_admin() %}
+                                    <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                        <i class="bi bi-eye me-1"></i>View Resume
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    
-                    <h6 class="text-muted mb-2">Job Description</h6>
-                    <div class="mb-4">
-                        {{ application.job.description|nl2br }}
-                    </div>
+                {% endif %}
+            </article>
 
-                    <h6 class="text-muted mb-2">Requirements</h6>
+            <article class="card surface-card--padded mb-4">
+                <div class="section-header">
                     <div>
-                        {{ application.job.requirements|nl2br }}
+                        <h2 class="surface-section__title">Job Details</h2>
+                        <p class="surface-section__subtitle">The role you applied for and the supporting requirements.</p>
                     </div>
                 </div>
-            </div>
+                <div class="metric-strip mb-4">
+                    <span class="metric-pill"><i class="bi bi-building"></i>{{ application.job.department }}</span>
+                    {% if application.job.location %}
+                        <span class="metric-pill"><i class="bi bi-geo-alt"></i>{{ application.job.location }}</span>
+                    {% endif %}
+                    {% if application.job.salary_range %}
+                        <span class="metric-pill"><i class="bi bi-cash-stack"></i>{{ application.job.salary_range }}</span>
+                    {% endif %}
+                </div>
+                <h3 class="h5 mb-3">{{ application.job.title }}</h3>
+                <div class="text-secondary mb-4">{{ application.job.description|nl2br }}</div>
+                {% if application.job.requirements %}
+                    <h4 class="h6 mb-3">Requirements</h4>
+                    <div class="text-secondary">{{ application.job.requirements|nl2br }}</div>
+                {% endif %}
+            </article>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Application Timeline -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-clock-history me-2"></i>Application Timeline
-                    </h5>
+        <div class="col-xl-4">
+            <article class="card surface-card--padded mb-4">
+                <div class="section-header">
+                    <div>
+                        <h2 class="surface-section__title">Application Timeline</h2>
+                        <p class="surface-section__subtitle">Follow major milestones in this application.</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        <!-- Submitted -->
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-success"></div>
-                            <div class="timeline-content">
-                                <h6 class="mb-0">Application Submitted</h6>
-                                <small class="text-muted">
-                                    {{ application.application_date.strftime('%B %d, %Y at %I:%M %p') }}
-                                </small>
-                            </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h3 class="h6 mb-1">Application Submitted</h3>
+                            <small>{{ application.application_date.strftime('%B %d, %Y at %I:%M %p') }}</small>
                         </div>
+                    </div>
 
-                        <!-- Interview (if scheduled) -->
-                        {% if application.interview %}
+                    {% if application.interview %}
                         <div class="timeline-item">
-                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-marker bg-info"></div>
                             <div class="timeline-content">
-                                <h6 class="mb-0">Interview Scheduled</h6>
-                                <small class="text-muted">
-                                    {{ application.interview.scheduled_date.strftime('%B %d, %Y at %I:%M %p') }}
-                                </small>
-                                <div class="mt-2">
-                                    <strong>Type:</strong> {{ application.interview.interview_type }}<br>
-                                    <strong>Location:</strong> {{ application.interview.location_or_link }}
+                                <h3 class="h6 mb-1">Interview Scheduled</h3>
+                                <small>{{ application.interview.scheduled_date.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                                <div class="mt-2 text-secondary">
+                                    <div><strong>Type:</strong> {{ application.interview.interview_type }}</div>
+                                    <div><strong>Location:</strong> {{ application.interview.location_or_link }}</div>
                                     {% if application.interview.notes %}
-                                    <div class="mt-2">
-                                        <strong>Notes:</strong><br>
-                                        {{ application.interview.notes|nl2br }}
-                                    </div>
+                                        <div class="mt-2"><strong>Notes:</strong> {{ application.interview.notes|nl2br }}</div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-
-                        <!-- Status Updates -->
-                        {% if application.status != 'submitted' %}
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-{{ 'success' if application.status == 'accepted' 
-                                                        else 'warning' if application.status == 'under_review' 
-                                                        else 'danger' if application.status == 'rejected' 
-                                                        else 'secondary' }}"></div>
-                            <div class="timeline-content">
-                                <h6 class="mb-0">Status Updated</h6>
-                                <small class="text-muted">
-                                    Status changed to: {{ application.status|replace('_', ' ')|title }}
-                                </small>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
-            </div>
+            </article>
 
-            <!-- Admin Actions -->
             {% if current_user.is_admin() %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-gear me-2"></i>Admin Actions
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <!-- Update Status -->
-                    <form method="POST" action="{{ url_for('main.update_application_status', application_id=application.application_id) }}" class="mb-3">
+                <article class="card surface-card--padded">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="surface-section__title">Admin Actions</h2>
+                            <p class="surface-section__subtitle">Update status, send feedback, and schedule interviews.</p>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.update_application_status', application_id=application.application_id) }}" class="mb-4">
                         <div class="mb-3">
                             <label for="status" class="form-label">Update Status</label>
                             <select name="status" id="status" class="form-select">
@@ -238,77 +176,22 @@
                                 <option value="rejected" {{ 'selected' if application.status == 'rejected' }}>Rejected</option>
                             </select>
                         </div>
-                        
                         <div class="mb-3">
                             <label for="feedback" class="form-label">Personalized Feedback</label>
-                            <textarea name="feedback" id="feedback" class="form-control" rows="5" 
-                                      placeholder="Add personalized feedback for the candidate (especially important for accepted/rejected statuses)">{{ application.feedback }}</textarea>
-                            <small class="form-text text-muted">
-                                This feedback will be included in the email notification to the candidate.
-                                <br>
-                                <strong>Tip:</strong> For rejections, provide constructive feedback. For acceptances, include next steps.
-                            </small>
+                            <textarea name="feedback" id="feedback" class="form-control" rows="5" placeholder="Share candidate-facing feedback for this application.">{{ application.feedback }}</textarea>
+                            <small class="form-text">This message is included in the notification sent to the candidate.</small>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary">Update Status & Send Email</button>
+                        <button type="submit" class="btn btn-primary w-100">Update Status &amp; Send Email</button>
                     </form>
 
-                    <!-- Schedule Interview -->
                     {% if application.status in ['submitted', 'under_review'] %}
-                    <a href="{{ url_for('main.schedule_interview', application_id=application.application_id) }}" 
-                       class="btn btn-outline-primary">
-                        <i class="bi bi-calendar-plus"></i> Schedule Interview
-                    </a>
+                        <a href="{{ url_for('main.schedule_interview', application_id=application.application_id) }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-calendar-plus me-1"></i>Schedule Interview
+                        </a>
                     {% endif %}
-                </div>
-            </div>
+                </article>
             {% endif %}
         </div>
     </div>
 </div>
-
-<style>
-.timeline {
-    position: relative;
-    padding: 0;
-    list-style: none;
-}
-
-.timeline-item {
-    position: relative;
-    padding-left: 24px;
-    margin-bottom: 24px;
-}
-
-.timeline-item:last-child {
-    margin-bottom: 0;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 12px;
-    bottom: -24px;
-    width: 2px;
-    background-color: #e9ecef;
-}
-
-.timeline-item:last-child::before {
-    display: none;
-}
-
-.timeline-content {
-    padding-left: 12px;
-}
-</style>
-{% endblock %} 
+{% endblock %}
