@@ -4,6 +4,9 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Le
 from app.models import User, UserRole
 from flask_wtf.file import FileAllowed
 from markupsafe import Markup
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)], 
@@ -95,17 +98,17 @@ class LoginForm(FlaskForm):
     def validate(self):
         initial_validation = super(LoginForm, self).validate()
         if not initial_validation:
-            print("===DEBUG=== Form validation failed")
+            logger.info("===DEBUG=== Form validation failed")
             return False
             
         if self.email.data:
-            print(f"===DEBUG=== Form validation - Email length: {len(self.email.data)}")
+            logger.info(f"===DEBUG=== Form validation - Email length: {len(self.email.data)}")
         if self.password.data:
-            print(f"===DEBUG=== Form validation - Password length: {len(self.password.data)}")
+            logger.info(f"===DEBUG=== Form validation - Password length: {len(self.password.data)}")
         
         # Ensure password field is not empty
         if not self.password.data or not self.password.data.strip():
-            print("===DEBUG=== Empty password submitted")
+            logger.info("===DEBUG=== Empty password submitted")
             self.password.errors = ["Password cannot be empty"]
             return False
             

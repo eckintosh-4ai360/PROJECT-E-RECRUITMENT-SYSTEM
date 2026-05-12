@@ -4,6 +4,9 @@ from flask_login import UserMixin
 from sqlalchemy import Enum
 import enum
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UserRole(enum.Enum):
     admin = "admin"
@@ -53,26 +56,26 @@ class User(UserMixin, db.Model):
 
     def set_password(self, password):
         """Set the user's password using our custom SHA-256 hashing function."""
-        print(f"===DEBUG=== Setting password for user {self.username}")
-        print(f"===DEBUG=== Password length: {len(password)}")
+        logger.info(f"===DEBUG=== Setting password for user {self.username}")
+        logger.info(f"===DEBUG=== Password length: {len(password)}")
         self.password_hash = generate_password_hash(password)
-        print(f"===DEBUG=== Generated hash: {self.password_hash}")
+        logger.info(f"===DEBUG=== Generated hash: {self.password_hash}")
 
     def check_password(self, password):
         """Check if the provided password matches the stored hash."""
-        print(f"\n===DEBUG=== Checking password for user {self.username}")
-        print(f"===DEBUG=== Input password length: {len(password)}")
-        print(f"===DEBUG=== Stored hash: {self.password_hash}")
+        logger.info(f"\n===DEBUG=== Checking password for user {self.username}")
+        logger.info(f"===DEBUG=== Input password length: {len(password)}")
+        logger.info(f"===DEBUG=== Stored hash: {self.password_hash}")
         if not self.password_hash:
-            print("===DEBUG=== No password hash stored!")
+            logger.info("===DEBUG=== No password hash stored!")
             return False
         result = check_password_hash(self.password_hash, password)
-        print(f"===DEBUG=== Password check result: {result}")
+        logger.info(f"===DEBUG=== Password check result: {result}")
         return result
 
     def is_admin(self):
-        print(f"===DEBUG=== is_admin() called for {self.username}")
-        print(f"===DEBUG=== role type: {type(self.role)}, value: {self.role}")
+        logger.info(f"===DEBUG=== is_admin() called for {self.username}")
+        logger.info(f"===DEBUG=== role type: {type(self.role)}, value: {self.role}")
         if isinstance(self.role, str):
             return self.role == "admin"
         return self.role == UserRole.admin

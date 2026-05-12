@@ -9,6 +9,15 @@ from flask_mail import Mail
 import pymysql # Ensure pymysql is imported if not automatically handled by SQLAlchemy
 from datetime import datetime, timezone # Import timezone
 from markupsafe import Markup
+import logging
+import sys
+
+# Configure logging to handle potential console issues on Windows
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    stream=sys.stdout
+)
 
 
 # Explicitly tell SQLAlchemy to use pymysql (though we switched to SQLite, keep for reference)

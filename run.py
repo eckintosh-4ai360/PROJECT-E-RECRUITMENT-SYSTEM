@@ -2,6 +2,16 @@ from app import create_app, db
 from app.models import User, Candidate, Resume, Job, JobMatch, UserRole # Import all models
 import os
 from datetime import datetime, timedelta
+import logging
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    stream=sys.stdout
+)
+logger = logging.getLogger(__name__)
 
 app = create_app()
 
@@ -19,7 +29,7 @@ def make_shell_context():
     }
 
 def add_initial_data():
-    print("Checking for initial data...")
+    logger.info("Checking for initial data...")
     # Check if admin user exists
     admin_user = User.query.filter_by(role=UserRole.admin).first()
     if not admin_user:
@@ -33,23 +43,31 @@ def add_initial_data():
         )
         admin_user.set_password("adminpassword") # Use a strong password in production!
         db.session.add(admin_user)
-        print("Admin user created.")
+        logger.info("Admin user created.")
     else:
-        print("Admin user already exists.")
+        logger.info("Admin user already exists. Verifying password...")
+        # If the hashing algorithm changed, the old hash will fail. 
+        # Reset it to ensure the admin can log in.
+        if not admin_user.check_password("adminpassword"):
+            logger.info("Admin password incorrect or hashing algorithm changed. Resetting...")
+            admin_user.set_password("adminpassword")
+            logger.info("Admin password reset.")
+        else:
+            logger.info("Admin password verified.")
 
     # Check if a sample CS job exists
     try:
         sample_job = Job.query.filter_by(title="Sample CS Lecturer Position").first()
     except Exception as e:
-        print(f"Error querying jobs: {e}")
-        print("Recreating jobs table...")
+        logger.error(f"Error querying jobs: {e}")
+        logger.info("Recreating jobs table...")
         # Drop and recreate the jobs table
         Job.__table__.drop(db.engine, checkfirst=True)
         Job.__table__.create(db.engine)
         sample_job = None
 
     if not sample_job:
-        print("Creating sample CS job...")
+        logger.info("Creating sample CS job...")
         if not admin_user.id:
              db.session.flush() # Ensure admin_user has an ID
         sample_job = Job(
@@ -64,27 +82,27 @@ def add_initial_data():
             closing_date=datetime.utcnow() + timedelta(days=30)  # Set closing date to 30 days from now
         )
         db.session.add(sample_job)
-        print("Sample job created.")
+        logger.info("Sample job created.")
     else:
-        print("Sample job already exists.")
+        logger.info("Sample job already exists.")
     
     try:
         db.session.commit()
-        print("Initial data commit successful.")
+        logger.info("Initial data commit successful.")
     except Exception as e:
         db.session.rollback()
-        print(f"Error adding initial data: {e}")
+        logger.error(f"Error adding initial data: {e}")
 
 if __name__ == "__main__":
     with app.app_context():
-        print("Creating database tables (if they don't exist)...")
+        logger.info("Creating database tables (if they don't exist)...")
         db.create_all()
-        print("Database tables checked/created.")
+        logger.info("Database tables checked/created.")
         # Add initial data
         add_initial_data()
 
     # Run the app
-    print("Starting Flask application...")
+    logger.info("Starting Flask application...")
     
     # Configure Flask to watch only our app files, excluding virtual environment
     extra_dirs = ['app/']
