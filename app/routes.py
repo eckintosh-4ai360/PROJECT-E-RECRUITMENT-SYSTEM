@@ -439,7 +439,8 @@ def view_jobs():
         "view_jobs.html",
         title="Open Positions",
         jobs=jobs,
-        departments=departments
+        departments=departments,
+        UserRole=UserRole
     )
 
 @bp.route("/jobs/<int:job_id>")

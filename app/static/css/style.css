@@ -1290,3 +1290,400 @@ textarea::placeholder {
         margin-top: 2rem;
     }
 }
+
+/* ============================================================
+   STEPS INFOGRAPHIC  –  matches the reference "Step 01/02" design
+   ============================================================ */
+.steps-infographic {
+    max-width: 860px;
+    margin: 3rem auto 2rem;
+    padding: 0 1rem;
+    position: relative;
+}
+
+/* Each row = one step (pill + number side by side) */
+.step-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 0;
+    position: relative;
+}
+
+/* Flipped row: step number LEFT, pill RIGHT */
+.step-row--flip {
+    flex-direction: row-reverse;
+}
+
+/* ---- Pill side ---- */
+.step-pill-wrap {
+    flex: 0 0 72%;
+    max-width: 72%;
+}
+
+/* The pill card itself */
+.step-pill {
+    display: flex;
+    align-items: center;
+    border-radius: 100px;
+    padding: 1.6rem 1.6rem 1.6rem 2rem;
+    position: relative;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: visible;
+}
+
+.step-pill:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.35);
+}
+
+/* Colour variants */
+.step-pill--1 { background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%); }
+.step-pill--2 { background: linear-gradient(135deg, #0f6b82 0%, #0e7490 100%); }
+.step-pill--3 { background: linear-gradient(135deg, #155e75 0%, #0f6b82 100%); }
+.step-pill--4 { background: linear-gradient(135deg, #1e3a5f 0%, #1a4f7a 100%); }
+
+/* Text block inside pill */
+.step-pill__text {
+    flex: 1;
+    color: #ffffff;
+    padding-right: 1.5rem;
+}
+
+.step-pill__label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.3rem;
+}
+
+.step-pill__title {
+    font-size: 1.55rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+    color: #ffffff;
+}
+
+.step-pill__desc {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* Protruding white icon circle */
+.step-pill__icon {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: #0e7490;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    /* Protrude past the pill edge */
+    margin-right: -45px;
+    z-index: 5;
+    position: relative;
+}
+
+/* For flipped pills, icon protrudes on the LEFT */
+.step-row--flip .step-pill__icon {
+    margin-right: 0;
+    margin-left: -45px;
+    order: -1;
+}
+
+/* ---- Number side ---- */
+.step-num-wrap {
+    flex: 0 0 28%;
+    max-width: 28%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-left: 3rem;
+    position: relative;
+    z-index: 4;
+}
+
+.step-row--flip .step-num-wrap {
+    padding-left: 0;
+    padding-right: 3rem;
+    justify-content: flex-end;
+}
+
+/* The small connector ring */
+.step-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 4px solid #0891b2;
+    background: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px rgba(8,145,178,0.2);
+}
+
+/* STEP 01 text block */
+.step-number {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.step-word {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary, #94a3b8);
+    text-transform: uppercase;
+}
+
+.step-digit {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #0891b2;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+/* ---- Dotted S-curve connector ---- */
+.step-curve {
+    width: 80px;
+    height: 60px;
+    margin: -6px auto;
+    position: relative;
+    z-index: 3;
+}
+
+.step-curve--right {
+    margin-left: calc(72% - 10px);  /* aligns with the right icon protrusion */
+    border-right: 3px dashed #0891b2;
+    border-bottom: 3px dashed #0891b2;
+    border-bottom-right-radius: 50px;
+    border-top: none;
+    border-left: none;
+}
+
+.step-curve--left {
+    margin-right: calc(72% - 10px);
+    margin-left: 0;
+    border-left: 3px dashed #0891b2;
+    border-bottom: 3px dashed #0891b2;
+    border-bottom-left-radius: 50px;
+    border-top: none;
+    border-right: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 767.98px) {
+    .step-row, .step-row--flip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .step-pill-wrap, .step-num-wrap {
+        flex: unset;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .step-pill {
+        border-radius: 20px;
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .step-pill__icon,
+    .step-row--flip .step-pill__icon {
+        margin: 0 auto 1rem;
+        order: 0;
+    }
+
+    .step-pill__text {
+        padding-right: 0;
+    }
+
+    .step-num-wrap,
+    .step-row--flip .step-num-wrap {
+        padding: 0.5rem 0;
+        justify-content: flex-start;
+    }
+
+    .step-curve {
+        display: none;
+    }
+}
+
+.zigzag-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    position: relative;
+    padding: 1rem 1rem;
+}
+
+.zigzag-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.zigzag-card {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 100px;
+    padding: 4px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 10;
+}
+
+.zigzag-item:nth-child(even) .zigzag-card {
+    flex-direction: row-reverse;
+}
+
+/* The circular icon container */
+.zigzag-circle {
+    width: 90px;
+    height: 90px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #1a1a1a;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 11;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* The thick connecting path */
+.zigzag-path {
+    position: absolute;
+    width: calc(100% - 130px); /* Extends from center of one circle to center of next */
+    height: calc(100% + 3rem); /* Reaches exactly the center of the next item */
+    top: 50%;
+    z-index: 1;
+}
+
+.zigzag-item:nth-child(odd) .zigzag-path {
+    left: 65px;
+    border-top: 15px solid var(--secondary);
+    border-right: 15px solid var(--secondary);
+    border-bottom: 15px solid var(--secondary);
+    border-top-right-radius: 80px;
+    border-bottom-right-radius: 80px;
+}
+
+.zigzag-item:nth-child(even) .zigzag-path {
+    right: 65px;
+    border-top: 15px solid var(--secondary);
+    border-left: 15px solid var(--secondary);
+    border-bottom: 15px solid var(--secondary);
+    border-top-left-radius: 80px;
+    border-bottom-left-radius: 80px;
+}
+
+.zigzag-item:last-child .zigzag-path {
+    display: none;
+}
+
+/* Content styling */
+.zigzag-content {
+    flex-grow: 1;
+    padding: 1.5rem 3rem;
+}
+
+.zigzag-item:nth-child(odd) .zigzag-content {
+    padding-left: 1.5rem;
+}
+
+.zigzag-item:nth-child(even) .zigzag-content {
+    padding-right: 1.5rem;
+    text-align: right;
+}
+
+.zigzag-step-label {
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--secondary);
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.zigzag-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+}
+
+.zigzag-description {
+    font-size: 1.05rem;
+    color: #555555;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Decorative triangles (peaks) */
+.zigzag-peaks {
+    position: absolute;
+    display: flex;
+    gap: 8px;
+    z-index: 12;
+}
+
+.zigzag-item:nth-child(odd) .zigzag-peaks {
+    bottom: -15px;
+    left: 40%;
+}
+
+.zigzag-item:nth-child(even) .zigzag-peaks {
+    top: -15px;
+    right: 40%;
+    transform: rotate(180deg);
+}
+
+.peak {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid var(--secondary);
+}
+
+@media (max-width: 991.98px) {
+    .zigzag-card, .zigzag-item:nth-child(even) .zigzag-card {
+        flex-direction: column;
+        text-align: center;
+        border-radius: 30px;
+        padding: 2rem;
+    }
+    
+    .zigzag-path {
+        display: none;
+    }
+    
+    .zigzag-content, .zigzag-item:nth-child(even) .zigzag-content {
+        padding: 2rem 0 0 0;
+        text-align: center;
+    }
+    
+    .zigzag-circle {
+        margin: 0 auto;
+    }
+}
+
