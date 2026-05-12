@@ -3,7 +3,7 @@
 {% block content %}
 <div class="page-shell">
     <section class="page-hero">
-        <div class="row g-4 align-items-center">
+        <div class="row g-4 align-items-stretch">
             <div class="col-xl-7">
                 <span class="page-hero__eyebrow">University Recruitment Hub</span>
                 <h1 class="page-hero__title">A sharper, more modern hiring experience for UMaT.</h1>
@@ -44,8 +44,12 @@
             </div>
 
             <div class="col-xl-5">
-                <div class="hero-image-container">
-                    <img src="{{ url_for('static', filename='homeright.jpg') }}" alt="Recruitment Team" class="hero-image">
+                <div class="hero-image-container h-100">
+                    <img 
+                        src="{{ url_for('static', filename='homeright.jpg') }}" 
+                        alt="Recruitment Team" 
+                        class="hero-image"
+                    >
                     <div class="hero-image-overlay"></div>
                 </div>
             </div>
@@ -63,28 +67,28 @@
             <article class="feature-card">
                 <div class="feature-card__body">
                     <span class="feature-card__icon"><i class="bi bi-file-earmark-text"></i></span>
-                    <h3 class="h5">Resume Analysis</h3>
+                    <h3 class="h5 text-white">Resume Analysis</h3>
                     <p class="text-secondary mb-0">AI-assisted parsing, skill extraction, completeness feedback, and job relevance scoring.</p>
                 </div>
             </article>
             <article class="feature-card">
                 <div class="feature-card__body">
                     <span class="feature-card__icon"><i class="bi bi-diagram-3"></i></span>
-                    <h3 class="h5">Application Tracking</h3>
+                    <h3 class="h5 text-white">Application Tracking</h3>
                     <p class="text-secondary mb-0">Follow every application through submission, review, interview scheduling, and outcome.</p>
                 </div>
             </article>
             <article class="feature-card">
                 <div class="feature-card__body">
                     <span class="feature-card__icon"><i class="bi bi-camera-video"></i></span>
-                    <h3 class="h5">Interview Readiness</h3>
+                    <h3 class="h5 text-white">Interview Readiness</h3>
                     <p class="text-secondary mb-0">Stay aligned on interview timing, venue links, level progression, and next steps.</p>
                 </div>
             </article>
             <article class="feature-card">
                 <div class="feature-card__body">
                     <span class="feature-card__icon"><i class="bi bi-bar-chart-line"></i></span>
-                    <h3 class="h5">Recruitment Analytics</h3>
+                    <h3 class="h5 text-white">Recruitment Analytics</h3>
                     <p class="text-secondary mb-0">Administrative metrics, pipeline visibility, and cleaner hiring operations for the team.</p>
                 </div>
             </article>
