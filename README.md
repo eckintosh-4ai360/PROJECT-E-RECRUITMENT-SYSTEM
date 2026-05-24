@@ -1,18 +1,49 @@
+README.md
+
+# UMaT Job Portal
+
 # UMaT E-Recruitment System
 
+A web-based career platform and e-recruitment system for the University of Mines and Technology (UMaT), featuring an AI-powered resume analysis module to intelligently match candidates with suitable job opportunities.
 A Flask-based recruitment platform for the University of Mines and Technology (UMaT) that supports candidate applications, resume analysis, interview tracking, recruitment analytics, and role-based AI assistance for candidates, administrators, and portal visitors.
+
+## Features
+
+- **Role-based Authentication:** Secure access for Candidates and Administrators.
+- **AI-Powered Resume Analysis:** Utilizes Groq AI (Llama 3) for fast and accurate resume parsing, skill extraction, and completeness feedback.
+- **Semantic Job Matching:** Intelligent scoring system that aligns candidate skills and experiences with open job requirements.
+- **Application Tracking:** Comprehensive pipeline to manage applications from submission through review, interview scheduling, and final outcome.
+- **Admin Dashboard:** Recruitment analytics and metrics for streamlined hiring operations.
+- **Candidate Profiles:** Personalized portals for users to manage their resumes, view matched jobs, and track applications.
 
 ## Overview
 
-This project brings the main recruitment workflow into one web application:
+## Built With
+
+- **Backend:** Python, Flask
+- **Database:** SQLite (via Flask-SQLAlchemy)
+- **Frontend:** HTML5, CSS3, Bootstrap 5, Jinja2
+- **AI/NLP:** Groq API (Llama-3.3-70b-versatile), spaCy, NLTK
+- **Document Parsing:** pdfminer.six, python-docx
+  This project brings the main recruitment workflow into one web application:
+
+## Screenshots
 
 - candidates can create profiles, upload resumes, discover jobs, apply, and track progress
 - administrators can manage jobs, review applications, schedule interviews, and monitor hiring activity
 - AI features help explain resume quality, job fit, cover letters, interview preparation, candidate comparisons, and portal FAQs
 
+![Homepage Overview](screenshots/home.JPG)
+_(Placeholder: Add your homepage screenshot here)_
+
 ## What The System Can Do
 
 ### Candidate experience
+
+![Resume Analysis](screenshots/user%20profile.JPG)
+![Resume Analysis](screenshots/resume%20coach.JPG)
+![Resume Analysis](screenshots/resume%20analysis.JPG)
+_(Placeholder: Add your admin dashboard screenshot here)_
 
 - register and sign in as a candidate
 - upload one or more resumes
@@ -25,6 +56,11 @@ This project brings the main recruitment workflow into one web application:
 
 ### Admin experience
 
+![Admin Dashboard](screenshots/admin%20dashboard.JPG)
+![Admin Dashboard](screenshots/admin%20dashboard2.JPG)
+
+_(Placeholder: Add your resume analysis screenshot here)_
+
 - create, edit, close, and delete job postings
 - manage university events
 - review all submitted applications
@@ -32,6 +68,8 @@ This project brings the main recruitment workflow into one web application:
 - update candidate status with feedback
 - view dashboard analytics for users, jobs, resumes, applications, and pipeline flow
 - use an Admin Recruitment Copilot for applicant summaries, candidate comparison, feedback drafting, shortlist reasoning, and interview prep notes
+
+## Installation
 
 ### Public portal support
 
@@ -82,20 +120,27 @@ The current AI layer is built around the app's real data rather than free-form c
 ### 1. Clone the repository
 
 ```bash
+# Clone the repository
 git clone https://github.com/eckintosh-4ai360/PROJECT-E-RECRUITMENT-SYSTEM.git
+
+# Navigate into the project directory
 cd PROJECT-E-RECRUITMENT-SYSTEM
 ```
 
 ### 2. Create and activate a virtual environment
 
+# Create and activate a virtual environment
+
 ```bash
 python -m venv .venv
+# On Windows:
 ```
 
 On Windows:
 
 ```bash
 .venv\Scripts\activate
+# On macOS/Linux:
 ```
 
 On macOS/Linux:
@@ -106,13 +151,23 @@ source .venv/bin/activate
 
 ### 3. Install dependencies
 
+# Install required dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
+# Create an environment file for secrets
+
+# Add your GROQ_API_KEY to this file
+
+echo "GROQ_API_KEY=your_api_key_here" > .env
+
 ### 4. Create a `.env` file
 
 At minimum, add your Groq API key:
+
+# Run the application (this will auto-create the database and tables)
 
 ```env
 SECRET_KEY=change-this-in-production
@@ -187,6 +242,11 @@ Uploaded files are stored locally:
 - the AI layer works best when resumes are parsed cleanly and jobs have clear skill requirements
 
 ## Future Improvements
+
+- **Real-time Notifications:** Email and in-app alerts for application status updates.
+- **Advanced Admin Reporting:** Deeper analytics, custom report generation, and data export capabilities.
+- **Mobile App Integration:** Companion mobile application for candidates to apply on the go.
+- **Cloud Storage Integration:** Move resume file storage to AWS S3 or Cloudinary for better scalability.
 
 - richer audit and reporting exports
 - stronger applicant scoring explainability in the admin interface
