@@ -107,6 +107,54 @@
                     </div>
                 {% endif %}
             </article>
+
+            <article class="card surface-card--padded mt-4">
+                <div
+                    class="assistant-widget assistant-widget--compact"
+                    data-assistant-widget
+                    data-assistant-endpoint="{{ url_for('assistant.portal_assistant') }}"
+                    data-assistant-mode="support"
+                >
+                    <div class="assistant-widget__header">
+                        <div>
+                            <span class="assistant-widget__eyebrow"><i class="bi bi-life-preserver"></i>Portal Support</span>
+                            <h2 class="assistant-widget__title">Questions about this event?</h2>
+                            <p class="assistant-widget__subtitle">Ask about the information shown here or how to find related opportunities and next steps in the portal.</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" value="event_detail" data-assistant-field="page_context">
+                    <input type="hidden" value="{{ event.event_id }}" data-assistant-field="event_id">
+
+                    <div class="assistant-widget__chips">
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="Summarize this event for me.">Summarize this event</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="What key details should I note from this event page?">Key details</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="How can I explore jobs or other events from here?">Related portal steps</button>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Your question</label>
+                        <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask a support question about this event or the portal."></textarea>
+                    </div>
+
+                    <div class="assistant-widget__actions">
+                        <button type="button" class="btn btn-primary" data-assistant-submit>
+                            <i class="bi bi-stars me-1"></i>Ask Portal Support
+                        </button>
+                        <span class="assistant-widget__status" data-assistant-status></span>
+                    </div>
+
+                    <div class="assistant-widget__response" data-assistant-response>
+                        <div class="assistant-widget__response-meta">
+                            <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                            <div class="assistant-widget__secondary-actions">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                            </div>
+                        </div>
+                        <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                    </div>
+                </div>
+            </article>
         </div>
     </div>
 </div>

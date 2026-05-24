@@ -98,12 +98,12 @@
                     </div>
                     <div class="step-dot"></div>
                 </div>
-                <div class="step-pill-wrap">
+                <div class="step-pill-wrap " >
                     <div class="step-pill step-pill--2">
                         <div class="step-pill__icon">
                             <i class="bi bi-diagram-3"></i>
                         </div>
-                        <div class="step-pill__text">
+                        <div class="step-pill__text px-3">
                             <span class="step-pill__label">Option B</span>
                             <h3 class="step-pill__title">Application Tracking</h3>
                             <p class="step-pill__desc">Follow every application through submission, review, interview scheduling, and outcome.</p>
@@ -116,7 +116,7 @@
 
             <!-- STEP 3 - pill LEFT, number RIGHT -->
             <div class="step-row">
-                <div class="step-pill-wrap">
+                <div class="step-pill-wrap mt-4">
                     <div class="step-pill step-pill--3">
                         <div class="step-pill__text">
                             <span class="step-pill__label">Option C</span>
@@ -153,7 +153,7 @@
                         <div class="step-pill__icon">
                             <i class="bi bi-bar-chart-line"></i>
                         </div>
-                        <div class="step-pill__text">
+                        <div class="step-pill__text px-3">
                             <span class="step-pill__label">Option D</span>
                             <h3 class="step-pill__title">Recruitment Analytics</h3>
                             <p class="step-pill__desc">Administrative metrics, pipeline visibility, and cleaner hiring operations for the team.</p>
@@ -162,6 +162,54 @@
                 </div>
             </div>
 
+    </section>
+
+    <section class="surface-card--padded mb-4">
+        <div
+            class="assistant-widget"
+            data-assistant-widget
+            data-assistant-endpoint="{{ url_for('assistant.portal_assistant') }}"
+            data-assistant-mode="support"
+        >
+            <div class="assistant-widget__header">
+                <div>
+                    <span class="assistant-widget__eyebrow"><i class="bi bi-life-preserver"></i>Portal Support</span>
+                    <h2 class="assistant-widget__title">Need help using the recruitment portal?</h2>
+                    <p class="assistant-widget__subtitle">Ask about application steps, required documents, interview stages, jobs, or upcoming events.</p>
+                </div>
+            </div>
+
+            <input type="hidden" value="home" data-assistant-field="page_context">
+
+            <div class="assistant-widget__chips">
+                <button type="button" class="assistant-chip" data-assistant-suggestion="How do I apply for a job on this portal?">How to apply</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="What documents do I need before I can apply?">Required documents</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="Explain the interview process shown in this portal.">Interview process</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="What upcoming events should I pay attention to?">Upcoming events</button>
+            </div>
+
+            <div>
+                <label class="form-label">Your question</label>
+                <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask anything about the UMaT recruitment portal."></textarea>
+            </div>
+
+            <div class="assistant-widget__actions">
+                <button type="button" class="btn btn-primary" data-assistant-submit>
+                    <i class="bi bi-stars me-1"></i>Ask Portal Support
+                </button>
+                <span class="assistant-widget__status" data-assistant-status></span>
+            </div>
+
+            <div class="assistant-widget__response" data-assistant-response>
+                <div class="assistant-widget__response-meta">
+                    <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                    <div class="assistant-widget__secondary-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                    </div>
+                </div>
+                <p class="assistant-widget__content mb-0" data-assistant-output></p>
+            </div>
+        </div>
     </section>
 
 
@@ -206,7 +254,7 @@
                                     {% if event.location %}
                                         <div><i class="bi bi-geo-alt me-2"></i>{{ event.location }}</div>
                                     {% endif %}
-                                    <div><i class="bi bi-tag me-2"></i>{{ event.event_type.title() }}</div>
+                                    <div><i class="bi bi-tag me-2"></i>{{ event.event_typegit .title() }}</div>
                                 </div>
                             </div>
                             <div class="event-card-footer">

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from markupsafe import Markup
 from app import db, login_manager
 from datetime import datetime
-from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus, Event
+from app.models import User, UserRole, Candidate, Resume, Job, JobMatch, Application, Interview, ApplicationStatus, Event, InterviewLevel
 from app.forms import RegistrationForm, LoginForm, ResumeUploadForm, JobForm, ApplicationForm, InterviewForm, ProfileEditForm, EventForm
 from flask_login import login_user, logout_user, current_user, login_required
 from functools import wraps
@@ -553,10 +553,12 @@ def edit_job(job_id):
         try:
             job.title = form.title.data
             job.description = form.description.data
-            job.requirements = form.requirements.data
+            job.required_skills = form.required_skills.data
             job.department = form.department.data
             job.location = form.location.data
             job.salary_range = form.salary_range.data
+            job.status = form.status.data
+            job.closing_date = form.closing_date.data
             
             db.session.commit()
             flash("Job posting updated successfully!", "success")
@@ -813,7 +815,9 @@ def schedule_interview(application_id):
                 scheduled_date=scheduled_datetime,
                 interview_type=form.interview_type.data,
                 location_or_link=form.location_or_link.data,
-                notes=form.notes.data
+                notes=form.notes.data,
+                interview_level=getattr(InterviewLevel, form.interview_level.data),
+                interviewer_id=form.interviewer.data,
             )
             
             # Update application status

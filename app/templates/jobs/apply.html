@@ -32,6 +32,56 @@
         </div>
 
         <div class="col-xl-8">
+            <article class="card surface-card--padded mb-4">
+                <div
+                    class="assistant-widget"
+                    data-assistant-widget
+                    data-assistant-endpoint="{{ url_for('assistant.candidate_assistant') }}"
+                    data-assistant-mode="cover_letter"
+                    data-assistant-external-fields="#resume"
+                    data-assistant-target="#cover_letter"
+                >
+                    <div class="assistant-widget__header">
+                        <div>
+                            <span class="assistant-widget__eyebrow"><i class="bi bi-pen"></i>Candidate AI</span>
+                            <h2 class="assistant-widget__title">Cover Letter Assistant</h2>
+                            <p class="assistant-widget__subtitle">Generate a draft grounded in the selected resume and this role, then drop it straight into the application form.</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" value="{{ job.job_id }}" data-assistant-field="job_id">
+
+                    <div class="assistant-widget__chips">
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="Draft a tailored cover letter for this role.">Draft full letter</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="Write a shorter, confident cover letter for this job.">Shorter version</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="Emphasize my strongest role-relevant skills in this cover letter.">Emphasize my fit</button>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Direction for the assistant</label>
+                        <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask for a full draft, a shorter version, or a specific tone." {% if not form.resume.choices %}disabled{% endif %}></textarea>
+                    </div>
+
+                    <div class="assistant-widget__actions">
+                        <button type="button" class="btn btn-primary" data-assistant-submit {% if not form.resume.choices %}disabled{% endif %}>
+                            <i class="bi bi-stars me-1"></i>Generate Cover Letter
+                        </button>
+                        <span class="assistant-widget__status" data-assistant-status>{% if not form.resume.choices %}Upload a resume first so the assistant can tailor the draft.{% endif %}</span>
+                    </div>
+
+                    <div class="assistant-widget__response" data-assistant-response>
+                        <div class="assistant-widget__response-meta">
+                            <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                            <div class="assistant-widget__secondary-actions">
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-assistant-insert>Use in cover letter field</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                            </div>
+                        </div>
+                        <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                    </div>
+                </div>
+            </article>
+
             <article class="card surface-card--padded">
                 <div class="section-header">
                     <div>
@@ -45,7 +95,7 @@
 
                     <div class="mb-3">
                         <label for="resume" class="form-label">Select Resume</label>
-                        {{ form.resume(class="form-select") }}
+                        {{ form.resume(class="form-select", data_assistant_field="resume_id") }}
                         {% for error in form.resume.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
                         {% endfor %}

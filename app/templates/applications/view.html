@@ -14,8 +14,8 @@
                 </div>
             </div>
             <div class="action-cluster">
-                <a href="{{ url_for('main.my_applications') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Back to My Applications
+                <a href="{{ url_for('admin.all_applications') if current_user.is_admin() else url_for('main.my_applications') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>{{ 'Back to All Applications' if current_user.is_admin() else 'Back to My Applications' }}
                 </a>
             </div>
         </div>
@@ -58,16 +58,18 @@
                                 <div class="job-card__meta mb-3">
                                     <div><i class="bi bi-file-earmark-text me-2"></i>{{ application.cover_letter_file.split('/')[-1] }}</div>
                                 </div>
-                                <div class="action-cluster">
-                                    <a href="{{ url_for('admin.download_cover_letter', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                        <i class="bi bi-download me-1"></i>Download
-                                    </a>
-                                    {% if current_user.is_admin() %}
+                                {% if current_user.is_admin() %}
+                                    <div class="action-cluster">
+                                        <a href="{{ url_for('admin.download_cover_letter', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                            <i class="bi bi-download me-1"></i>Download
+                                        </a>
                                         <a href="{{ url_for('admin.view_cover_letter', application_id=application.application_id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                             <i class="bi bi-eye me-1"></i>View
                                         </a>
-                                    {% endif %}
-                                </div>
+                                    </div>
+                                {% else %}
+                                    <p class="assistant-widget__panel-note mb-0">Uploaded cover letter files are available to administrators during review.</p>
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}
@@ -82,13 +84,15 @@
                                 <div><i class="bi bi-calendar3 me-2"></i>Uploaded {{ application.resume.upload_date.strftime('%B %d, %Y') }}</div>
                             </div>
                             <div class="action-cluster">
-                                <a href="{{ url_for('admin.download_resume', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                    <i class="bi bi-download me-1"></i>Download
-                                </a>
                                 {% if current_user.is_admin() %}
+                                    <a href="{{ url_for('admin.download_resume', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                        <i class="bi bi-download me-1"></i>Download
+                                    </a>
                                     <a href="{{ url_for('admin.view_resume', application_id=application.application_id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-eye me-1"></i>View Resume
                                     </a>
+                                {% else %}
+                                    <span class="assistant-widget__panel-note">Resume file access is shown in the original upload area on your profile.</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -157,6 +161,55 @@
                 </div>
             </article>
 
+            {% if not current_user.is_admin() and application.interview %}
+                <article class="card surface-card--padded">
+                    <div
+                        class="assistant-widget"
+                        data-assistant-widget
+                        data-assistant-endpoint="{{ url_for('assistant.candidate_assistant') }}"
+                        data-assistant-mode="interview_prep"
+                    >
+                        <div class="assistant-widget__header">
+                            <div>
+                                <span class="assistant-widget__eyebrow"><i class="bi bi-camera-video"></i>Candidate AI</span>
+                                <h2 class="assistant-widget__title">Interview Prep Assistant</h2>
+                                <p class="assistant-widget__subtitle">Get likely interview questions, talking points, and ways to handle skill-gap questions using this application and role context.</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" value="{{ application.application_id }}" data-assistant-field="application_id">
+
+                        <div class="assistant-widget__chips">
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="What questions am I most likely to get in this interview?">Likely questions</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="How should I explain my fit for this role in the interview?">Explain my fit</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="How should I answer questions about my skill gaps honestly?">Address gaps</button>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Your question</label>
+                            <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask for questions, talking points, or preparation help."></textarea>
+                        </div>
+
+                        <div class="assistant-widget__actions">
+                            <button type="button" class="btn btn-primary" data-assistant-submit>
+                                <i class="bi bi-stars me-1"></i>Get Interview Prep
+                            </button>
+                            <span class="assistant-widget__status" data-assistant-status></span>
+                        </div>
+
+                        <div class="assistant-widget__response" data-assistant-response>
+                            <div class="assistant-widget__response-meta">
+                                <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                                <div class="assistant-widget__secondary-actions">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                                </div>
+                            </div>
+                            <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                        </div>
+                    </div>
+                </article>
+            {% endif %}
+
             {% if current_user.is_admin() %}
                 <article class="card surface-card--padded">
                     <div class="section-header">
@@ -165,15 +218,63 @@
                             <p class="surface-section__subtitle">Update status, send feedback, and schedule interviews.</p>
                         </div>
                     </div>
+
+                    <div
+                        class="assistant-widget assistant-widget--compact mb-4"
+                        data-assistant-widget
+                        data-assistant-endpoint="{{ url_for('assistant.admin_assistant') }}"
+                        data-assistant-mode="draft_feedback"
+                        data-assistant-external-fields="#status"
+                        data-assistant-target="#feedback"
+                    >
+                        <div class="assistant-widget__header">
+                            <div>
+                                <span class="assistant-widget__eyebrow"><i class="bi bi-stars"></i>Admin AI</span>
+                                <h3 class="assistant-widget__title">Feedback Drafting Assistant</h3>
+                                <p class="assistant-widget__subtitle">Generate candidate-facing feedback grounded in the application, match data, and current target status.</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" value="{{ application.application_id }}" data-assistant-field="application_id">
+
+                        <div class="assistant-widget__chips">
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="Draft respectful feedback for this candidate.">Draft feedback</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="Write concise feedback with clear strengths and gaps.">Concise version</button>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Direction for the assistant</label>
+                            <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Optionally add tone or focus, for example: keep it warm but specific."></textarea>
+                        </div>
+
+                        <div class="assistant-widget__actions">
+                            <button type="button" class="btn btn-primary" data-assistant-submit>
+                                <i class="bi bi-stars me-1"></i>Generate Feedback
+                            </button>
+                            <span class="assistant-widget__status" data-assistant-status></span>
+                        </div>
+
+                        <div class="assistant-widget__response" data-assistant-response>
+                            <div class="assistant-widget__response-meta">
+                                <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                                <div class="assistant-widget__secondary-actions">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-assistant-insert>Use in feedback field</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                                </div>
+                            </div>
+                            <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                        </div>
+                    </div>
+
                     <form method="POST" action="{{ url_for('main.update_application_status', application_id=application.application_id) }}" class="mb-4">
                         <div class="mb-3">
                             <label for="status" class="form-label">Update Status</label>
-                            <select name="status" id="status" class="form-select">
-                                <option value="submitted" {{ 'selected' if application.status == 'submitted' }}>Submitted</option>
-                                <option value="under_review" {{ 'selected' if application.status == 'under_review' }}>Under Review</option>
-                                <option value="interview_scheduled" {{ 'selected' if application.status == 'interview_scheduled' }}>Interview Scheduled</option>
-                                <option value="accepted" {{ 'selected' if application.status == 'accepted' }}>Accepted</option>
-                                <option value="rejected" {{ 'selected' if application.status == 'rejected' }}>Rejected</option>
+                            <select name="status" id="status" class="form-select" data-assistant-field="target_status">
+                                <option value="submitted" {{ 'selected' if application.status.name == 'submitted' }}>Submitted</option>
+                                <option value="under_review" {{ 'selected' if application.status.name == 'under_review' }}>Under Review</option>
+                                <option value="interview_scheduled" {{ 'selected' if application.status.name == 'interview_scheduled' }}>Interview Scheduled</option>
+                                <option value="accepted" {{ 'selected' if application.status.name == 'accepted' }}>Accepted</option>
+                                <option value="rejected" {{ 'selected' if application.status.name == 'rejected' }}>Rejected</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -184,7 +285,61 @@
                         <button type="submit" class="btn btn-primary w-100">Update Status &amp; Send Email</button>
                     </form>
 
-                    {% if application.status in ['submitted', 'under_review'] %}
+                    <div
+                        class="assistant-widget assistant-widget--compact"
+                        data-assistant-widget
+                        data-assistant-endpoint="{{ url_for('assistant.admin_assistant') }}"
+                    >
+                        <div class="assistant-widget__header">
+                            <div>
+                                <span class="assistant-widget__eyebrow"><i class="bi bi-clipboard2-pulse"></i>Admin AI</span>
+                                <h3 class="assistant-widget__title">Shortlist and Interview Copilot</h3>
+                                <p class="assistant-widget__subtitle">Generate shortlist reasons, interview questions, or interviewer prep notes from this application.</p>
+                            </div>
+                        </div>
+
+                        <div class="assistant-widget__fields">
+                            <input type="hidden" value="{{ application.application_id }}" data-assistant-field="application_id">
+                            <div>
+                                <label class="form-label">Action</label>
+                                <select class="form-select" data-assistant-field="mode">
+                                    <option value="shortlist_reasons">Suggest shortlist reasons</option>
+                                    <option value="interview_questions">Generate interview questions</option>
+                                    <option value="interview_notes">Draft interviewer prep notes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="assistant-widget__chips">
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="shortlist_reasons" data-assistant-suggestion="Give me shortlist reasons and the main concerns to validate.">Shortlist reasons</button>
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="interview_questions" data-assistant-suggestion="Generate interview questions that test the candidate's strongest claims.">Interview questions</button>
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="interview_notes" data-assistant-suggestion="Draft structured interviewer notes and a scorecard for this candidate.">Interviewer notes</button>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Optional focus</label>
+                            <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Add any focus area, like research depth, communication, or technical ownership."></textarea>
+                        </div>
+
+                        <div class="assistant-widget__actions">
+                            <button type="button" class="btn btn-outline-primary" data-assistant-submit>
+                                <i class="bi bi-stars me-1"></i>Run Copilot
+                            </button>
+                            <span class="assistant-widget__status" data-assistant-status></span>
+                        </div>
+
+                        <div class="assistant-widget__response" data-assistant-response>
+                            <div class="assistant-widget__response-meta">
+                                <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                                <div class="assistant-widget__secondary-actions">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                                </div>
+                            </div>
+                            <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                        </div>
+                    </div>
+
+                    {% if application.status.name in ['submitted', 'under_review'] %}
                         <a href="{{ url_for('main.schedule_interview', application_id=application.application_id) }}" class="btn btn-outline-primary w-100">
                             <i class="bi bi-calendar-plus me-1"></i>Schedule Interview
                         </a>

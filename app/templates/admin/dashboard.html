@@ -1050,6 +1050,87 @@ footer section:last-child {
         </section>
 
         <section class="row g-4">
+            <div class="col-12">
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div class="panel-heading__copy">
+                            <i class="bi bi-stars"></i>
+                            <div>
+                                <h2>Recruitment Copilot</h2>
+                                <p>Summarize applicants for a role or compare the strongest candidates using live portal data.</p>
+                            </div>
+                        </div>
+                        <span class="panel-tag">Read-only guidance</span>
+                    </div>
+
+                    <div
+                        class="assistant-widget"
+                        data-assistant-widget
+                        data-assistant-endpoint="{{ url_for('assistant.admin_assistant') }}"
+                    >
+                        <div class="assistant-widget__header">
+                            <div>
+                                <span class="assistant-widget__eyebrow"><i class="bi bi-shield-check"></i>Admin AI</span>
+                                <h3 class="assistant-widget__title">Job-level hiring guidance</h3>
+                                <p class="assistant-widget__subtitle">Use this for applicant summaries, comparison notes, and fast screening support. Assistant output is advisory and does not change any records.</p>
+                            </div>
+                        </div>
+
+                        <div class="assistant-widget__fields">
+                            <div>
+                                <label class="form-label">Action</label>
+                                <select class="form-select" data-assistant-field="mode">
+                                    <option value="job_summary">Summarize applicants for this job</option>
+                                    <option value="candidate_compare">Compare top candidates for this job</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Job</label>
+                                <select class="form-select" data-assistant-field="job_id" {% if not active_jobs %}disabled{% endif %}>
+                                    {% if active_jobs %}
+                                        {% for job in active_jobs %}
+                                            <option value="{{ job.job_id }}">{{ job.title }} - {{ job.department }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="">No open jobs available</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="assistant-widget__chips">
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="job_summary" data-assistant-suggestion="Summarize the current applicant pool and highlight the strongest profiles.">Summarize pool</button>
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="candidate_compare" data-assistant-suggestion="Compare the top candidates and flag the main strengths, risks, and interview follow-ups.">Compare top candidates</button>
+                            <button type="button" class="assistant-chip" data-assistant-set-mode="job_summary" data-assistant-suggestion="Focus on the main gaps we should validate in screening.">Screening gaps</button>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Optional focus</label>
+                            <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Add any emphasis, like technical fit, teaching potential, communication, or shortlist readiness." {% if not active_jobs %}disabled{% endif %}></textarea>
+                        </div>
+
+                        <div class="assistant-widget__actions">
+                            <button type="button" class="btn btn-primary" data-assistant-submit {% if not active_jobs %}disabled{% endif %}>
+                                <i class="bi bi-stars me-1"></i>Run Recruitment Copilot
+                            </button>
+                            <span class="assistant-widget__status" data-assistant-status>{% if not active_jobs %}Create or reopen a job first to use the copilot.{% endif %}</span>
+                        </div>
+
+                        <div class="assistant-widget__response" data-assistant-response>
+                            <div class="assistant-widget__response-meta">
+                                <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                                <div class="assistant-widget__secondary-actions">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                                </div>
+                            </div>
+                            <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="row g-4">
             <div class="col-xl-4">
                 <article class="dashboard-panel">
                     <div class="panel-heading">

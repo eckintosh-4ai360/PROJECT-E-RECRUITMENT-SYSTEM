@@ -129,6 +129,54 @@
                     </a>
                 {% endif %}
             </article>
+
+            <article class="card surface-card--padded mt-4">
+                <div
+                    class="assistant-widget assistant-widget--compact"
+                    data-assistant-widget
+                    data-assistant-endpoint="{{ url_for('assistant.portal_assistant') }}"
+                    data-assistant-mode="support"
+                >
+                    <div class="assistant-widget__header">
+                        <div>
+                            <span class="assistant-widget__eyebrow"><i class="bi bi-life-preserver"></i>Portal Support</span>
+                            <h2 class="assistant-widget__title">Questions about this role?</h2>
+                            <p class="assistant-widget__subtitle">Ask about how to apply, what the portal requires, or what is visible on this job posting.</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" value="job_detail" data-assistant-field="page_context">
+                    <input type="hidden" value="{{ job.job_id }}" data-assistant-field="job_id">
+
+                    <div class="assistant-widget__chips">
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="How do I apply for this role through the portal?">How to apply</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="What documents do I need before applying for this role?">Required documents</button>
+                        <button type="button" class="assistant-chip" data-assistant-suggestion="Summarize what this role page is telling me.">Summarize this role page</button>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Your question</label>
+                        <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask a role or portal support question."></textarea>
+                    </div>
+
+                    <div class="assistant-widget__actions">
+                        <button type="button" class="btn btn-primary" data-assistant-submit>
+                            <i class="bi bi-stars me-1"></i>Ask Portal Support
+                        </button>
+                        <span class="assistant-widget__status" data-assistant-status></span>
+                    </div>
+
+                    <div class="assistant-widget__response" data-assistant-response>
+                        <div class="assistant-widget__response-meta">
+                            <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                            <div class="assistant-widget__secondary-actions">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                            </div>
+                        </div>
+                        <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                    </div>
+                </div>
+            </article>
         </div>
     </div>
 </div>

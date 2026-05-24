@@ -200,6 +200,133 @@
         });
     });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const widgets = document.querySelectorAll('[data-assistant-widget]');
+
+        function collectPayload(widget) {
+            const payload = {
+                mode: widget.dataset.assistantMode || ''
+            };
+
+            const inlineFields = widget.querySelectorAll('[data-assistant-field]');
+            inlineFields.forEach(function (field) {
+                const key = field.dataset.assistantField || field.name || field.id;
+                if (!key) return;
+                payload[key] = field.value;
+            });
+
+            const externalSelectors = (widget.dataset.assistantExternalFields || '')
+                .split(',')
+                .map(selector => selector.trim())
+                .filter(Boolean);
+
+            externalSelectors.forEach(function (selector) {
+                const field = document.querySelector(selector);
+                if (!field) return;
+                const key = field.dataset.assistantField || field.name || field.id;
+                if (!key) return;
+                payload[key] = field.value;
+            });
+
+            const input = widget.querySelector('[data-assistant-input]');
+            payload.question = input ? input.value.trim() : '';
+
+            return payload;
+        }
+
+        widgets.forEach(function (widget) {
+            const submitButton = widget.querySelector('[data-assistant-submit]');
+            const statusNode = widget.querySelector('[data-assistant-status]');
+            const responseNode = widget.querySelector('[data-assistant-response]');
+            const outputNode = widget.querySelector('[data-assistant-output]');
+            const sourceNode = widget.querySelector('[data-assistant-source]');
+            const copyButton = widget.querySelector('[data-assistant-copy]');
+            const insertButton = widget.querySelector('[data-assistant-insert]');
+            const input = widget.querySelector('[data-assistant-input]');
+
+            widget.querySelectorAll('[data-assistant-suggestion]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    if (!input) return;
+                    const modeValue = button.dataset.assistantSetMode;
+                    if (modeValue) {
+                        const modeField = widget.querySelector('[data-assistant-field="mode"]');
+                        if (modeField) modeField.value = modeValue;
+                    }
+                    input.value = button.dataset.assistantSuggestion || button.textContent.trim();
+                    input.focus();
+                });
+            });
+
+            if (copyButton) {
+                copyButton.addEventListener('click', async function () {
+                    if (!outputNode || !outputNode.textContent.trim()) return;
+                    try {
+                        await navigator.clipboard.writeText(outputNode.textContent.trim());
+                        copyButton.textContent = 'Copied';
+                        window.setTimeout(function () {
+                            copyButton.textContent = 'Copy response';
+                        }, 1400);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            if (insertButton) {
+                insertButton.addEventListener('click', function () {
+                    const targetSelector = widget.dataset.assistantTarget;
+                    const target = targetSelector ? document.querySelector(targetSelector) : null;
+                    if (!target || !outputNode) return;
+                    target.value = outputNode.textContent.trim();
+                    target.focus();
+                });
+            }
+
+            if (!submitButton) return;
+
+            submitButton.addEventListener('click', async function () {
+                const endpoint = widget.dataset.assistantEndpoint;
+                if (!endpoint) return;
+
+                const payload = collectPayload(widget);
+                if (!payload.mode) {
+                    if (statusNode) statusNode.textContent = 'Assistant mode is missing.';
+                    return;
+                }
+
+                submitButton.disabled = true;
+                if (statusNode) statusNode.textContent = 'Thinking...';
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok || !result.ok) {
+                        throw new Error(result.error || 'The assistant could not complete that request.');
+                    }
+
+                    if (outputNode) outputNode.textContent = result.response || '';
+                    if (sourceNode) sourceNode.textContent = result.source === 'groq' ? 'Live assistant response' : 'Fallback assistant response';
+                    if (responseNode) responseNode.classList.add('is-visible');
+                    if (statusNode) statusNode.textContent = 'Ready';
+                } catch (error) {
+                    console.error(error);
+                    if (statusNode) statusNode.textContent = error.message || 'Something went wrong.';
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
+        });
+    });
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>

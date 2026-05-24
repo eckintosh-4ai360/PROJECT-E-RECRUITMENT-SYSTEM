@@ -8,11 +8,12 @@ from app.utils import show_pdf
 import logging
 
 admin = Blueprint('admin', __name__)
+logger = logging.getLogger(__name__)
 
 @admin.route('/users')
 @login_required
 def list_users():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.index'))
     
@@ -22,7 +23,7 @@ def list_users():
 @admin.route('/active-jobs')
 @login_required
 def active_jobs():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.index'))
     
@@ -32,7 +33,7 @@ def active_jobs():
 @admin.route('/applications')
 @login_required
 def all_applications():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.index'))
     
@@ -74,7 +75,7 @@ def all_applications():
 @admin.route('/view_resume/<int:application_id>')
 @login_required
 def view_resume(application_id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.index'))
         
@@ -102,7 +103,7 @@ def view_resume(application_id):
 @admin.route('/download_resume/<int:application_id>')
 @login_required
 def download_resume(application_id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.index'))
         

@@ -130,6 +130,15 @@ class Job(db.Model):
     applications = db.relationship("Application", backref="job", lazy=True)
     matches = db.relationship("JobMatch", backref="job", lazy=True)
 
+    @property
+    def requirements(self):
+        """Backward-compatible alias used by older routes/templates."""
+        return self.required_skills
+
+    @requirements.setter
+    def requirements(self, value):
+        self.required_skills = value
+
     def __repr__(self):
         return f"<Job {self.job_id}: {self.title}>"
 
@@ -232,6 +241,29 @@ class Interview(db.Model):
     def current_level_display(self):
         """Get a display string for the current level and status"""
         return f"{self.interview_level.value} Level - {self.level_status.value}"
+
+class AssistantInteraction(db.Model):
+    __tablename__ = "assistant_interactions"
+
+    interaction_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    scope = db.Column(db.String(100), nullable=False)
+    prompt = db.Column(db.Text, nullable=False)
+    response = db.Column(db.Text, nullable=False)
+    mode = db.Column(db.String(100), nullable=False)
+    metadata_json = db.Column(db.Text)
+    resume_id = db.Column(db.Integer, db.ForeignKey("resumes.resume_id"), nullable=True)
+    job_id = db.Column(db.Integer, db.ForeignKey("jobs.job_id"), nullable=True)
+    application_id = db.Column(db.Integer, db.ForeignKey("applications.application_id"), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="assistant_interactions", lazy=True)
+    resume = db.relationship("Resume", backref="assistant_interactions", lazy=True)
+    job = db.relationship("Job", backref="assistant_interactions", lazy=True)
+    application = db.relationship("Application", backref="assistant_interactions", lazy=True)
+
+    def __repr__(self):
+        return f"<AssistantInteraction {self.interaction_id} {self.scope}:{self.mode}>"
 
 class Event(db.Model):
     __tablename__ = "events"

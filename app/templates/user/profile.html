@@ -185,5 +185,75 @@
             </article>
         </div>
     </div>
+
+    <section class="card surface-card--padded mt-4">
+        <div class="section-header">
+            <div>
+                <h2 class="surface-section__title">Candidate Resume Coach</h2>
+                <p class="surface-section__subtitle">Ask for resume improvements, match guidance, or career-positioning help using the analysis already generated in your workspace.</p>
+            </div>
+        </div>
+
+        <div
+            class="assistant-widget"
+            data-assistant-widget
+            data-assistant-endpoint="{{ url_for('assistant.candidate_assistant') }}"
+            data-assistant-mode="resume_coach"
+        >
+            <div class="assistant-widget__header">
+                <div>
+                    <span class="assistant-widget__eyebrow"><i class="bi bi-stars"></i>Candidate AI</span>
+                    <h3 class="assistant-widget__title">Get guidance from your resume data</h3>
+                    <p class="assistant-widget__subtitle">Pick a resume and ask about fit, missing sections, stronger wording, or what to improve next.</p>
+                </div>
+            </div>
+
+            <div class="assistant-widget__fields">
+                <div>
+                    <label class="form-label">Resume</label>
+                    <select class="form-select" data-assistant-field="resume_id" {% if not resumes %}disabled{% endif %}>
+                        {% if resumes %}
+                            {% for resume in resumes %}
+                                <option value="{{ resume.resume_id }}" {% if resume.is_primary %}selected{% endif %}>
+                                    {{ resume.original_filename }}{% if resume.is_primary %} - Primary{% endif %}
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">Upload a resume first</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="assistant-widget__chips">
+                <button type="button" class="assistant-chip" data-assistant-suggestion="What should I improve first in this resume?">Improve first</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="What kinds of roles does this resume fit best?">Best-fit roles</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="What skills or sections are missing from this resume?">Missing gaps</button>
+                <button type="button" class="assistant-chip" data-assistant-suggestion="Give me stronger wording ideas for this resume.">Stronger wording</button>
+            </div>
+
+            <div>
+                <label class="form-label">Your question</label>
+                <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask for resume advice grounded in the file you selected." {% if not resumes %}disabled{% endif %}></textarea>
+            </div>
+
+            <div class="assistant-widget__actions">
+                <button type="button" class="btn btn-primary" data-assistant-submit {% if not resumes %}disabled{% endif %}>
+                    <i class="bi bi-stars me-1"></i>Ask Resume Coach
+                </button>
+                <span class="assistant-widget__status" data-assistant-status>{% if not resumes %}Upload a resume to unlock the coach.{% endif %}</span>
+            </div>
+
+            <div class="assistant-widget__response" data-assistant-response>
+                <div class="assistant-widget__response-meta">
+                    <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                    <div class="assistant-widget__secondary-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                    </div>
+                </div>
+                <p class="assistant-widget__content mb-0" data-assistant-output></p>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

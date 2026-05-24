@@ -140,6 +140,74 @@
             </div>
             {% endif %}
 
+            <div class="analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-stars"></i>Resume Coach
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div
+                        class="assistant-widget assistant-widget--compact"
+                        data-assistant-widget
+                        data-assistant-endpoint="{{ url_for('assistant.candidate_assistant') }}"
+                        data-assistant-mode="resume_coach"
+                    >
+                        <div class="assistant-widget__header">
+                            <div>
+                                <span class="assistant-widget__eyebrow"><i class="bi bi-person-workspace"></i>Candidate AI</span>
+                                <h3 class="assistant-widget__title">Ask about fit, gaps, or next steps</h3>
+                                <p class="assistant-widget__subtitle">This coach uses your resume text, analysis, and match results from this page.</p>
+                            </div>
+                        </div>
+
+                        <div class="assistant-widget__fields">
+                            <input type="hidden" value="{{ resume.resume_id }}" data-assistant-field="resume_id">
+                            {% if matched_jobs %}
+                                <div>
+                                    <label class="form-label">Focus Job</label>
+                                    <select class="form-select" data-assistant-field="job_id">
+                                        <option value="">General advice</option>
+                                        {% for match in matched_jobs[:8] %}
+                                            <option value="{{ match.job.job_id }}">{{ match.job.title }} ({{ "%.0f"|format(match.match_score * 100) }}%)</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="assistant-widget__chips">
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="What are the biggest improvements I should make to this resume first?">Top improvements</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="Why would this resume be a weak match for the selected job?">Why weak match?</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="Which jobs fit me best and why?">Best-fit jobs</button>
+                            <button type="button" class="assistant-chip" data-assistant-suggestion="How can I improve my match score for the selected role?">Improve my score</button>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Your question</label>
+                            <textarea class="form-control assistant-widget__textarea" data-assistant-input placeholder="Ask something specific about your resume, match quality, missing sections, or next steps."></textarea>
+                        </div>
+
+                        <div class="assistant-widget__actions">
+                            <button type="button" class="btn btn-primary" data-assistant-submit>
+                                <i class="bi bi-stars me-1"></i>Ask Resume Coach
+                            </button>
+                            <span class="assistant-widget__status" data-assistant-status></span>
+                        </div>
+
+                        <div class="assistant-widget__response" data-assistant-response>
+                            <div class="assistant-widget__response-meta">
+                                <span class="assistant-widget__badge" data-assistant-source>Assistant response</span>
+                                <div class="assistant-widget__secondary-actions">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-assistant-copy>Copy response</button>
+                                </div>
+                            </div>
+                            <p class="assistant-widget__content mb-0" data-assistant-output></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Experience Level -->
             {% if analysis and analysis.experience %}
             <div class="analysis-card mb-4">
