@@ -917,6 +917,428 @@ footer section:last-child {
         border: 0;
     }
 }
+
+/* Light dashboard overrides */
+:root {
+    --dashboard-bg: #f4f8fc;
+    --dashboard-surface: rgba(255, 255, 255, 0.98);
+    --dashboard-surface-strong: #ffffff;
+    --dashboard-surface-soft: #f6f9fc;
+    --dashboard-border: rgba(15, 23, 42, 0.08);
+    --dashboard-text: #152235;
+    --dashboard-muted: #617186;
+    --dashboard-grid: rgba(148, 163, 184, 0.1);
+    --dashboard-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+    --tone-cyan: #0ea5e9;
+    --tone-blue: #2563eb;
+    --tone-emerald: #10b981;
+    --tone-teal: #0f766e;
+    --tone-violet: #7c3aed;
+    --tone-indigo: #4f46e5;
+    --tone-amber: #d97706;
+    --tone-orange: #ea580c;
+    --tone-rose: #e11d48;
+    --tone-crimson: #dc2626;
+}
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 24%),
+        radial-gradient(circle at 88% 14%, rgba(37, 99, 235, 0.1), transparent 20%),
+        linear-gradient(180deg, #f7fbff 0%, #eef4fa 54%, #f5f8fc 100%);
+    color: var(--dashboard-text);
+}
+
+body::before {
+    opacity: 0.32;
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07) !important;
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand,
+.navbar .navbar-toggler {
+    color: #1e3350 !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #0f62c9 !important;
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.navbar .navbar-toggler {
+    border-color: rgba(15, 23, 42, 0.12);
+}
+
+.navbar .navbar-toggler-icon {
+    filter: none;
+}
+
+#umatTitle {
+    color: #10243d;
+}
+
+footer {
+    background-color: transparent !important;
+}
+
+footer section:first-child {
+    background: linear-gradient(135deg, #eef8ff, #e7f5f2) !important;
+    color: #17304c;
+}
+
+footer section:last-child {
+    background: #f3f7fb !important;
+    color: var(--dashboard-muted);
+}
+
+.alert {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--dashboard-text);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.btn-close {
+    filter: none;
+}
+
+.dashboard-hero {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 253, 0.96)),
+        linear-gradient(120deg, rgba(15, 118, 110, 0.05), rgba(37, 99, 235, 0.05));
+}
+
+.dashboard-hero::before {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.16), transparent 70%);
+}
+
+.dashboard-hero::after {
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%);
+}
+
+.dashboard-eyebrow {
+    background: rgba(15, 118, 110, 0.1);
+    border: 1px solid rgba(15, 118, 110, 0.14);
+    color: #0f766e;
+}
+
+.dashboard-eyebrow::before {
+    background: linear-gradient(135deg, var(--tone-teal), var(--tone-blue));
+    box-shadow: none;
+}
+
+.dashboard-hero p,
+.panel-heading p,
+.dashboard-stat__footer,
+.panel-mini-stat span,
+.panel-mini-stat small,
+.legend-row small,
+.pipeline-row small,
+.role-row small,
+.candidate-email,
+.job-meta {
+    color: var(--dashboard-muted);
+}
+
+.dashboard-meta-pill {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    color: #24364e;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+}
+
+.dashboard-meta-pill strong {
+    color: #0f62c9;
+}
+
+.dashboard-meta-pill i,
+.panel-heading__copy i,
+.role-row__index {
+    color: var(--tone-blue);
+}
+
+.hero-action {
+    color: #17304c;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+
+.hero-action:hover {
+    color: #0f62c9;
+    border-color: rgba(37, 99, 235, 0.18);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
+}
+
+.hero-action i {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--tone-blue);
+}
+
+.dashboard-stat,
+.dashboard-panel {
+    background: linear-gradient(180deg, #ffffff 0%, #f7fafd 100%);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: var(--dashboard-shadow);
+}
+
+.dashboard-stat:hover {
+    border-color: rgba(37, 99, 235, 0.16);
+    box-shadow: 0 24px 44px rgba(15, 23, 42, 0.12);
+}
+
+.dashboard-stat__label {
+    color: #718197;
+}
+
+.dashboard-stat__link {
+    background: #f7fafd;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    color: #17304c;
+}
+
+.tone-cyan .dashboard-stat__icon { background: rgba(14, 165, 233, 0.12); }
+.tone-emerald .dashboard-stat__icon { background: rgba(16, 185, 129, 0.12); }
+.tone-violet .dashboard-stat__icon { background: rgba(124, 58, 237, 0.12); }
+.tone-amber .dashboard-stat__icon { background: rgba(217, 119, 6, 0.12); }
+
+.dashboard-panel::before {
+    background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(15, 118, 110, 0.05), transparent 24%);
+}
+
+.panel-tag,
+.dashboard-pagination a,
+.dashboard-pagination span,
+.score-pill,
+.role-chip {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.08);
+    color: #304357;
+}
+
+.dashboard-empty {
+    background: #f8fbff;
+    border: 1px dashed rgba(37, 99, 235, 0.16);
+}
+
+.dashboard-empty i {
+    color: var(--tone-blue);
+}
+
+.legend-row,
+.pipeline-row,
+.role-row,
+.panel-mini-stat {
+    background: #f8fbff;
+    border-color: rgba(15, 23, 42, 0.06);
+}
+
+.legend-row strong,
+.pipeline-row strong,
+.candidate-name,
+.role-row__title {
+    color: #10243d;
+}
+
+.panel-stat-grid {
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-table-wrap {
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-table {
+    color: var(--dashboard-text);
+}
+
+.dashboard-table thead th {
+    background: #f5f8fc;
+    color: #65768b;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-table tbody tr:hover {
+    background: #f3f7fc;
+}
+
+.dashboard-table td {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.candidate-avatar {
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.candidate-placeholder {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(79, 70, 229, 0.15));
+    color: #17304c;
+}
+
+.status-pill--accepted {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.16);
+}
+
+.status-pill--review {
+    background: rgba(217, 119, 6, 0.12);
+    color: #b45309;
+    border-color: rgba(217, 119, 6, 0.16);
+}
+
+.status-pill--submitted {
+    background: rgba(37, 99, 235, 0.1);
+    color: #1d4ed8;
+    border-color: rgba(37, 99, 235, 0.14);
+}
+
+.status-pill--rejected {
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
+    border-color: rgba(220, 38, 38, 0.14);
+}
+
+.status-pill--other {
+    background: rgba(124, 58, 237, 0.1);
+    color: #6d28d9;
+    border-color: rgba(124, 58, 237, 0.14);
+}
+
+.score-track {
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-pagination a:hover,
+.dashboard-pagination a.is-active {
+    background: linear-gradient(135deg, var(--tone-teal), var(--tone-blue));
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.dashboard-pagination .ellipsis {
+    background: transparent;
+    border-color: transparent;
+    color: var(--dashboard-muted);
+}
+
+.role-row__index {
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.panel-link {
+    color: #0f62c9;
+}
+
+.panel-link:hover {
+    color: #0a4a9c;
+}
+
+.dashboard-panel .assistant-widget {
+    background: linear-gradient(180deg, #ffffff, #f7fafd);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-panel .assistant-widget__subtitle,
+.dashboard-panel .assistant-widget__status,
+.dashboard-panel .assistant-widget__panel-note,
+.dashboard-panel .assistant-widget__content {
+    color: #516176;
+}
+
+.dashboard-panel .assistant-widget__response {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-panel .assistant-chip {
+    background: rgba(37, 99, 235, 0.05);
+    border-color: rgba(37, 99, 235, 0.14);
+    color: #1d4ed8;
+}
+
+.dashboard-panel .assistant-widget__eyebrow {
+    background: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-shell {
+        gap: 1.25rem;
+    }
+
+    .dashboard-hero {
+        padding: 1.5rem;
+        border-radius: 24px;
+    }
+
+    .dashboard-hero__actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .candidate-cell {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-hero,
+    .dashboard-stat,
+    .dashboard-panel {
+        padding: 1.25rem;
+    }
+
+    .dashboard-meta,
+    .panel-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .legend-row,
+    .pipeline-row,
+    .role-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-table-wrap {
+        background: transparent;
+        border: 0;
+    }
+
+    .dashboard-table tbody tr {
+        margin-bottom: 0.9rem;
+        padding: 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .dashboard-table td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.35rem;
+        color: var(--dashboard-muted);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+}
 {% endblock %}
 
 {% block content %}
@@ -933,7 +1355,7 @@ footer section:last-child {
                         <h1>Admin Dashboard</h1>
                         <p>
                             A sharper, corporate view of your hiring pipeline with live recruitment metrics,
-                            cleaner actions, and a dark ambient visual system that works well in both day and night settings.
+                            cleaner actions, and a bright interface designed for the day-to-day pace of hiring operations.
                         </p>
                         <div class="dashboard-meta">
                             <span class="dashboard-meta-pill">
@@ -1248,7 +1670,7 @@ footer section:last-child {
                                             {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
                                         {% endif %}
                                         <tr>
-                                            <td>
+                                            <td data-label="Applicant">
                                                 <div class="candidate-cell">
                                                     {% if application.applicant.profile_image %}
                                                         <img
@@ -1271,15 +1693,15 @@ footer section:last-child {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td data-label="Position">
                                                 <div class="candidate-name">{{ application.job.title }}</div>
                                                 <div class="job-meta">{{ application.job.department }}</div>
                                             </td>
-                                            <td>
+                                            <td data-label="Applied">
                                                 <div class="candidate-name">{{ application.application_date.strftime('%b %d, %Y') }}</div>
                                                 <div class="job-meta">{{ application.application_date.strftime('%I:%M %p') }}</div>
                                             </td>
-                                            <td>
+                                            <td data-label="Status">
                                                 {% set status_text = application.status_display %}
                                                 <span class="status-pill
                                                     {% if status_text == 'Accepted' %}status-pill--accepted
@@ -1290,7 +1712,7 @@ footer section:last-child {
                                                     {{ status_text }}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label="Match Score">
                                                 <div class="score-wrap">
                                                     {% if match %}
                                                         {% set score = (match.match_score * 100)|int %}

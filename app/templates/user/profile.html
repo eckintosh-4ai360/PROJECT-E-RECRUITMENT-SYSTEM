@@ -82,7 +82,7 @@
 
                 {% if resumes %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle table-stack-sm">
                             <thead>
                                 <tr>
                                     <th>Filename</th>
@@ -94,16 +94,16 @@
                             <tbody>
                                 {% for resume in resumes %}
                                     <tr>
-                                        <td>{{ resume.original_filename }}</td>
-                                        <td>{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                        <td>
+                                        <td data-label="Filename">{{ resume.original_filename }}</td>
+                                        <td data-label="Uploaded">{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td data-label="Primary">
                                             {% if resume.is_primary %}
                                                 <span class="badge bg-success">Primary</span>
                                             {% else %}
                                                 <span class="text-secondary small">Standard</span>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td data-label="Actions">
                                             <div class="d-flex flex-wrap gap-2">
                                                 <a href="{{ url_for('main.resume_analysis', resume_id=resume.resume_id) }}" class="btn btn-outline-primary btn-sm">
                                                     <i class="bi bi-graph-up me-1"></i>View
@@ -144,7 +144,7 @@
 
                 {% if matches %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle table-stack-sm">
                             <thead>
                                 <tr>
                                     <th>Position</th>
@@ -155,17 +155,17 @@
                             <tbody>
                                 {% for match in matches %}
                                     <tr>
-                                        <td>
+                                        <td data-label="Position">
                                             <div>{{ match.job.title }}</div>
                                             <small class="text-secondary">{{ match.resume.original_filename }}</small>
                                         </td>
-                                        <td style="min-width: 180px;">
+                                        <td data-label="Match" style="min-width: 180px;">
                                             <div class="progress">
                                                 <div class="progress-bar {% if match.match_score >= 0.7 %}bg-success{% elif match.match_score >= 0.4 %}bg-warning{% else %}bg-secondary{% endif %}" role="progressbar" style="width: {{ match.match_score * 100 }}%"></div>
                                             </div>
                                             <small class="text-secondary d-block mt-2">{{ "%.0f"|format(match.match_score * 100) }}% match</small>
                                         </td>
-                                        <td>
+                                        <td data-label="Action">
                                             <a href="{{ url_for('main.view_job_detail', job_id=match.job.job_id) }}" class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-eye me-1"></i>View
                                             </a>

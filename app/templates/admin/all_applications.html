@@ -59,7 +59,7 @@
     <section class="card surface-card--padded">
         {% if applications %}
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle table-stack-sm">
                     <thead>
                         <tr>
                             <th>Applicant</th>
@@ -78,7 +78,7 @@
                                 {% set match = application.resume.matches|selectattr('job_id', 'equalto', application.job.job_id)|first %}
                             {% endif %}
                             <tr>
-                                <td>
+                                <td data-label="Applicant">
                                     <div class="d-flex align-items-center gap-3">
                                         {% if application.applicant.profile_image %}
                                             <img src="{{ url_for('static', filename='profile_images/' + application.applicant.profile_image) }}" class="candidate-avatar rounded-circle" width="40" height="40" alt="{{ application.applicant.first_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
@@ -92,15 +92,15 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><a href="{{ url_for('main.view_job_detail', job_id=application.job.job_id) }}">{{ application.job.title }}</a></td>
-                                <td>{{ application.job.department }}</td>
-                                <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
-                                <td>
+                                <td data-label="Position"><a href="{{ url_for('main.view_job_detail', job_id=application.job.job_id) }}">{{ application.job.title }}</a></td>
+                                <td data-label="Department">{{ application.job.department }}</td>
+                                <td data-label="Applied">{{ application.application_date.strftime('%Y-%m-%d') }}</td>
+                                <td data-label="Status">
                                     <span class="badge bg-{{ 'success' if application.status == ApplicationStatus.accepted else 'warning' if application.status == ApplicationStatus.under_review else 'info' if application.status == ApplicationStatus.submitted else 'danger' if application.status == ApplicationStatus.rejected else 'secondary' }}">
                                         {{ application.status.value }}
                                     </span>
                                 </td>
-                                <td style="min-width: 140px;">
+                                <td data-label="Match" style="min-width: 140px;">
                                     {% if match %}
                                         <div class="progress">
                                             <div class="progress-bar {% if match.match_score >= 0.7 %}bg-success{% elif match.match_score >= 0.5 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ (match.match_score * 100)|int }}%"></div>
@@ -110,7 +110,7 @@
                                         <small class="text-secondary">No match yet</small>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <div class="d-flex flex-wrap gap-2">
                                         <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" class="btn btn-outline-primary btn-sm" title="View Details">
                                             <i class="bi bi-eye"></i>

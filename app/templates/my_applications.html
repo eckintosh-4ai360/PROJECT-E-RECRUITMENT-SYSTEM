@@ -10,7 +10,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-stack-sm">
                             <thead>
                                 <tr>
                                     <th>Job Title</th>
@@ -24,15 +24,15 @@
                             <tbody>
                                 {% for application in applications.items %}
                                 <tr>
-                                    <td>
+                                    <td data-label="Job Title">
                                         <a href="{{ url_for('main.view_job_detail', job_id=application.job.job_id) }}" 
                                            class="text-decoration-none">
                                             {{ application.job.title }}
                                         </a>
                                     </td>
-                                    <td>{{ application.job.department }}</td>
-                                    <td>{{ application.application_date.strftime('%Y-%m-%d') }}</td>
-                                    <td>
+                                    <td data-label="Department">{{ application.job.department }}</td>
+                                    <td data-label="Applied Date">{{ application.application_date.strftime('%Y-%m-%d') }}</td>
+                                    <td data-label="Status">
                                         <span class="badge bg-{{ 'success' if application.status.value in ['offer_accepted'] 
                                                             else 'danger' if application.status.value in ['rejected', 'withdrawn']
                                                             else 'warning' if application.status.value in ['submitted', 'under_review']
@@ -40,14 +40,14 @@
                                             {{ application.status.value|replace('_', ' ')|title }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Last Updated">
                                         {% if application.last_updated %}
                                             {{ application.last_updated.strftime('%Y-%m-%d %H:%M') }}
                                         {% else %}
                                             {{ application.application_date.strftime('%Y-%m-%d %H:%M') }}
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td data-label="Actions">
                                         <a href="{{ url_for('main.view_application', application_id=application.application_id) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-eye"></i> View Details

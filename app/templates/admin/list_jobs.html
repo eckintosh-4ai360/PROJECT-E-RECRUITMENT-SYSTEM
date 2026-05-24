@@ -23,7 +23,7 @@
     <section class="card surface-card--padded">
         {% if jobs %}
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle table-stack-sm">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -37,12 +37,12 @@
                     <tbody>
                         {% for job in jobs %}
                             <tr>
-                                <td><a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}">{{ job.title }}</a></td>
-                                <td>{{ job.department }}</td>
-                                <td><span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status|title }}</span></td>
-                                <td>{{ job.posted_date.strftime('%Y-%m-%d') }}</td>
-                                <td>{{ job.closing_date.strftime('%Y-%m-%d') if job.closing_date else 'N/A' }}</td>
-                                <td>
+                                <td data-label="Title"><a href="{{ url_for('main.view_job_detail', job_id=job.job_id) }}">{{ job.title }}</a></td>
+                                <td data-label="Department">{{ job.department }}</td>
+                                <td data-label="Status"><span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">{{ job.status|title }}</span></td>
+                                <td data-label="Posted">{{ job.posted_date.strftime('%Y-%m-%d') }}</td>
+                                <td data-label="Closing">{{ job.closing_date.strftime('%Y-%m-%d') if job.closing_date else 'N/A' }}</td>
+                                <td data-label="Actions">
                                     <div class="d-flex flex-wrap gap-2">
                                         <a href="{{ url_for('main.edit_job', job_id=job.job_id) }}" class="btn btn-outline-warning btn-sm">
                                             <i class="bi bi-pencil-square me-1"></i>Edit

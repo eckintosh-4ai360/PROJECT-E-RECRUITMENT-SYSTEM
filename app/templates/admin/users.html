@@ -19,7 +19,7 @@
 
     <section class="card surface-card--padded">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle table-stack-sm">
                 <thead>
                     <tr>
                         <th>Profile</th>
@@ -34,7 +34,7 @@
                 <tbody>
                     {% for user in users %}
                         <tr>
-                            <td>
+                            <td data-label="Profile">
                                 {% if user.profile_image %}
                                     <img src="{{ user.profile_image_url }}" class="candidate-avatar rounded-circle" width="38" height="38" alt="{{ user.username }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
                                     <span class="candidate-placeholder rounded-circle" style="display: none; width: 38px; height: 38px;">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
@@ -42,12 +42,12 @@
                                     <span class="candidate-placeholder rounded-circle" style="width: 38px; height: 38px;">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
                                 {% endif %}
                             </td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.first_name }} {{ user.last_name }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
-                            <td><span class="badge {% if user.role.value == 'admin' %}bg-success{% else %}bg-secondary{% endif %}">{{ user.role.value|title }}</span></td>
-                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td data-label="Username">{{ user.username }}</td>
+                            <td data-label="Full Name">{{ user.first_name }} {{ user.last_name }}</td>
+                            <td data-label="Email">{{ user.email }}</td>
+                            <td data-label="Phone Number">{{ user.candidate_profile.phone_number if user.candidate_profile else 'N/A' }}</td>
+                            <td data-label="Role"><span class="badge {% if user.role.value == 'admin' %}bg-success{% else %}bg-secondary{% endif %}">{{ user.role.value|title }}</span></td>
+                            <td data-label="Joined">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
