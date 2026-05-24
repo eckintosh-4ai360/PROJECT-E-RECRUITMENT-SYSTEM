@@ -11,36 +11,43 @@ logger = logging.getLogger(__name__)
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., johndoe"
+        })
     email = StringField("Email", validators=[DataRequired(), Email()], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., john.doe@example.com"
+        })
     first_name = StringField("First Name", validators=[DataRequired()], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., John"
+        })
     last_name = StringField("Last Name", validators=[DataRequired()], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., Doe"
+        })
     phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., +233 24 123 4567"
+        })
     profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')], 
     render_kw={
             "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+        })
     password = PasswordField("Password", validators=[DataRequired(), Length(min=6)], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "Create a secure password"
+        })
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")], 
     render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px;  color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px;  color: green",
+            "placeholder": "Confirm your password"
+        })
     submit = SubmitField(Markup('<i class="bi bi-person-plus me-1"></i> Register'))
 
     def validate_username(self, username):
@@ -54,11 +61,11 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("That email is already in use. Please choose a different one.")
 
 class ProfileEditForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)])
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    first_name = StringField("First Name", validators=[DataRequired()])
-    last_name = StringField("Last Name", validators=[DataRequired()])
-    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)])
+    username = StringField("Username", validators=[DataRequired(), Length(min=4, max=25)], render_kw={"placeholder": "e.g., johndoe"})
+    email = StringField("Email", validators=[DataRequired(), Email()], render_kw={"placeholder": "e.g., john.doe@example.com"})
+    first_name = StringField("First Name", validators=[DataRequired()], render_kw={"placeholder": "e.g., John"})
+    last_name = StringField("Last Name", validators=[DataRequired()], render_kw={"placeholder": "e.g., Doe"})
+    phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=15)], render_kw={"placeholder": "e.g., +233 24 123 4567"})
     profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
     submit = SubmitField('Save Changes')
 
@@ -82,13 +89,15 @@ class ProfileEditForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()], 
             render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,}
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "e.g., john.doe@example.com"
+        }
  )
     password = PasswordField("Password", validators=[DataRequired()], 
             render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "Enter your password"
+        })
     remember_me = BooleanField("Remember Me", )
     submit = SubmitField("Sign In")
 
@@ -122,14 +131,14 @@ class ResumeUploadForm(FlaskForm):
     is_primary = BooleanField("Set as primary resume")
 
 class JobForm(FlaskForm):
-    title = StringField("Job Title", validators=[DataRequired()])
-    department = StringField("Department", validators=[DataRequired()])
-    description = TextAreaField("Job Description", validators=[DataRequired()])
-    required_skills = TextAreaField("Required Skills", validators=[DataRequired()])
-    location = StringField("Location", validators=[DataRequired()])
-    salary_range = StringField("Salary Range")
+    title = StringField("Job Title", validators=[DataRequired()], render_kw={"placeholder": "e.g., Senior Software Engineer"})
+    department = StringField("Department", validators=[DataRequired()], render_kw={"placeholder": "e.g., Computer Science / IT"})
+    description = TextAreaField("Job Description", validators=[DataRequired()], render_kw={"placeholder": "Describe the responsibilities, role expectations, and daily tasks..."})
+    required_skills = TextAreaField("Required Skills", validators=[DataRequired()], render_kw={"placeholder": "e.g., Python, Flask, SQL, Git, AWS (one per line or comma-separated)"})
+    location = StringField("Location", validators=[DataRequired()], render_kw={"placeholder": "e.g., Tarkwa, Ghana or Remote"})
+    salary_range = StringField("Salary Range", render_kw={"placeholder": "e.g., GHS 5,000 - 8,000 per month"})
     status = SelectField("Status", choices=[("open", "Open"), ("closed", "Closed")], validators=[DataRequired()])
-    closing_date = DateField("Closing Date", format="%Y-%m-%d", validators=[DataRequired()])
+    closing_date = DateField("Closing Date", format="%Y-%m-%d", validators=[DataRequired()], render_kw={"placeholder": "YYYY-MM-DD"})
     submit = SubmitField("Submit Job Posting")
 
 class ApplicationForm(FlaskForm):
@@ -150,7 +159,7 @@ class ApplicationForm(FlaskForm):
 
 class InterviewForm(FlaskForm):
     interview_date = DateField('Interview Date', format='%Y-%m-%d', validators=[DataRequired()])
-    interview_time = StringField('Interview Time (HH:MM)', validators=[DataRequired()])
+    interview_time = StringField('Interview Time (HH:MM)', validators=[DataRequired()], render_kw={"placeholder": "e.g., 10:00 AM or 14:30"})
     interview_level = SelectField('Interview Level', choices=[
         ('department', 'Department Level'),
         ('faculty', 'Faculty Level'),
@@ -161,9 +170,9 @@ class InterviewForm(FlaskForm):
         ('phone', 'Phone Interview'),
         ('in-person', 'In-Person Interview')
     ], validators=[DataRequired()])
-    location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()])
+    location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()], render_kw={"placeholder": "e.g., Google Meet Link or Room 402, Main Block"})
     interviewer = SelectField('Interviewer', coerce=int, validators=[DataRequired()])
-    notes = TextAreaField('Additional Notes')
+    notes = TextAreaField('Additional Notes', render_kw={"placeholder": "e.g., Remind the candidate to prepare a 10-minute presentation."})
     submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
 
     def __init__(self, *args, **kwargs):
@@ -176,15 +185,17 @@ class InterviewForm(FlaskForm):
 class EventForm(FlaskForm):
     title = StringField('Event Title', validators=[DataRequired(), Length(max=255)], 
                          render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "Enter event title"
+        })
     description = TextAreaField('Event Description', validators=[DataRequired()], 
                               render_kw={"rows": 5, "placeholder": "Describe the event details...", 
                                          "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"})
     event_date = DateTimeField('Event Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()],
                                 render_kw={
-            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"
-        ,})
+            "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
+            "placeholder": "YYYY-MM-DD HH:MM"
+        })
     location = StringField('Event Location', validators=[Optional(), Length(max=255)],
                          render_kw={"placeholder": "Enter event location or 'Online'", 
                                     "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"})

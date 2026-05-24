@@ -1056,14 +1056,15 @@ def email_settings():
     """Configure email settings for the application."""
     # Create a simple form to update email settings
     class EmailSettingsForm(FlaskForm):
-        mail_server = StringField("SMTP Server", validators=[DataRequired()])
-        mail_port = StringField("SMTP Port", validators=[DataRequired()])
+        mail_server = StringField("SMTP Server", validators=[DataRequired()], render_kw={"placeholder": "e.g., smtp.gmail.com"})
+        mail_port = StringField("SMTP Port", validators=[DataRequired()], render_kw={"placeholder": "e.g., 587 or 465"})
         mail_use_tls = BooleanField("Use TLS")
-        mail_username = StringField("Email Username", validators=[DataRequired(), Email()])
-        mail_password = PasswordField("Email Password", validators=[DataRequired()])
-        mail_default_sender = StringField("Default Sender", validators=[DataRequired(), Email()])
+        mail_username = StringField("Email Username", validators=[DataRequired(), Email()], render_kw={"placeholder": "e.g., registrar@umat.edu.gh"})
+        mail_password = PasswordField("Email Password", validators=[DataRequired()], render_kw={"placeholder": "Enter SMTP app password"})
+        mail_default_sender = StringField("Default Sender", validators=[DataRequired(), Email()], render_kw={"placeholder": "e.g., registrar@umat.edu.gh"})
         test_recipient = StringField("Test Email Address", validators=[Email()], 
-                                    description="Enter an email address to receive a test message")
+                                    description="Enter an email address to receive a test message",
+                                    render_kw={"placeholder": "e.g., test@example.com"})
         submit = SubmitField("Save Settings")
         test_email = SubmitField("Send Test Email")
     
