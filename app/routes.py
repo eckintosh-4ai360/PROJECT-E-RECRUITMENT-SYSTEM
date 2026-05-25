@@ -1248,6 +1248,7 @@ def edit_event(event_id):
     """Edit an existing event."""
     event = Event.query.get_or_404(event_id)
     form = EventForm(obj=event)
+    form.submit.label.text = "Update Event"
     
     if form.validate_on_submit():
         try:

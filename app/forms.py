@@ -173,7 +173,7 @@ class InterviewForm(FlaskForm):
     location_or_link = StringField('Location or Meeting Link', validators=[DataRequired()], render_kw={"placeholder": "e.g., Google Meet Link or Room 402, Main Block"})
     interviewer = SelectField('Interviewer', coerce=int, validators=[DataRequired()])
     notes = TextAreaField('Additional Notes', render_kw={"placeholder": "e.g., Remind the candidate to prepare a 10-minute presentation."})
-    submit = SubmitField(Markup('<i class="bi bi-calendar-check me-1"></i> Schedule Interview'))
+    submit = SubmitField('Schedule Interview')
 
     def __init__(self, *args, **kwargs):
         super(InterviewForm, self).__init__(*args, **kwargs)
@@ -191,10 +191,10 @@ class EventForm(FlaskForm):
     description = TextAreaField('Event Description', validators=[DataRequired()], 
                               render_kw={"rows": 5, "placeholder": "Describe the event details...", 
                                          "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green"})
-    event_date = DateTimeField('Event Date & Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()],
+    event_date = DateTimeField('Event Date & Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()],
                                 render_kw={
             "style": "border: 1px solid #22c55e; border-radius: 4px; padding: 8px; color: green",
-            "placeholder": "YYYY-MM-DD HH:MM"
+            "type": "datetime-local"
         })
     location = StringField('Event Location', validators=[Optional(), Length(max=255)],
                          render_kw={"placeholder": "Enter event location or 'Online'", 
