@@ -21,7 +21,7 @@ A Flask-based recruitment platform for the University of Mines and Technology (U
 ## Built With
 
 - **Backend:** Python, Flask
-- **Database:** SQLite (via Flask-SQLAlchemy)
+- **Database:** PostgreSQL on Neon via `DATABASE_URL` (SQLite fallback for local-only use if no database URL is set)
 - **Frontend:** HTML5, CSS3, Bootstrap 5, Jinja2
 - **AI/NLP:** Groq API (Llama-3.3-70b-versatile), spaCy, NLTK
 - **Document Parsing:** pdfminer.six, python-docx
@@ -100,7 +100,7 @@ The current AI layer is built around the app's real data rather than free-form c
 
 - **Backend:** Python, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, Flask-Mail
 - **Frontend:** Jinja2 templates, Bootstrap 5, custom CSS
-- **Database:** SQLite
+- **Database:** PostgreSQL (Neon) via `DATABASE_URL`
 - **AI/NLP:** Groq API, spaCy, NLTK, scikit-learn, sentence-transformers
 - **Document parsing:** pdfminer.six, python-docx, PyPDF2
 
@@ -171,6 +171,7 @@ At minimum, add your Groq API key:
 
 ```env
 SECRET_KEY=change-this-in-production
+DATABASE_URL=postgresql://username:password@your-neon-pooler-host/neondb?sslmode=require&channel_binding=require
 GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
@@ -202,10 +203,25 @@ http://127.0.0.1:5000
 
 On first run, the app will:
 
-- create the SQLite database if needed
+- connect to the configured database from `DATABASE_URL` and create required tables if they do not already exist
 - create required tables
 - create a default admin account if one does not already exist
 - create a sample open job if missing
+
+## Migrating Existing SQLite Data To Neon
+
+If you already have local data in `app.db` and want to move it into Neon, run:
+
+```bash
+python migrate_sqlite_to_neon.py
+```
+
+The script will:
+
+- create the PostgreSQL tables in Neon if they do not already exist
+- copy data from the local SQLite database into Neon
+- preserve primary keys and reset PostgreSQL sequences
+- ensure the default admin account exists after the migration
 
 ## Default Admin Account
 
@@ -236,7 +252,9 @@ Uploaded files are stored locally:
 
 ## Notes For Development
 
-- the app uses SQLite by default
+- the app is now configured to use Neon/PostgreSQL when `DATABASE_URL` is present
+- for Render or any production host, use the Neon pooled connection string as `DATABASE_URL`
+- keep the unpooled Neon connection string only for direct SQL clients or one-off maintenance tasks
 - if Groq is unavailable, some assistant and analysis flows fall back to simpler responses
 - assistant interactions are saved in the database for traceability
 - the AI layer works best when resumes are parsed cleanly and jobs have clear skill requirements

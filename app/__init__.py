@@ -6,7 +6,6 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
-import pymysql # Ensure pymysql is imported if not automatically handled by SQLAlchemy
 from datetime import datetime, timezone # Import timezone
 from markupsafe import Markup
 import logging
@@ -18,10 +17,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     stream=sys.stdout
 )
-
-
-# Explicitly tell SQLAlchemy to use pymysql (though we switched to SQLite, keep for reference)
-# pymysql.install_as_MySQLdb()
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -69,15 +64,15 @@ def create_app(config_class=Config):
 
     # Create database tables if they don't exist
     with app.app_context():
-        # Check if the database file exists before creating tables
-        db_path = app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", "")
-        if not os.path.exists(db_path):
-             print(f"Database file not found at {db_path}. Creating tables...")
-             db.create_all()
+        database_uri = app.config["SQLALCHEMY_DATABASE_URI"]
+        if database_uri.startswith("sqlite:///"):
+            db_path = database_uri.replace("sqlite:///", "", 1)
+            if not os.path.exists(db_path):
+                print(f"Database file not found at {db_path}. Creating tables...")
         else:
-             # Optionally check if tables exist, but create_all is safe
-             # print("Database file found. Ensuring tables exist...")
-             db.create_all() # Safe to call even if tables exist
+            print("Using external database from DATABASE_URL. Ensuring tables exist...")
+
+        db.create_all()
 
     return app
 

@@ -5,15 +5,24 @@ from datetime import timedelta
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, ".env"))
 
+
+def _normalize_database_url(database_url):
+    if not database_url:
+        return None
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql://", 1)
+    return database_url
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") or "you-will-never-guess"
-    
-    # Switched to SQLite
-    # Define the path for the SQLite database file
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
+
+    SQLALCHEMY_DATABASE_URI = _normalize_database_url(os.environ.get("DATABASE_URL")) or \
         "sqlite:///" + os.path.join(basedir, "app.db")
-        
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+    }
     UPLOAD_FOLDER = os.path.join(basedir, "uploads") # For resume uploads
     ALLOWED_EXTENSIONS = {"pdf", "docx"}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
