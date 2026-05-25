@@ -55,23 +55,14 @@ class User(UserMixin, db.Model):
     applications = db.relationship("Application", backref="applicant", lazy=True)
 
     def set_password(self, password):
-        """Set the user's password using our custom SHA-256 hashing function."""
-        logger.info(f"===DEBUG=== Setting password for user {self.username}")
-        logger.info(f"===DEBUG=== Password length: {len(password)}")
+        """Set the user's password using the custom SHA-256 hashing function."""
         self.password_hash = generate_password_hash(password)
-        logger.info(f"===DEBUG=== Generated hash: {self.password_hash}")
 
     def check_password(self, password):
         """Check if the provided password matches the stored hash."""
-        logger.info(f"\n===DEBUG=== Checking password for user {self.username}")
-        logger.info(f"===DEBUG=== Input password length: {len(password)}")
-        logger.info(f"===DEBUG=== Stored hash: {self.password_hash}")
         if not self.password_hash:
-            logger.info("===DEBUG=== No password hash stored!")
             return False
-        result = check_password_hash(self.password_hash, password)
-        logger.info(f"===DEBUG=== Password check result: {result}")
-        return result
+        return check_password_hash(self.password_hash, password)
 
     def is_admin(self):
         logger.info(f"===DEBUG=== is_admin() called for {self.username}")

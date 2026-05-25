@@ -104,8 +104,8 @@ class LoginForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
         
-    def validate(self):
-        initial_validation = super(LoginForm, self).validate()
+    def validate(self, extra_validators=None):
+        initial_validation = super(LoginForm, self).validate(extra_validators=extra_validators)
         if not initial_validation:
             logger.info("===DEBUG=== Form validation failed")
             return False
@@ -149,8 +149,8 @@ class ApplicationForm(FlaskForm):
                                 validators=[Optional(), FileAllowed(['pdf', 'doc', 'docx'])])
     submit = SubmitField('Submit Application', render_kw={"class": "btn-primary", "data-icon": "bi-send"})
 
-    def validate(self):
-        if not super().validate():
+    def validate(self, extra_validators=None):
+        if not super().validate(extra_validators=extra_validators):
             return False
         if not self.cover_letter.data and not self.cover_letter_file.data:
             self.cover_letter.errors.append('Please provide a cover letter - either type it or upload a file.')

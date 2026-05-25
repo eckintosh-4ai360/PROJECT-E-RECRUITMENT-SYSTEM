@@ -4,12 +4,20 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 
 from app.models import Application, Job, Resume, UserRole
-from app.assistant_service import RecruitmentAssistantService
 
 
 logger = logging.getLogger(__name__)
 assistant_bp = Blueprint("assistant", __name__, url_prefix="/assistant")
-assistant_service = RecruitmentAssistantService()
+assistant_service = None
+
+
+def get_assistant_service():
+    global assistant_service
+    if assistant_service is None:
+        from app.assistant_service import RecruitmentAssistantService
+
+        assistant_service = RecruitmentAssistantService()
+    return assistant_service
 
 
 def _payload() -> dict:
@@ -32,6 +40,8 @@ def _json_error(message: str, status: int = 400):
 @assistant_bp.route("/candidate", methods=["POST"])
 @login_required
 def candidate_assistant():
+    assistant_service = get_assistant_service()
+
     if getattr(current_user.role, "value", current_user.role) != UserRole.candidate.value:
         return _json_error("Candidate assistant access is limited to candidate accounts.", 403)
 
@@ -119,6 +129,8 @@ def candidate_assistant():
 @assistant_bp.route("/admin", methods=["POST"])
 @login_required
 def admin_assistant():
+    assistant_service = get_assistant_service()
+
     if not current_user.is_admin():
         return _json_error("Admin assistant access is limited to administrators.", 403)
 
@@ -179,6 +191,8 @@ def admin_assistant():
 
 @assistant_bp.route("/portal", methods=["POST"])
 def portal_assistant():
+    assistant_service = get_assistant_service()
+
     data = _payload()
     question = (data.get("question") or "").strip()
     page_context = (data.get("page_context") or "").strip() or None

@@ -159,66 +159,42 @@ def save_uploaded_file(uploaded_file, directory):
 def generate_password_hash(password):
     """Generate a SHA-256 password hash compatible with Python 3.13."""
     try:
-        logger.info(f"===DEBUG=== Generating hash for password")
         salt = os.urandom(16)  # 16 bytes of random salt
         password_bytes = password.encode('utf-8')
-        logger.info(f"===DEBUG=== Password bytes: {password_bytes!r}")
-        logger.info(f"===DEBUG=== Salt bytes: {salt!r}")
         
         # Convert salt to hex
         salt_hex = salt.hex()
         
         # Create salted hash
         salted_hash = hashlib.sha256(salt + password_bytes).hexdigest()
-        logger.info(f"===DEBUG=== Generated hash: {salted_hash}")
         
         # Final format: salt_hex:hash_hex
-        final_hash = f"{salt_hex}:{salted_hash}"
-        logger.info(f"===DEBUG=== Final stored hash: {final_hash}")
-        return final_hash
+        return f"{salt_hex}:{salted_hash}"
     except Exception as e:
-        logger.error(f"===DEBUG=== Error generating password hash: {e}")
+        logger.error("Error generating password hash: %s", e)
         raise
 
 def check_password_hash(stored_hash, password):
     """Check a password against a SHA-256 hash."""
     try:
-        logger.info(f"\n===DEBUG=== Starting password verification")
-        logger.info(f"===DEBUG=== Checking password hash: {stored_hash}")
-        logger.info(f"===DEBUG=== Input password length: {len(password)}")
-        
         # Parse the stored hash
         parts = stored_hash.split(':')
         if len(parts) != 2:
-            logger.info(f"===DEBUG=== Invalid hash format, got {len(parts)} parts instead of 2")
-            logger.info(f"===DEBUG=== Hash parts: {parts}")
             return False
             
         salt_hex, hash_value = parts
         
         # Convert salt from hex back to bytes
         salt = bytes.fromhex(salt_hex)
-        logger.info(f"===DEBUG=== Decoded salt: {salt!r}")
         
         # Create the hash with the same salt
         password_bytes = password.encode('utf-8')
-        logger.info(f"===DEBUG=== Password bytes: {password_bytes!r}")
         
         # Create the combined bytes
         combined = salt + password_bytes
-        logger.info(f"===DEBUG=== Combined bytes to hash: {combined!r}")
-        
         calculated_hash = hashlib.sha256(combined).hexdigest()
-        logger.info(f"===DEBUG=== Calculated hash: {calculated_hash}")
-        logger.info(f"===DEBUG=== Expected hash:  {hash_value}")
-        
-        result = calculated_hash == hash_value
-        logger.info(f"===DEBUG=== Hash match: {result}")
-        return result
+        return calculated_hash == hash_value
     except Exception as e:
-        logger.error(f"===DEBUG=== Error checking password hash: {e}")
-        logger.error(f"===DEBUG=== Exception type: {type(e)}")
-        import traceback
-        logger.error(traceback.format_exc())
+        logger.error("Error checking password hash: %s", e, exc_info=True)
         return False
 

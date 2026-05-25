@@ -9,8 +9,6 @@ from functools import wraps
 import os
 from werkzeug.utils import secure_filename
 from app.utils import parse_resume, save_profile_image, send_email, show_pdf
-from app.ai_analyzer import analyze_resume_and_match
-from app.resume_analyzer import ResumeAnalyzer
 import logging
 from app.models import UserRole
 from app.courses import course_recommender, ds_course, web_course, android_course, ios_course, uiux_course
@@ -71,7 +69,10 @@ def upload_resume():
                 # Enhanced AI Analysis
                 try:
                     logger.info(f"Starting enhanced analysis for resume {new_resume.resume_id}")
-                    
+
+                    from app.ai_analyzer import analyze_resume_and_match
+                    from app.resume_analyzer import ResumeAnalyzer
+
                     # Initialize analyzers
                     resume_analyzer = ResumeAnalyzer()
                     
@@ -597,6 +598,8 @@ def resume_analysis(resume_id):
         return redirect(url_for("main.user_profile"))
     
     try:
+        from app.resume_analyzer import ResumeAnalyzer
+
         # Initialize analyzers
         resume_analyzer = ResumeAnalyzer()
         
