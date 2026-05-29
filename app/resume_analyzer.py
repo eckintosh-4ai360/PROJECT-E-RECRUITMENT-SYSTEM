@@ -22,7 +22,7 @@ GROQ_MODEL   = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")  # fallback to
 if not GROQ_API_KEY:
     logger.warning("GROQ_API_KEY is not set. Resume analysis via Groq will fall back to keyword scan.")
 
-_groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+_groq_client = Groq(api_key=GROQ_API_KEY, timeout=8.0, max_retries=0) if GROQ_API_KEY else None
 
 
 ANALYSIS_PROMPT = """You are an expert resume analyst. Analyse the resume text below and return ONLY a valid JSON object – no markdown, no explanation.

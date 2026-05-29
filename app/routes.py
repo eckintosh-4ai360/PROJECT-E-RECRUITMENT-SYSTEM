@@ -70,11 +70,7 @@ def upload_resume():
                 try:
                     logger.info(f"Starting enhanced analysis for resume {new_resume.resume_id}")
 
-                    from app.ai_analyzer import analyze_resume_and_match
-                    from app.resume_analyzer import ResumeAnalyzer
-
-                    # Initialize analyzers
-                    resume_analyzer = ResumeAnalyzer()
+                    from app.lightweight_matcher import analyze_resume_and_match
                     
                     # Get open jobs
                     jobs_to_analyze = Job.query.filter_by(status="open").all()
@@ -97,7 +93,9 @@ def upload_resume():
                     if semantic_matching_enabled:
                         try:
                             from app.semantic_job_matcher import enhanced_job_matching
+                            from app.resume_analyzer import ResumeAnalyzer
 
+                            resume_analyzer = ResumeAnalyzer()
                             analysis = resume_analyzer.analyze_resume(parsed_text)
                             matches = enhanced_job_matching(
                                 resume_text=parsed_text,
@@ -601,7 +599,7 @@ def resume_analysis(resume_id):
             return redirect(url_for("main.user_profile"))
 
         from app.resume_analyzer import ResumeAnalyzer
-        from app.ai_analyzer import analyze_resume_and_match
+        from app.lightweight_matcher import analyze_resume_and_match
 
         # Initialize analyzers
         resume_analyzer = ResumeAnalyzer()
