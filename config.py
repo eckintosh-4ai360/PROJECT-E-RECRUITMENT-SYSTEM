@@ -1,4 +1,5 @@
 import os
+import tempfile
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -23,13 +24,13 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
     }
-    UPLOAD_FOLDER = os.path.join(basedir, "uploads") # For resume uploads
+    _default_upload_folder = os.path.join(basedir, "uploads")
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        _default_upload_folder = os.path.join(tempfile.gettempdir(), "project-e-recruitment-system", "uploads")
+
+    UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", _default_upload_folder) # For resume uploads
     ALLOWED_EXTENSIONS = {"pdf", "docx"}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
-
-    # Ensure the upload folder exists
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
 
     # Session configuration
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
@@ -44,6 +45,7 @@ class Config:
 
     # AI configuration
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    ENABLE_SEMANTIC_MATCHING = os.environ.get("ENABLE_SEMANTIC_MATCHING", "false").lower() in ["true", "on", "1"]
 
     @staticmethod
     def init_app(app):

@@ -91,33 +91,35 @@ def upload_resume():
                         "requirements": getattr(job, 'requirements', '')  # Use getattr with default empty string
                     } for job in jobs_to_analyze]
                     
-                    # Try enhanced semantic job matching first
-                    try:
-                        from app.semantic_job_matcher import enhanced_job_matching
-                        
-                        # Perform resume analysis
-                        analysis = resume_analyzer.analyze_resume(parsed_text)
-                        
-                        # Generate job matches with enhanced algorithm
-                        matches = enhanced_job_matching(
-                            resume_text=parsed_text,
-                            resume_analysis=analysis,
-                            jobs_data=jobs_data
-                        )
-                        
-                        logger.info(f"Enhanced semantic job matching completed for resume {new_resume.resume_id}")
-                        
-                    except ImportError:
-                        # Fall back to basic matching
-                        logger.warning("Enhanced job matching not available, using basic algorithm")
-                        
-                        # Perform analysis with basic algorithm
-                    analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
-                    
-                    if not analysis_results:
-                        flash("Resume uploaded, but analysis could not be completed.", "warning")
-                        return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
-                            
+                    matches = []
+                    semantic_matching_enabled = current_app.config.get("ENABLE_SEMANTIC_MATCHING", False)
+
+                    if semantic_matching_enabled:
+                        try:
+                            from app.semantic_job_matcher import enhanced_job_matching
+
+                            analysis = resume_analyzer.analyze_resume(parsed_text)
+                            matches = enhanced_job_matching(
+                                resume_text=parsed_text,
+                                resume_analysis=analysis,
+                                jobs_data=jobs_data
+                            )
+                            logger.info(f"Enhanced semantic job matching completed for resume {new_resume.resume_id}")
+
+                        except Exception as semantic_err:
+                            logger.warning(
+                                "Enhanced semantic job matching failed; using basic matching: %s",
+                                semantic_err,
+                                exc_info=True
+                            )
+
+                    if not matches:
+                        analysis_results = analyze_resume_and_match(new_resume.resume_id, parsed_text, jobs_data)
+
+                        if not analysis_results:
+                            flash("Resume uploaded, but analysis could not be completed.", "warning")
+                            return redirect(url_for("main.resume_analysis", resume_id=new_resume.resume_id))
+
                         matches = analysis_results.get("matches", [])
                     
                     # Delete old matches

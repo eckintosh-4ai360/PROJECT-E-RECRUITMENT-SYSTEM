@@ -1,7 +1,5 @@
 # app/ai_analyzer.py - Improved version with better debugging
-import spacy
 import nltk
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
@@ -10,57 +8,73 @@ import os
 import json
 from collections import defaultdict
 
+try:
+    import spacy
+except ImportError:
+    spacy = None
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Download required NLTK data
-try:
-    nltk.download('punkt', quiet=True)
-    nltk.download('stopwords', quiet=True)
-    nltk.download('wordnet', quiet=True)
-    nltk.download('averaged_perceptron_tagger', quiet=True)
-    nltk.download('punkt_tab', quiet=True)
-    nltk.download('maxent_ne_chunker', quiet=True)
-    nltk.download('words', quiet=True)
-except Exception as e:
-    logging.error(f"Failed to download NLTK data: {e}")
-
 def download_nltk_data():
-    """Checks for required NLTK data and downloads if missing."""
-    required_data = ["wordnet", "stopwords", "punkt", "averaged_perceptron_tagger", "punkt_tab"]
+    """Checks for optional NLTK data without downloading during web requests."""
+    required_data = {
+        "wordnet": "corpora/wordnet",
+        "stopwords": "corpora/stopwords",
+        "punkt": "tokenizers/punkt",
+        "averaged_perceptron_tagger": "taggers/averaged_perceptron_tagger",
+        "punkt_tab": "tokenizers/punkt_tab",
+    }
     nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
     if nltk_data_path not in nltk.data.path:
         nltk.data.path.append(nltk_data_path)
         logger.info(f"Added {nltk_data_path} to NLTK data path.")
 
     all_found = True
-    for resource in required_data:
+    for resource, lookup_path in required_data.items():
         try:
-            nltk.download(resource, quiet=True)
-            logger.info(f"NLTK resource '{resource}' downloaded/verified.")
-        except Exception as e:
-            logger.error(f"Failed to download NLTK resource '{resource}': {e}")
+            nltk.data.find(lookup_path)
+            logger.info(f"NLTK resource '{resource}' found.")
+        except Exception:
+            logger.warning(f"NLTK resource '{resource}' is unavailable; fallback logic will be used.")
             all_found = False
     return all_found
 
 # Ensure NLTK data is available at import time
 if not download_nltk_data():
-    logger.error("Essential NLTK data could not be downloaded or found. AI features may be limited.")
+    logger.warning("Some NLTK data is unavailable. AI features will use built-in fallbacks where needed.")
 
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 # Load spaCy model
 try:
+    if spacy is None:
+        raise OSError("spaCy is not installed")
     nlp = spacy.load("en_core_web_sm")
     logger.info("spaCy model 'en_core_web_sm' loaded successfully.")
 except OSError:
-    logger.error("spaCy model 'en_core_web_sm' not found. Please download it using: python -m spacy download en_core_web_sm")
+    logger.warning("spaCy is unavailable. Resume matching will continue with keyword and TF-IDF analysis.")
     nlp = None
 
-stop_words = set(stopwords.words("english"))
+try:
+    stop_words = set(stopwords.words("english"))
+except LookupError:
+    logger.warning("NLTK stopwords data is unavailable; using a small built-in fallback.")
+    stop_words = {
+        "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",
+        "has", "he", "in", "is", "it", "its", "of", "on", "that", "the",
+        "to", "was", "were", "will", "with"
+    }
+
 lemmatizer = WordNetLemmatizer()
+
+def _safe_lemmatize(word):
+    try:
+        return lemmatizer.lemmatize(word)
+    except LookupError:
+        return word
 
 # Skill taxonomy data
 SKILL_CATEGORIES = {
@@ -246,7 +260,7 @@ def preprocess_text(text):
         
         # Lemmatization and stopword removal
         lemmatized_tokens = [
-            lemmatizer.lemmatize(word) for word in tokens 
+            _safe_lemmatize(word) for word in tokens 
             if word not in stop_words and len(word) > 1 and word.isalpha()
         ]
         
