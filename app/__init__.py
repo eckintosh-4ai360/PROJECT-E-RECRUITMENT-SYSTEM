@@ -73,6 +73,8 @@ def create_app(config_class=Config):
             print("Using external database from DATABASE_URL. Ensuring tables exist...")
 
         db.create_all()
+        from app.schema_compat import ensure_schema_compatibility
+        ensure_schema_compatibility(db)
 
     return app
 

@@ -594,19 +594,21 @@ def delete_job(job_id):
 @bp.route("/resume/analysis/<int:resume_id>")
 @login_required
 def resume_analysis(resume_id):
-    resume = Resume.query.get_or_404(resume_id)
-    if resume.candidate_id != current_user.id and not current_user.is_admin():
-        flash("You do not have permission to view this resume analysis.", "danger")
-        return redirect(url_for("main.user_profile"))
-    
     try:
+        resume = Resume.query.get_or_404(resume_id)
+        if resume.candidate_id != current_user.id and not current_user.is_admin():
+            flash("You do not have permission to view this resume analysis.", "danger")
+            return redirect(url_for("main.user_profile"))
+
         from app.resume_analyzer import ResumeAnalyzer
+        from app.ai_analyzer import analyze_resume_and_match
 
         # Initialize analyzers
         resume_analyzer = ResumeAnalyzer()
+        resume_text = resume.parsed_text or ""
         
         # Perform resume analysis
-        analysis = resume_analyzer.analyze_resume(resume.parsed_text)
+        analysis = resume_analyzer.analyze_resume(resume_text)
         
         # Get all active jobs for matching
         active_jobs = Job.query.filter_by(status='open').all()
@@ -620,50 +622,67 @@ def resume_analysis(resume_id):
             for job in active_jobs
         ]
         
-        # Use enhanced semantic job matching
-        try:
-            from app.semantic_job_matcher import enhanced_job_matching
-            
-            # Generate job matches with enhanced algorithm
-            enhanced_matches = enhanced_job_matching(
-                resume_text=resume.parsed_text,
-                resume_analysis=analysis,
-                jobs_data=jobs_data
-            )
-            
-            # Update or create JobMatch records
-            for match in enhanced_matches:
-                job_id = match["job_id"]
-                match_score = match["match_score"]
-                match_details = match["match_details"]
-                
-                # Check if match record exists
-                existing_match = JobMatch.query.filter_by(
-                    resume_id=resume_id,
-                    job_id=job_id
-                ).first()
-                
-                if existing_match:
-                    # Update existing match
-                    existing_match.match_score = match_score
-                    existing_match.match_details = match_details
-                    existing_match.calculated_at = datetime.utcnow()
-                else:
-                    # Create new match record
-                    new_match = JobMatch(
+        matches_to_store = []
+        semantic_matching_enabled = current_app.config.get("ENABLE_SEMANTIC_MATCHING", False)
+
+        if semantic_matching_enabled and resume_text and jobs_data:
+            try:
+                from app.semantic_job_matcher import enhanced_job_matching
+
+                matches_to_store = enhanced_job_matching(
+                    resume_text=resume_text,
+                    resume_analysis=analysis,
+                    jobs_data=jobs_data
+                )
+                logger.info(f"Enhanced job matching completed for resume {resume_id}")
+
+            except Exception as semantic_err:
+                logger.warning(
+                    "Enhanced job matching failed for resume %s; using basic matching: %s",
+                    resume_id,
+                    semantic_err,
+                    exc_info=True
+                )
+
+        if not matches_to_store and resume_text and jobs_data:
+            analysis_results = analyze_resume_and_match(resume_id, resume_text, jobs_data)
+            if isinstance(analysis_results, dict):
+                matches_to_store = analysis_results.get("matches", [])
+
+        if matches_to_store:
+            try:
+                for match in matches_to_store:
+                    if match.get("match_score", 0) <= 0.05:
+                        continue
+
+                    job_id = match["job_id"]
+                    match_score = match["match_score"]
+                    match_details = match.get("match_details")
+
+                    existing_match = JobMatch.query.filter_by(
                         resume_id=resume_id,
-                        job_id=job_id,
-                        match_score=match_score,
-                        match_details=match_details
-                    )
-                    db.session.add(new_match)
-            
-            # Commit changes to database
-            db.session.commit()
-            logger.info(f"Enhanced job matching completed for resume {resume_id}")
-            
-        except ImportError:
-            logger.warning("Enhanced job matching not available, using existing matches")
+                        job_id=job_id
+                    ).first()
+
+                    if existing_match:
+                        existing_match.match_score = match_score
+                        existing_match.match_details = match_details
+                        existing_match.calculated_at = datetime.utcnow()
+                    else:
+                        new_match = JobMatch(
+                            resume_id=resume_id,
+                            job_id=job_id,
+                            match_score=match_score,
+                            match_details=match_details
+                        )
+                        db.session.add(new_match)
+
+                db.session.commit()
+                logger.info(f"Job matching records updated for resume {resume_id}")
+
+            except Exception as match_err:
+                db.session.rollback()
+                logger.warning("Could not update job matches for resume %s: %s", resume_id, match_err, exc_info=True)
             
         # Get job matches for this resume from database
         matches = (
@@ -675,7 +694,7 @@ def resume_analysis(resume_id):
         )
         
         # Get course recommendations based on resume content
-        recommended_courses = course_recommender(resume.parsed_text)
+        recommended_courses = course_recommender(resume_text)
         
         # Prepare course details
         course_details = {

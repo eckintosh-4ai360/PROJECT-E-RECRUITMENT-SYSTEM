@@ -25,7 +25,7 @@ class Config:
         "pool_pre_ping": True,
     }
     _default_upload_folder = os.path.join(basedir, "uploads")
-    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("RENDER"):
         _default_upload_folder = os.path.join(tempfile.gettempdir(), "project-e-recruitment-system", "uploads")
 
     UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", _default_upload_folder) # For resume uploads
